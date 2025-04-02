@@ -1,4 +1,4 @@
-"use config";
+"use client";
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck, Activity, TrendingUp } from "lucide-react";
