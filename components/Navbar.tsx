@@ -29,6 +29,7 @@ const Navbar = () => {
     await supabase.auth.signOut();
     setUser(null);
     setIsMenuOpen(false);
+    window.location.href = "/";
   };
 
   return (
