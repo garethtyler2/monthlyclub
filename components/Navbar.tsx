@@ -74,15 +74,9 @@ const Navbar = () => {
             </Button>
           ) : (
             <>
-              <Button
-                asChild
-                variant="ghost"
-                className="text-sm font-medium hover:text-white transition-colors"
-              >
-                <Link href="/login">Login</Link>
-              </Button>
+
               <Button className="ml-2 bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90">
-                <Link href="/signup" className="text-white">Sign Up</Link>
+                <Link href="/login" className="text-white">Access AI-Rehab</Link>
               </Button>
             </>
           )}
@@ -157,19 +151,12 @@ const Navbar = () => {
                 </Button>
               ) : (
                 <>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    className="justify-start px-2"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Link href="/login">Login</Link>
-                  </Button>
+
                   <Button
                     className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90 w-full"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <Link href="/signup" className="text-white">Sign Up</Link>
+                    <Link href="/login" className="text-white">Access AI-Rehab</Link>
                   </Button>
                 </>
               )}

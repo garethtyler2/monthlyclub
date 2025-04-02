@@ -48,9 +48,7 @@ const Hero = () => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button variant="outline" className="hero-button-secondary">
-              Learn More
-            </Button>
+
           </div>
 
           <div
