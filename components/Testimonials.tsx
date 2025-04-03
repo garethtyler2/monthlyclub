@@ -49,7 +49,7 @@ const testimonials = [
 
 const Testimonials = () => {
   return (
-    <section id="testimonials" className="py-16 md:py-24 relative">
+    <section id="testimonials" className="py-16 md:py-24 relative overflow-hidden">
       {/* Gradient background effect */}
       <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-brand-purple/20 rounded-full blur-[128px] -z-10" />
 
