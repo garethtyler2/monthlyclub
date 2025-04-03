@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+
 
 interface SearchBarProps {
   placeholder?: string;
@@ -34,8 +34,9 @@ const SearchBar = ({
     <form 
       onSubmit={handleSubmit} 
       className={cn(
-        "relative flex items-center w-full max-w-md",
+        "relative flex flex-col sm:flex-rowitems-center w-full max-w-md",
         className
+        
       )}
     >
       <div className="relative flex-1">
@@ -62,13 +63,7 @@ const SearchBar = ({
         )}
       </div>
       
-      <Button 
-        type="submit" 
-        size="sm"
-        className="ml-2 bg-gradient-to-r from-brand-purple to-brand-blue hover:opacity-90 rounded-xl"
-      >
-        Search
-      </Button>
+
     </form>
   );
 };

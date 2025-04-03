@@ -14,7 +14,7 @@ const SearchDemo = () => {
   };
 
   return (
-    <section className="py-12 relative">
+    <section className="pt-40 py-12 relative">
       {/* Gradient background effect */}
       <div className="absolute top-1/2 right-1/4 w-64 h-64 bg-brand-blue/10 rounded-full blur-[80px] -z-10" />
       
