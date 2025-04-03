@@ -1,10 +1,36 @@
+"use client";
 import SearchBarTemplate from "@/components/shared/SearchBarTemplate";
 import SEOContent from "@/components/shared/SEOContent";
+import { toast } from "@/hooks/use-toast";
 
 export default function PrehabSearchPage() {
+  const handleSearch = (query: string) => {
+    toast({
+      title: "Searching for body part",
+      description: `You entered: "${query}"`,
+    });
+    console.log("Searching for:", query);
+    // You can also add routing logic here later
+  };
+
   return (
     <>
-      <SearchBarTemplate />
+      <SearchBarTemplate
+        titleStart="Prehab"
+        titleHighlight="Build Resilience, Prevent Injuries, and Optimize Recovery"
+        placeholderList={[
+          "Knee Replacement",
+          "ACL Reconstruction",
+          "Rotator Cuff Surgery",
+          "Hip Replacement",
+          "Spinal Fusion",
+          "Achilles Tendon Repair",
+        ]}
+        description="Tip: Search for specific conditions, surgeries, or goals."
+        onSearch={handleSearch}
+      />
+
+
 
       <SEOContent
         titleStart="What Is Prehab?"
