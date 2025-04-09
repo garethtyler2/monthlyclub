@@ -57,12 +57,16 @@ const Navbar = () => {
           <Link href="/personal_training" className="text-sm font-medium hover:text-white transition-colors">
             Personal Training
           </Link>
-          <Link href="/dashboard" className="text-sm font-medium hover:text-white transition-colors">
-            Dashboard
-          </Link>
+
           <Link href="/insights" className="text-sm font-medium hover:text-white transition-colors">
             Insights
           </Link>
+          {user && (
+            <Button className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90">
+                <Link href="/dashboard" className="text-white">Dashboard</Link>
+            </Button>
+            )}
+
 
           {user ? (
             <Button
@@ -124,13 +128,12 @@ const Navbar = () => {
             >
               Personal Training
             </Link>
-            <Link
-              href="/dashboard"
-              className="text-sm font-medium hover:text-white transition-colors p-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Dashboard
-            </Link>
+            {user && (
+                <Button className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90">
+                    <Link href="/dashboard" className="text-white">Dashboard</Link>
+                </Button>
+                )}
+
             <Link
               href="/insights"
               className="text-sm font-medium hover:text-white transition-colors p-2"
