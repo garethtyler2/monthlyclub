@@ -48,7 +48,7 @@ const Navbar = () => {
           <Link href="/prehab_search" className="text-sm font-medium hover:text-white transition-colors">
             Prehab
           </Link>
-          <Link href="/injury-diagnosis" className="text-sm font-medium hover:text-white transition-colors">
+          <Link href="/injury_diagnosis" className="text-sm font-medium hover:text-white transition-colors">
             Injury Diagnosis
           </Link>
           <Link href="/direct_rehab" className="text-sm font-medium hover:text-white transition-colors">
@@ -108,7 +108,7 @@ const Navbar = () => {
               Prehab
             </Link>
             <Link
-              href="/injury-diagnosis"
+              href="/injury_diagnosis"
               className="text-sm font-medium hover:text-white transition-colors p-2"
               onClick={() => setIsMenuOpen(false)}
             >

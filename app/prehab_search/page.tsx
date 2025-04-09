@@ -6,7 +6,7 @@ import { toast } from "@/hooks/use-toast";
 export default function PrehabSearchPage() {
   const handleSearch = (query: string) => {
     toast({
-      title: "Searching for body part",
+      title: "Searching for prehab",
       description: `You entered: "${query}"`,
     });
     console.log("Searching for:", query);

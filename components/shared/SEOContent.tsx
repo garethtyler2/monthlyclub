@@ -1,3 +1,4 @@
+"use client";
 // components/shared/SEOContent.tsx
 import React from "react";
 
