@@ -38,7 +38,8 @@ export default function DashboardPage() {
   }
 
   // ✅ Fake saved items array for testing
-  const userSavedItems = []; // Replace with real DB data when ready
+  const userSavedItems: any[] = []; // TEMP - will replace with real DB data
+
 
   return (
     <div >
