@@ -22,8 +22,8 @@ const DashboardCard = ({
   fallback = false,
 }: DashboardCardProps) => {
   const cardClass = fallback
-    ? "border-destructive/20 bg-gradient-to-b from-destructive/10 to-transparent"
-    : "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent";
+    ? "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent"
+    : "border-destructive/20 bg-gradient-to-b from-destructive/10 to-transparent";
 
   return (
     <Card className={cn("border rounded-xl overflow-hidden animate-fade-in", cardClass)}>

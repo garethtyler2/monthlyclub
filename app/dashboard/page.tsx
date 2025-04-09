@@ -42,14 +42,17 @@ export default function DashboardPage() {
 
 
   return (
-    <div >
-      <h1 className="p-6 text-3xl font-bold text-blue-500">Dashboard</h1>
-      <p className="text-muted-foreground mb-8">Welcome, {user.email}</p>
-
-      <section className="py-10 px-4 md:px-6">
-        <h2 className="text-2xl font-bold mb-6">Your Saved Programs</h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div className="flex flex-col items-center px-4 py-10 w-full max-w-4xl mx-auto">
+  <h1 className="mb-4 animate-fade-in text-4xl sm:text-5xl font-bold leading-tight py-6 text-center">
+    <span className="block">Welcome</span>
+            <span className="block text-lg sm:text-2xl text-muted-foreground mt-2">
+              <span className="gradient-text">{user.email}</span>
+            </span>
+            </h1>
+      <section className="w-full max-w-6xl">
+        <h2 className="text-2xl font-bold mb-6 text-center">Your Saved Programs</h2>
+  
+        <div className="grid grid-cols-1 gap-6">
           {userSavedItems.length > 0 ? (
             userSavedItems.map((item, i) => (
               <DashboardCard
@@ -72,4 +75,5 @@ export default function DashboardPage() {
       </section>
     </div>
   );
+  
 }
