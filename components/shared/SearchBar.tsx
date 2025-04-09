@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useTypingPlaceholder } from "@/hooks/useTypingPlaceholder";
 
 interface SearchBarProps {
   placeholder?: string;
@@ -19,57 +20,7 @@ const SearchBar = ({
   onSearch,
 }: SearchBarProps) => {
   const [query, setQuery] = useState("");
-  const [dynamicPlaceholder, setDynamicPlaceholder] = useState("");
-
-  const placeholderIndex = useRef(0);
-  const charIndex = useRef(0);
-  const isDeleting = useRef(false);
-
-  // Typing animation logic
-  useEffect(() => {
-    if (!placeholderList || placeholderList.length === 0) return;
-  
-    const typeSpeed = 100;
-    const deleteSpeed = 50;
-    const pauseTime = 1500;
-  
-    let timeout: NodeJS.Timeout;
-  
-    const handleTyping = () => {
-      const currentPhrase = placeholderList[placeholderIndex.current];
-  
-      if (!isDeleting.current) {
-        const nextText = currentPhrase.substring(0, charIndex.current + 1);
-        setDynamicPlaceholder(nextText);
-        charIndex.current++;
-  
-        if (nextText === currentPhrase) {
-          isDeleting.current = true;
-          timeout = setTimeout(handleTyping, pauseTime); // wait before deleting
-          return;
-        }
-  
-        timeout = setTimeout(handleTyping, typeSpeed);
-      } else {
-        const nextText = currentPhrase.substring(0, charIndex.current - 1);
-        setDynamicPlaceholder(nextText);
-        charIndex.current--;
-  
-        if (nextText === "") {
-          isDeleting.current = false;
-          placeholderIndex.current =
-            (placeholderIndex.current + 1) % placeholderList.length;
-        }
-  
-        timeout = setTimeout(handleTyping, deleteSpeed);
-      }
-    };
-  
-    timeout = setTimeout(handleTyping, typeSpeed);
-  
-    return () => clearTimeout(timeout);
-  }, [placeholderList]);
-  
+  const dynamicPlaceholder = useTypingPlaceholder(placeholderList); // ✅ central hook
 
   // Handle search submission
   const handleSubmit = (e: React.FormEvent) => {
@@ -87,7 +38,7 @@ const SearchBar = ({
     <form
       onSubmit={handleSubmit}
       className={cn(
-        "relative flex flex-col sm:flex-row items-center w-full max-w-md", // ✅ fixed typo here
+        "relative flex flex-col sm:flex-row items-center w-full max-w-md",
         className
       )}
     >

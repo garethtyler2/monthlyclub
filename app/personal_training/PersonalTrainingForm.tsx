@@ -20,6 +20,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useTypingPlaceholder } from "@/hooks/useTypingPlaceholder";
+
+
+  
 
 const PersonalTraining = () => {
   const [showDetails, setShowDetails] = useState(false);
@@ -41,13 +45,21 @@ const PersonalTraining = () => {
   const toggleDetails = () => {
     setShowDetails(!showDetails);
   };
-  
+  const focusPlaceholder = useTypingPlaceholder([
+    "Flexibility and Mobility",
+    "Marathon Training",
+    "Increase Bench Press",
+    "Sprint Speed",
+    "VO2 MAX",
+    "Leg Day",
+    "Weight Loss"
+  ]);
   return (
     <div className="min-h-screen">
-      <div className="container px-4 py-8 md:py-16 max-w-4xl mx-auto">
+      <div className="container px-3 py-8 md:py-16 max-w-4xl mx-auto">
         <div className="text-center mb-10 animate-fade-in">
-        <h1 className="animate-fade-in pt-6 pb-4" style={{ animationDelay: "400ms" }}>
-            <span className="block">Your AI-Powered</span>
+        <h1 className="animate-fade-in pt-10 pb-4" style={{ animationDelay: "400ms" }}>
+            <span className="block pt-4">Your AI-Powered</span>
             <span className="gradient-text">
             Personal Training Plan
             </span>
@@ -61,15 +73,15 @@ const PersonalTraining = () => {
           <form onSubmit={handleSubmit} className="space-y-8">
           
             {/* Timeframe Selection */}
-            <div className="space-y-3">
+            <div className="space-y-3 ">
               <h3 className="text-xl font-semibold flex items-center gap-2">
                 <Clock className="h-5 w-5  " /> 
                 How long would you like the workout programme for?
               </h3>
-              <div className="grid grid-cols-3 gap-3 text-zinc-900">
-                <RadioCard id="timeframe_1_day" name="timeframe" value="1-day" label="1 Day" />
-                <RadioCard id="timeframe_1_week" name="timeframe" value="1-week" label="1 Week" />
-                <RadioCard id="timeframe_1_month" name="timeframe" value="1-month" label="1 Month" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-zinc-900">
+                <RadioCard id="timeframe_1_day" name="timeframe" value="1-day" label="Day" />
+                <RadioCard id="timeframe_1_week" name="timeframe" value="1-week" label="Week" />
+                <RadioCard id="timeframe_1_month" name="timeframe" value="1-month" label="Month" />
               </div>
             </div>
             
@@ -106,7 +118,7 @@ const PersonalTraining = () => {
                 id="focus_area" 
                 name="focus_area" 
                 className="border-slate-300 focus-visible:ring-fitness-primary" 
-                placeholder="E.g. Arms, Core, Full body, etc."
+                placeholder={focusPlaceholder}
               />
             </div>
             {/* Tip Message */}
@@ -279,7 +291,7 @@ const PersonalTraining = () => {
                   <h3 className="text-xl font-semibold  800">
                     What is your current fitness level?
                   </h3>
-                  <div className="grid grid-cols-3 gap-3 text-zinc-900">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-zinc-900">
                     <RadioCard id="fitness_beginner" name="fitness_level" value="beginner" label="Beginner" />
                     <RadioCard id="fitness_intermediate" name="fitness_level" value="intermediate" label="Intermediate" />
                     <RadioCard id="fitness_advanced" name="fitness_level" value="advanced" label="Advanced" />
