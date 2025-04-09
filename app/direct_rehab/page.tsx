@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
-export default function InjuryDiagnosisSearchPage() {
+export default function DirectRehabSearchPage() {
   const handleSearch = (query: string) => {
     toast({
       title: "Searching for body part",
