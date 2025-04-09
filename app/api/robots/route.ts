@@ -2,7 +2,7 @@ export async function GET(request: Request) {
     const url = new URL(request.url)
     const hostname = url.hostname
   
-    const isProductionDomain = hostname === "www.tytonsolutions.co.uk"
+    const isProductionDomain = hostname === "ai-rehab.co.uk"
     const content = isProductionDomain
       ? "User-agent: *\nAllow: /"
       : "User-agent: *\nDisallow: /"
