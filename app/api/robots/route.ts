@@ -1,6 +1,9 @@
-export async function GET() {
-    const isProduction = process.env.NEXT_PUBLIC_SITE_ENV === "production"
-    const content = isProduction
+export async function GET(request: Request) {
+    const url = new URL(request.url)
+    const hostname = url.hostname
+  
+    const isProductionDomain = hostname === "tytonsolutions.co.uk"
+    const content = isProductionDomain
       ? "User-agent: *\nAllow: /"
       : "User-agent: *\nDisallow: /"
   
