@@ -5,9 +5,11 @@ import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react"
 
 export default function DirectRehabSearchPage() {
-  const handleSearch = (query: string) => {
+    const [searchQuery, setSearchQuery] = useState("")
+    const handleSearch = (query: string) => {
     toast({
       title: "Searching for body part",
       description: `You entered: "${query}"`,
@@ -26,15 +28,17 @@ export default function DirectRehabSearchPage() {
         ]}
         description="Tip: Use a specific injury for targeted rehab guidance."
         onSearch={handleSearch}
-      />
-           <div className="flex justify-center my-6">
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        cta={(
             <Button className="hero-button-primary" asChild>
-                <Link href="/injury_diagnosis">
-                Don't know your injury?
+              <Link href="/injury_diagnosis">
+              Don't know your injury?
                 <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
+              </Link>
             </Button>
-        </div>
+        )}
+      />
 
 
         <SEOContent

@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useTypingPlaceholder } from "@/hooks/useTypingPlaceholder";
 
 interface SearchBarProps {
+  value: string;
+  onChange: (query: string) => void;
   placeholder?: string;
   placeholderList?: string[];
   className?: string;
@@ -14,24 +16,22 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({
+  value,
+  onChange,
   placeholder = "Search...",
   placeholderList,
   className,
   onSearch,
 }: SearchBarProps) => {
-  const [query, setQuery] = useState("");
-  const dynamicPlaceholder = useTypingPlaceholder(placeholderList); // ✅ central hook
+  const dynamicPlaceholder = useTypingPlaceholder(placeholderList);
 
-  // Handle search submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSearch) {
-      onSearch(query);
-    }
+    if (onSearch) onSearch(value);
   };
 
   const clearSearch = () => {
-    setQuery("");
+    onChange("");
   };
 
   return (
@@ -49,15 +49,16 @@ const SearchBar = ({
 
         <Input
           type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          name="query" // ✅ so it can be picked up in forms if needed
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
           placeholder={
             placeholderList?.length ? dynamicPlaceholder : placeholder
           }
           className="pl-10 pr-10 bg-accent/50 border-white/10 focus-visible:ring-brand-purple/50 rounded-xl h-12"
         />
 
-        {query && (
+        {value && (
           <button
             type="button"
             onClick={clearSearch}

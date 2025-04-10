@@ -2,8 +2,10 @@
 import SearchBarTemplate from "@/components/shared/SearchBarTemplate";
 import SEOContent from "@/components/shared/SEOContent";
 import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 export default function PrehabSearchPage() {
+  const [searchQuery, setSearchQuery] = useState("")
   const handleSearch = (query: string) => {
     toast({
       title: "Searching for prehab",
@@ -28,6 +30,8 @@ export default function PrehabSearchPage() {
         ]}
         description="Tip: Search for specific conditions, surgeries, or goals."
         onSearch={handleSearch}
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
       />
 
 

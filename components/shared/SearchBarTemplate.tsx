@@ -2,6 +2,7 @@
 
 import React from "react";
 import SearchBar from "./SearchBar";
+import { ReactNode } from "react";
 
 interface SearchBarTemplateProps {
   titleStart: string;
@@ -9,10 +10,12 @@ interface SearchBarTemplateProps {
   description?: string;
   placeholder?: string;
   placeholderList?: string[];
-  onSearch: (query: string) => void;
+  onSearch?: (query: string) => void;
+  searchValue: string;
+  onSearchChange: (val: string) => void;
   className?: string;
+  cta?: ReactNode;
 }
-
 
 const SearchBarTemplate = ({
   titleStart,
@@ -21,10 +24,13 @@ const SearchBarTemplate = ({
   placeholder = "Search...",
   placeholderList,
   onSearch,
+  searchValue,
+  onSearchChange,
   className = "",
+  cta,
 }: SearchBarTemplateProps) => {
   return (
-    <section className={`pt-40 py-12 relative ${className}`}>
+    <section className={` py-4 relative ${className}`}>
       {/* Gradient background effect */}
       <div className="absolute top-1/2 right-1/4 w-64 h-64 bg-brand-blue/10 rounded-full blur-[80px] -z-10" />
 
@@ -38,14 +44,22 @@ const SearchBarTemplate = ({
           </h1>
         </div>
 
+        {cta && (
+          <div className="flex justify-center mb-6 mt-6">
+            {cta}
+          </div>
+        )}
+
         <div
           className="flex flex-col items-center animate-fade-in"
           style={{ animationDelay: "200ms" }}
         >
           <SearchBar
+            value={searchValue}
+            onChange={onSearchChange}
+            onSearch={onSearch}
             placeholder={placeholder}
             placeholderList={placeholderList}
-            onSearch={onSearch}
             className="w-full max-w-xl"
           />
 
@@ -56,7 +70,6 @@ const SearchBarTemplate = ({
           )}
         </div>
       </div>
-
     </section>
   );
 };

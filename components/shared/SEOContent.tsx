@@ -15,7 +15,7 @@ interface SEOContentProps {
 
 const SEOContent = ({ titleStart, titleHighlight, sections }: SEOContentProps) => {
   return (
-    <section className="max-w-3xl mx-auto px-4 md:px-0 py-16">
+    <section className="max-w-5xl mx-auto px-4 md:px-0 py-16">
       <h2 className="text-3xl font-bold mb-6">{titleStart} <span className="gradient-text">{titleHighlight}</span></h2>
       {sections.map((section, index) => (
         <div key={index} className="mb-6">

@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTypingPlaceholder } from "@/hooks/useTypingPlaceholder";
+import { RadioCard } from "@/components/ui/radio-card";
 
 
   
@@ -58,8 +59,8 @@ const PersonalTraining = () => {
     <div className="min-h-screen">
       <div className="container px-3 py-8 md:py-16 max-w-4xl mx-auto">
         <div className="text-center mb-10 animate-fade-in">
-        <h1 className="animate-fade-in pt-10 pb-4" style={{ animationDelay: "400ms" }}>
-            <span className="block pt-4">Your AI-Powered</span>
+        <h1 className="animate-fade-in pb-4" style={{ animationDelay: "400ms" }}>
+            <span className="block">Your AI-Powered</span>
             <span className="gradient-text">
             Personal Training Plan
             </span>
@@ -363,33 +364,6 @@ const PersonalTraining = () => {
   );
 };
 
-const RadioCard = ({ id, name, value, label, icon }: { 
-  id: string;
-  name: string;
-  value: string;
-  label: string;
-  icon?: React.ReactNode;
-}) => {
-  return (
-    <div className="relative">
-      <input 
-        id={id}
-        name={name}
-        value={value}
-        type="radio"
-        className="peer sr-only"
-      />
-      <label 
-        htmlFor={id}
-        className="flex h-full items-center justify-center gap-1 rounded-lg border border-slate-300 bg-white p-4 text-center text-sm transition-all   peer-checked:border-fitness-primary peer-checked:bg-fitness-light peer-checked:font-medium cursor-pointer"
-      >
-        {icon}
-        {label}
-      </label>
-      <CheckCircle2 className="absolute top-2 right-2 h-4 w-4   opacity-0 transition-opacity peer-checked:opacity-100" />
-    </div>
-  );
-};
 
 const CheckboxCard = ({ id, name, value, label }: { 
   id: string;
