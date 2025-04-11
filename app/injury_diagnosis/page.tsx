@@ -3,7 +3,6 @@
 import { useState } from "react"
 import SearchBarTemplate from "@/components/shared/SearchBarTemplate"
 import SEOContent from "@/components/shared/SEOContent"
-import { toast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
@@ -11,6 +10,8 @@ import { RadioCard } from "@/components/ui/radio-card"
 import { Textarea } from "@/components/ui/textarea"
 import { Slider } from "@/components/ui/slider"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
+import { supabase } from "@/lib/supabase/client"
+
 
 
 
@@ -21,14 +22,6 @@ export default function InjuryDiagnosisSearchPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [location, setLocation] = useState("");
 
-
-  const handleSearch = (query: string) => {
-    toast({
-      title: "Searching for body part",
-      description: `You entered: "${query}"`,
-    })
-    console.log("Searching for:", query)
-  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -45,11 +38,22 @@ export default function InjuryDiagnosisSearchPage() {
       strengthLevel: strength,
       mobilityLevel: mobility,
     }
-  
     console.log("Submitting to AI:", payload)
 
+    // 💾 Save form data so we can resume later
+    localStorage.setItem("injury_form", JSON.stringify(payload))
+  
+    // 🔐 Check if user is logged in
+    const { data: { user } } = await supabase.auth.getUser()
+  
+    if (!user) {
+      // Redirect to login and come back here
+      window.location.href = "/login?redirect=/injury_diagnosis"
+      return
+    }
+  
     setIsLoading(true)
-
+  
     try {
       const res = await fetch("/api/ai/injury-diagnosis", {
         method: "POST",
@@ -57,26 +61,21 @@ export default function InjuryDiagnosisSearchPage() {
       })
   
       const data = await res.json()
-
-      // Save response in localStorage for next page
+  
       localStorage.setItem("injury_results", JSON.stringify(data.injuries))
       localStorage.setItem("injury_levels", JSON.stringify({
         painLevel: pain,
         strengthLevel: strength,
-        mobilityLevel: mobility
+        mobilityLevel: mobility,
       }))
       localStorage.setItem("injury_location", location)
-
-      
-      
-      // Redirect to results page
       window.location.href = "/injury_results"
-      
     } catch (err) {
       console.error("Submission error:", err)
-      setIsLoading(false) // fallback if error
+      setIsLoading(false)
     }
   }
+  
   
 
   return (

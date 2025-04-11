@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { OpenAI } from "openai"
 import type { ChatCompletionMessageParam } from "openai/resources"
 
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 })
@@ -33,7 +34,7 @@ Please return the top 5 most likely injuries that match this presentation in the
     "title": "Injury Name",
     "description": "One or two sentences about the injury.",
     "selfTest": "A quick self-test or mention if one is not recommended."
-    "summary": "A short phrase describing what and where the injury is (e.g., 'hamstring strain in the back of the thigh')."
+    "bodyPart": "Where the injury is (e.g., 'lower back, knee, upper leg')."
   }
 ]`,
     },

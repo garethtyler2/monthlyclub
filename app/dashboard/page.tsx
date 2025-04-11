@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import DashboardCard from "@/components/DashboardCard";
 import { Clipboard } from "lucide-react";
+import RecentlyViewed from "@/components/RecentlyViewed"
 
 export default function DashboardPage() {
   console.log("🚀 Dashboard page loaded");
@@ -72,6 +73,11 @@ export default function DashboardPage() {
             />
           )}
         </div>
+      </section>
+      <section className="w-full max-w-6xl mt-10">
+        <h2 className="text-2xl font-bold mb-6 text-center">Recently Viewed Injuries</h2>
+
+        <RecentlyViewed userId={user.id} />
       </section>
     </div>
   );

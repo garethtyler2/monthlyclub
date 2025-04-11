@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { injury, levels } = body
 
-  if (!injury?.title || !injury?.summary) {
+  if (!injury?.title || !injury?.bodyPart) {
     return NextResponse.json({ error: "Missing injury data" }, { status: 400 })
   }
 
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 The user has selected the following injury:
 
 Title: ${injury.title}
-Summary: ${injury.summary}
+Body Part: ${injury.bodyPart}
 
 Their pain level is ${levels.painLevel}/10,
 strength level is ${levels.strengthLevel}/10,
@@ -52,7 +52,7 @@ Please return detailed information in this format:
     }
   ],
   "tips": ["Helpful advice", "What to avoid"],
-  "summary": "${injury.summary}"
+  "bodyPart": "${injury.bodyPart}"
 }
 Return only valid JSON. Do not include markdown formatting or code blocks.
       `,

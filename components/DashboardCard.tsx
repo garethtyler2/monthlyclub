@@ -37,7 +37,7 @@ const DashboardCard = ({
         <CardDescription className="text-muted-foreground">{description}</CardDescription>
         {link && (
           <Link href={link} className="text-brand-purple hover:underline text-sm mt-4 inline-block">
-            Learn more →
+            View →
           </Link>
         )}
       </CardContent>

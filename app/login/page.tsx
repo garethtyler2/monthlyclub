@@ -2,12 +2,16 @@
 
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
+
 
   // 🚨 Redirect already-logged-in users away from this page
   useEffect(() => {
@@ -25,7 +29,7 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/dashboard`
+        redirectTo: `${window.location.origin}${redirectTo}`
       },
     });
 
@@ -33,8 +37,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="absolute top-1/4 -right-64 w-96 h-96 bg-brand-purple/30 rounded-full blur-[128px] -z-10" />
+    <div className="h-screen flex items-center justify-center px-4">
+        <div className="absolute top-0 -right-64 w-96 h-96 bg-brand-purple/30 rounded-full blur-[128px] " />
         <div className="absolute -bottom-24 -left-64 w-96 h-96 bg-brand-blue/20 rounded-full blur-[128px] -z-10" />
         <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center">
         {/* Logo or app name */}

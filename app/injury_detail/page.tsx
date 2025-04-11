@@ -5,6 +5,9 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
 import { Dumbbell, TestTube2, AlertTriangle, Lightbulb } from "lucide-react"
+import { supabase } from "@/lib/supabase/client"
+import { useSearchParams } from "next/navigation"
+
 
 type InjuryDetail = {
   title: string
@@ -13,7 +16,7 @@ type InjuryDetail = {
   selfTests: { name: string; instructions: string; interpretation: string }[]
   earlyExercises: { name: string; instructions: string; reps: string; tip: string }[]
   tips: string[]
-  summary: string
+  bodyPart: string
 }
 
 export default function InjuryDetailPage() {
@@ -21,45 +24,92 @@ export default function InjuryDetailPage() {
   const [levels, setLevels] = useState<any>(null)
   const [detail, setDetail] = useState<InjuryDetail | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const searchParams = useSearchParams()
 
   useEffect(() => {
-    const storedInjury = localStorage.getItem("selected_injury")
-    const storedLevels = localStorage.getItem("injury_levels")
 
-    if (!storedInjury || !storedLevels) {
-      console.error("Missing injury or levels")
-      return
-    }
+    const injuryIdFromUrl = searchParams.get("id")
 
-    const parsedInjury = JSON.parse(storedInjury)
-    const parsedLevels = JSON.parse(storedLevels)
+    const fetchDetail = async () => {
+        const parsedLevels = JSON.parse(localStorage.getItem("injury_levels") || "{}")
+        setLevels(parsedLevels)
+      
+        if (injuryIdFromUrl) {
+          // Fetch injury from Supabase
+          const { data, error } = await supabase
+            .from("recently_viewed_injuries")
+            .select("raw_injury_data")
+            .eq("id", injuryIdFromUrl)
+            .single()
+      
+          if (error || !data) {
+            console.error("Failed to load injury from Supabase:", error?.message)
+            setIsLoading(false)
+            return
+          }
+      
+          setDetail(data.raw_injury_data)
+          setIsLoading(false)
+        } else {
+          // Fallback to localStorage
+          const storedInjury = localStorage.getItem("selected_injury")
+      
+          if (!storedInjury) {
+            console.error("No injury selected or passed in.")
+            return
+          }
+      
+          const parsedInjury = JSON.parse(storedInjury)
+          setInjury(parsedInjury)
+      
+          try {
+            const res = await fetch("/api/ai/injury-detail", {
+              method: "POST",
+              body: JSON.stringify({
+                injury: parsedInjury,
+                levels: parsedLevels,
+              }),
+            })
+      
+            const data = await res.json()
+            setDetail(data)
+            await saveRecentlyViewed(data)
+            setIsLoading(false)
+          } catch (err) {
+            console.error("Failed to load AI detail:", err)
+            setIsLoading(false)
+          }
+        }
+      }
+      
 
-    setInjury(parsedInjury)
-    setLevels(parsedLevels)
-
-    fetch("/api/ai/injury-detail", {
-      method: "POST",
-      body: JSON.stringify({
-        injury: parsedInjury,
-        levels: parsedLevels,
-      }),
-    })
-      .then(res => res.json())
-      .then(data => {
-        setDetail(data)
-        setIsLoading(false)
-      })
-      .catch(err => {
-        console.error("Failed to load AI detail:", err)
-        setIsLoading(false)
-      })
+    fetchDetail()
   }, [])
+
+  const saveRecentlyViewed = async (injuryData: InjuryDetail) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { error } = await supabase
+      .from("recently_viewed_injuries")
+      .insert([{
+        user_id: user.id,
+        injury_title: injuryData.title,
+        body_part: injuryData.bodyPart,
+        raw_injury_data: injuryData,
+      }])
+
+    if (error) {
+      console.error("Failed to save recently viewed injury:", error.message)
+    }
+  }
 
   if (isLoading) return <LoadingOverlay show message="Loading injury details..." />
 
   if (!detail) return <p className="text-center mt-10 text-muted-foreground">No data available.</p>
 
   return (
+
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
       <div className="space-y-6">
         <div className="text-center">
