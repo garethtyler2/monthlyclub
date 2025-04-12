@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import DashboardCard from "@/components/DashboardCard";
 import { Clipboard } from "lucide-react";
 import RecentlyViewed from "@/components/RecentlyViewed"
+import { LoadingOverlay } from "@/components/ui/loading-overlay"
 
 export default function DashboardPage() {
   console.log("🚀 Dashboard page loaded");
@@ -17,6 +18,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getUser();
+      
 
       if (data?.user) {
         setUser(data.user);
@@ -29,7 +31,7 @@ export default function DashboardPage() {
   }, []);
 
   // ✅ Wait for Supabase to finish
-  if (loading) return null;
+  if (loading) return <LoadingOverlay show message="Loading your dashboard..." />
 
   // ✅ Only redirect after we *know* there's no user
   if (!user) {
