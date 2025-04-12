@@ -29,15 +29,15 @@ const CTAButtons = [
   },
   {
     text: "Explore Prehab",
-    link: "/prehab_search"
+    link: "/prehab-search"
   },
   {
     text: "Get Rehab Information",
-    link: "/direct_rehab"
+    link: "/direct-rehab"
   },
   {
     text: "Start Personal Training",
-    link: "/personal_training"
+    link: "/personal-training"
   }
 ];
 

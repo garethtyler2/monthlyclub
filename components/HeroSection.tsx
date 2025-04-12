@@ -43,7 +43,7 @@ const Hero = () => {
             style={{ animationDelay: "800ms" }}
           >
             <Button className="hero-button-primary" asChild>
-              <Link href="/injury_diagnosis">
+              <Link href="/injury-diagnosis">
                 Start Your Virtual Physio Session
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

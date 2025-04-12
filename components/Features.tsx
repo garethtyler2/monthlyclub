@@ -20,7 +20,7 @@ const featureItems = [
     description: "Receive personalized rehab exercises based on your level and symptoms.",
     className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
     delay: 100,
-    link: "/direct_rehab"
+    link: "/direct-rehab"
   },
   {
     icon: BarChart,
@@ -36,7 +36,7 @@ const featureItems = [
     description: "Strengthen your body with exercises designed to prevent injuries before they happen.",
     className: "border-brand-pink/20 bg-gradient-to-b from-brand-pink/10 to-transparent",
     delay: 300,
-    link: "/prehab_search"
+    link: "/prehab-search"
   },
   {
     icon: Target,
@@ -44,7 +44,7 @@ const featureItems = [
     description: "Personalized training plans for weight loss, muscle gain, and more.",
     className: "border-brand-purple/20 bg-gradient-to-b from-brand-purple/10 to-transparent",
     delay: 400,
-    link: "/personal_training"
+    link: "/personal-training"
   },
   {
     icon: Brain,

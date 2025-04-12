@@ -32,7 +32,7 @@ export default function DirectRehabSearchPage() {
         onSearchChange={setSearchQuery}
         cta={(
             <Button className="hero-button-primary" asChild>
-              <Link href="/injury_diagnosis">
+              <Link href="/injury-diagnosis">
               Don't know your injury?
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

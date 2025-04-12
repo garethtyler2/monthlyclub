@@ -48,7 +48,7 @@ export default function InjuryDiagnosisSearchPage() {
   
     if (!user) {
       // Redirect to login and come back here
-      window.location.href = "/login?redirect=/injury_diagnosis"
+      window.location.href = "/login?redirect=/injury-diagnosis"
       return
     }
   
@@ -96,7 +96,7 @@ export default function InjuryDiagnosisSearchPage() {
             onSearch={(query) => setLocation(query)} // optional, for enter-key submit
             cta={(
             <Button className="hero-button-primary" asChild>
-              <Link href="/direct_rehab">
+              <Link href="/direct-rehab">
                 Already know your injury?
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>

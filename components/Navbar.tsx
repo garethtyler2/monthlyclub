@@ -45,16 +45,16 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4">
-          <Link href="/prehab_search" className="text-sm font-medium hover:text-white transition-colors">
+          <Link href="/prehab-search" className="text-sm font-medium hover:text-white transition-colors">
             Prehab
           </Link>
-          <Link href="/injury_diagnosis" className="text-sm font-medium hover:text-white transition-colors">
+          <Link href="/injury-diagnosis" className="text-sm font-medium hover:text-white transition-colors">
             Injury Diagnosis
           </Link>
-          <Link href="/direct_rehab" className="text-sm font-medium hover:text-white transition-colors">
+          <Link href="/direct-rehab" className="text-sm font-medium hover:text-white transition-colors">
             Injury Rehab
           </Link>
-          <Link href="/personal_training" className="text-sm font-medium hover:text-white transition-colors">
+          <Link href="/personal-training" className="text-sm font-medium hover:text-white transition-colors">
             Personal Training
           </Link>
 
@@ -101,28 +101,28 @@ const Navbar = () => {
         <div className="md:hidden border-t border-white/10 animate-fade-in">
           <div className="container mx-auto px-4 py-4 flex flex-col space-y-3">
             <Link
-              href="/prehab_search"
+              href="/prehab-search"
               className="text-sm font-medium hover:text-white transition-colors p-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Prehab
             </Link>
             <Link
-              href="/injury_diagnosis"
+              href="/injury-diagnosis"
               className="text-sm font-medium hover:text-white transition-colors p-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Injury Diagnosis
             </Link>
             <Link
-              href="/direct_rehab"
+              href="/direct-rehab"
               className="text-sm font-medium hover:text-white transition-colors p-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Injury Rehab
             </Link>
             <Link
-              href="/personal_training"
+              href="/personal-training"
               className="text-sm font-medium hover:text-white transition-colors p-2"
               onClick={() => setIsMenuOpen(false)}
             >
