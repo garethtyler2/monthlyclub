@@ -9,7 +9,7 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { injury, levels } = body
 
-  if (!injury?.title || !injury?.bodyPart) {
+  if (!injury?.title || !injury?.context) {
     return NextResponse.json({ error: "Missing injury data" }, { status: 400 })
   }
 
@@ -23,8 +23,8 @@ export async function POST(req: Request) {
       content: `
 The user has selected the following injury:
 
-Title: ${injury.title}
-Body Part: ${injury.bodyPart}
+- Title: ${injury.title}
+- Context: ${injury.context} (summary of their complaint)
 
 Their pain level is ${levels.painLevel}/10,
 strength level is ${levels.strengthLevel}/10,
@@ -52,9 +52,12 @@ Please return detailed information in this format:
     }
   ],
   "tips": ["Helpful advice", "What to avoid"],
-  "bodyPart": "${injury.bodyPart}"
 }
-Return only valid JSON. Do not include markdown formatting or code blocks.
+Return only valid, strict JSON.
+All keys must be double-quoted.
+Do not include markdown formatting, comments, or explanations.
+Do not include any text before or after the JSON.
+
       `,
     },
   ]

@@ -1,13 +1,25 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase/client"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
 import { Dumbbell, TestTube2, AlertTriangle, Lightbulb } from "lucide-react"
-import { supabase } from "@/lib/supabase/client"
-import { useSearchParams, useRouter } from "next/navigation"
 
+type SelfTest = {
+  name: string
+  instructions: string
+  interpretation: string
+}
+
+type EarlyExercise = {
+  name: string
+  instructions: string
+  reps: string
+  tip: string
+}
 
 type InjuryDetail = {
   title: string
@@ -16,110 +28,140 @@ type InjuryDetail = {
   selfTests: { name: string; instructions: string; interpretation: string }[]
   earlyExercises: { name: string; instructions: string; reps: string; tip: string }[]
   tips: string[]
-  bodyPart: string
 }
 
 export default function InjuryDetailPage() {
-  const [injury, setInjury] = useState<any>(null)
-  const [levels, setLevels] = useState<any>(null)
   const [detail, setDetail] = useState<InjuryDetail | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const searchParams = useSearchParams()
-  const router = useRouter();
+  const router = useRouter()
+
+  const complaintId = searchParams.get("complaintId")
+  const injuryName = searchParams.get("injury")
+
+  useEffect(() => {
+    const fetchInjuryDetail = async () => {
+      if (!complaintId || !injuryName) return
+
+      setIsLoading(true)
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.push("/login")
+        return
+      }
+
+      // Get summary label from complaint
+      const { data: complaint, error: complaintError } = await supabase
+        .from("primary_complaints")
+        .select("summary_label")
+        .eq("id", complaintId)
+        .single()
+
+      if (complaintError || !complaint?.summary_label) {
+        console.error("Error fetching summary label:", complaintError)
+        setIsLoading(false)
+        return
+      }
+
+      const summary = complaint.summary_label
+
+      // Check if injury detail already exists
+      const { data: existingDetail } = await supabase
+        .from("injury_details")
+        .select("*")
+        .eq("injury_name", injuryName)
+        .eq("context_summary", summary)
+        .single()
+
+      if (existingDetail) {
+        setDetail({
+          title: existingDetail.injury_name,
+          detailedDescription: existingDetail.description,
+          symptoms: [], // optional: parse from DB if needed
+          selfTests: JSON.parse(existingDetail.diagnostic_tests || "[]"),
+          earlyExercises: [], // optional: preload if needed
+          tips: JSON.parse(existingDetail.red_flags || "[]"),
+        })
+
+        await supabase.from("selected_injuries").insert({
+          user_id: user.id,
+          primary_complaint_id: complaintId,
+          injury_name: injuryName,
+          injury_detail_id: existingDetail.id,
+        })
+
+        setIsLoading(false)
+        return
+      }
+
+      // Otherwise, call AI
+      try {
+        const { data: metrics } = await supabase
+          .from("user_metrics")
+          .select("pain_level, strength_level, mobility_level")
+          .eq("primary_complaint_id", complaintId)
+          .order("recorded_at", { ascending: true })
+          .limit(1)
+          .single()
+
+        const res = await fetch("/api/ai/injury-detail", {
+          method: "POST",
+          body: JSON.stringify({
+            injury: { title: injuryName, context: summary },
+            levels: metrics,
+          }),
+        })
+
+        const data = await res.json()
+
+        setDetail(data)
+
+        // Save to injury_details
+        const { data: savedDetail } = await supabase
+          .from("injury_details")
+          .insert({
+            injury_name: data.title,
+            context_summary: summary,
+            description: data.detailedDescription,
+            causes: "", // optional
+            diagnostic_tests: JSON.stringify(data.selfTests),
+            red_flags: JSON.stringify(data.tips),
+          })
+          .select()
+          .single()
+
+        // Save to selected_injuries
+        await supabase.from("selected_injuries").insert({
+          user_id: user.id,
+          primary_complaint_id: complaintId,
+          injury_name: data.title,
+          injury_detail_id: savedDetail.id,
+        })
+
+        setIsLoading(false)
+      } catch (err) {
+        console.error("Error fetching or saving AI data:", err)
+        setIsLoading(false)
+      }
+    }
+
+    fetchInjuryDetail()
+  }, [injuryName, complaintId, router, searchParams])
 
   const handleClick = () => {
     if (detail?.title) {
-      router.push(`/rehab-plan-exercises?injury=${encodeURIComponent(detail.title)}`);
-    } else {
-      console.error("No injury title available to generate rehab plan.");
-    }
-  };
-  
-
-  useEffect(() => {
-
-    const injuryIdFromUrl = searchParams.get("id")
-
-    const fetchDetail = async () => {
-        const parsedLevels = JSON.parse(localStorage.getItem("injury_levels") || "{}")
-        setLevels(parsedLevels)
+      router.push(
+        `/rehab-plan-exercises?injury=${encodeURIComponent(detail.title)}&complaintId=${complaintId}`
+      )
       
-        if (injuryIdFromUrl) {
-          // Fetch injury from Supabase
-          const { data, error } = await supabase
-            .from("recently_viewed_injuries")
-            .select("raw_injury_data")
-            .eq("id", injuryIdFromUrl)
-            .single()
-      
-          if (error || !data) {
-            console.error("Failed to load injury from Supabase:", error?.message)
-            setIsLoading(false)
-            return
-          }
-      
-          setDetail(data.raw_injury_data)
-          setIsLoading(false)
-        } else {
-          // Fallback to localStorage
-          const storedInjury = localStorage.getItem("selected_injury")
-      
-          if (!storedInjury) {
-            console.error("No injury selected or passed in.")
-            return
-          }
-      
-          const parsedInjury = JSON.parse(storedInjury)
-          setInjury(parsedInjury)
-      
-          try {
-            const res = await fetch("/api/ai/injury-detail", {
-              method: "POST",
-              body: JSON.stringify({
-                injury: parsedInjury,
-                levels: parsedLevels,
-              }),
-            })
-      
-            const data = await res.json()
-            setDetail(data)
-            await saveRecentlyViewed(data)
-            setIsLoading(false)
-          } catch (err) {
-            console.error("Failed to load AI detail:", err)
-            setIsLoading(false)
-          }
-        }
-      }
-      
-
-    fetchDetail()
-  }, [searchParams])
-
-  const saveRecentlyViewed = async (injuryData: InjuryDetail) => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    const { error } = await supabase
-      .from("recently_viewed_injuries")
-      .insert([{
-        user_id: user.id,
-        injury_title: injuryData.title,
-        body_part: injuryData.bodyPart,
-        raw_injury_data: injuryData,
-      }])
-
-    if (error) {
-      console.error("Failed to save recently viewed injury:", error.message)
     }
   }
 
   if (isLoading) return <LoadingOverlay show message="Loading injury details..." />
-
   if (!detail) return <p className="text-center mt-10 text-muted-foreground">No data available.</p>
 
   return (
-
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
       <div className="space-y-6">
         <div className="text-center">
@@ -180,7 +222,7 @@ export default function InjuryDetailPage() {
 
         <div className="pt-4">
           <Button onClick={handleClick} className="w-full hero-button-primary">
-            Generate A Rehab Plan
+          Rehab Exercises & Weekly Plan
           </Button>
         </div>
       </div>

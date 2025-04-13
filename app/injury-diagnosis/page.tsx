@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import SearchBarTemplate from "@/components/shared/SearchBarTemplate"
-import SEOContent from "@/components/shared/SEOContent"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
@@ -11,25 +11,23 @@ import { Textarea } from "@/components/ui/textarea"
 import { Slider } from "@/components/ui/slider"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
 import { supabase } from "@/lib/supabase/client"
-
-
-
+import SEOContent from "@/components/shared/SEOContent"
 
 export default function InjuryDiagnosisSearchPage() {
   const [pain, setPain] = useState(5)
   const [strength, setStrength] = useState(5)
   const [mobility, setMobility] = useState(5)
   const [isLoading, setIsLoading] = useState(false)
-  const [location, setLocation] = useState("");
-
+  const [location, setLocation] = useState("")
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-  
+
     const form = e.currentTarget
     const onsetType = (form.elements.namedItem("onset_type") as RadioNodeList)?.value
     const cause = (form.elements.namedItem("injury_cause") as HTMLTextAreaElement)?.value
-  
+
     const payload = {
       location,
       onsetType,
@@ -38,72 +36,84 @@ export default function InjuryDiagnosisSearchPage() {
       strengthLevel: strength,
       mobilityLevel: mobility,
     }
-    console.log("Submitting to AI:", payload)
 
-    // 💾 Save form data so we can resume later
-    localStorage.setItem("injury_form", JSON.stringify(payload))
-  
-    // 🔐 Check if user is logged in
     const { data: { user } } = await supabase.auth.getUser()
-  
     if (!user) {
-      // Redirect to login and come back here
       window.location.href = "/login?redirect=/injury-diagnosis"
       return
     }
-  
+
     setIsLoading(true)
-  
+
     try {
       const res = await fetch("/api/ai/injury-diagnosis", {
         method: "POST",
         body: JSON.stringify(payload),
       })
-  
-      const data = await res.json()
-  
-      localStorage.setItem("injury_results", JSON.stringify(data.injuries))
-      localStorage.setItem("injury_levels", JSON.stringify({
-        painLevel: pain,
-        strengthLevel: strength,
-        mobilityLevel: mobility,
-      }))
-      localStorage.setItem("injury_location", location)
-      window.location.href = "/injury_results"
+
+      const ai = await res.json()
+
+      // Save to Supabase
+      const { data: complaint, error } = await supabase
+        .from("primary_complaints")
+        .insert({
+          user_id: user.id,
+          body_area: location,
+          onset: onsetType,
+          cause,
+          description: `${location} - ${cause}`,
+          summary_label: ai.summaryLabel,
+        })
+        .select()
+        .single()
+
+      await supabase.from("user_metrics").insert({
+        primary_complaint_id: complaint.id,
+        pain_level: pain,
+        strength_level: strength,
+        mobility_level: mobility,
+      })
+
+      await supabase.from("injury_options").insert(
+        ai.injuries.map((injury: any) => ({
+          primary_complaint_id: complaint.id,
+          injury_name: injury.title,
+          description: injury.description,
+          self_test: injury.selfTest,
+          source: "ai",
+        }))
+      )
+      router.push(`/injury-results?complaintId=${complaint.id}`)
     } catch (err) {
       console.error("Submission error:", err)
       setIsLoading(false)
     }
   }
-  
-  
 
   return (
     <>
-      
       <LoadingOverlay show={isLoading} message="Diagnosing..." />
-
 
       <div className="max-w-3xl mx-auto px-4">
         <form onSubmit={handleSubmit} className="space-y-8">
-        <SearchBarTemplate
+          <SearchBarTemplate
             titleStart="AI Injury Diagnosis"
             titleHighlight="Identify Your Injury with AI Assistance"
             placeholderList={["Neck ache", "Lower back pain", "Sore wrist", "Pain when I sit"]}
             description="Tip: You can search by body part or a symptom."
             searchValue={location}
             onSearchChange={setLocation}
-            onSearch={(query) => setLocation(query)} // optional, for enter-key submit
-            cta={(
-            <Button className="hero-button-primary" asChild>
-              <Link href="/direct-rehab">
-                Already know your injury?
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-        )}
-      />
-          {/* Onset type */}
+            onSearch={setLocation}
+            cta={
+              <Button className="hero-button-primary" asChild>
+                <Link href="/direct-rehab">
+                  Already know your injury?
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            }
+          />
+
           <div className="space-y-3">
             <h3 className="text-xl font-semibold">How did the pain start?</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-zinc-900">
@@ -112,7 +122,6 @@ export default function InjuryDiagnosisSearchPage() {
             </div>
           </div>
 
-          {/* Cause of injury */}
           <div className="space-y-3">
             <h3 className="text-xl font-semibold">Did anything specific happen to cause it?</h3>
             <Textarea
@@ -122,22 +131,21 @@ export default function InjuryDiagnosisSearchPage() {
             />
           </div>
 
-          {/* Sliders */}
           <div className="space-y-6">
             <h3 className="text-xl font-semibold">Rate the following from 1 to 10</h3>
 
             <div className="space-y-2">
-              <label htmlFor="pain_level" className="block font-medium">Pain Level</label>
+              <label className="block font-medium">Pain Level</label>
               <Slider value={[pain]} onValueChange={(val) => setPain(val[0])} min={1} max={10} step={1} />
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="strength_level" className="block font-medium">Strength Level</label>
+              <label className="block font-medium">Strength Level</label>
               <Slider value={[strength]} onValueChange={(val) => setStrength(val[0])} min={1} max={10} step={1} />
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="mobility_level" className="block font-medium">Mobility Level</label>
+              <label className="block font-medium">Mobility Level</label>
               <Slider value={[mobility]} onValueChange={(val) => setMobility(val[0])} min={1} max={10} step={1} />
             </div>
           </div>
