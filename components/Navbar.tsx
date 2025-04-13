@@ -23,7 +23,7 @@ const Navbar = () => {
     };
 
     getUser();
-  }, [supabase]);
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

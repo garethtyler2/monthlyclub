@@ -58,7 +58,7 @@ export default function RecentlyViewedSection({ userId }: { userId: string }) {
           title={item.injury_title}
           description={`Body Part: ${item.body_part}`}
           icon={History}
-          link={`/injury_detail?id=${item.id}`} // Placeholder link – can update
+          link={`/injury-detail?id=${item.id}`} 
         />
       ))}
     </div>

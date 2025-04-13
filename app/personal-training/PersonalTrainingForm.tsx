@@ -168,8 +168,8 @@ const PersonalTraining = () => {
                   
                   {hasInjury === "yes" && (
                     <Textarea 
-                      id="injury_details" 
-                      name="injury_details"
+                      id="injury-details" 
+                      name="injury-details"
                       className="mt-3 border-slate-300 focus-visible:ring-fitness-primary animate-fade-in" 
                       placeholder="Please provide details about your injury or limitation..."
                     />

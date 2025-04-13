@@ -61,7 +61,7 @@ Return only valid JSON. Do not include markdown formatting or code blocks.
 
   try {
     const chat = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // or gpt-4o
+      model: "gpt-4o-mini", 
       messages,
       temperature: 0,
     })

@@ -15,7 +15,7 @@ export default function InjuryResultsPage() {
   const [injuries, setInjuries] = useState<Injury[]>([])
   const handleSelectInjury = (injury: Injury) => {
     localStorage.setItem("selected_injury", JSON.stringify(injury))
-    window.location.href = "/injury_detail"
+    window.location.href = "/injury-detail"
   }
   
   useEffect(() => {

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
 import { Dumbbell, TestTube2, AlertTriangle, Lightbulb } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useRouter } from "next/navigation"
 
 
 type InjuryDetail = {
@@ -25,6 +25,16 @@ export default function InjuryDetailPage() {
   const [detail, setDetail] = useState<InjuryDetail | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const searchParams = useSearchParams()
+  const router = useRouter();
+
+  const handleClick = () => {
+    if (detail?.title) {
+      router.push(`/rehab-plan-exercises?injury=${encodeURIComponent(detail.title)}`);
+    } else {
+      console.error("No injury title available to generate rehab plan.");
+    }
+  };
+  
 
   useEffect(() => {
 
@@ -84,7 +94,7 @@ export default function InjuryDetailPage() {
       
 
     fetchDetail()
-  }, [])
+  }, [searchParams])
 
   const saveRecentlyViewed = async (injuryData: InjuryDetail) => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -169,7 +179,7 @@ export default function InjuryDetailPage() {
         </Card>
 
         <div className="pt-4">
-          <Button className="w-full hero-button-primary">
+          <Button onClick={handleClick} className="w-full hero-button-primary">
             Generate A Rehab Plan
           </Button>
         </div>

@@ -1,4 +1,3 @@
-// app/api/generateRehabPlan/route.ts
 
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
@@ -18,8 +17,7 @@ Respond with JSON in the following format:
     {
       "name": "Exercise Name",
       "description": "Brief description",
-      "reps": "Reps or duration",
-      "image": "Optional (or leave blank)"
+      "reps": "Reps or duration"
     }
   ]
 }
@@ -27,12 +25,22 @@ Injury: ${injury}
   `;
 
   const completion = await openai.chat.completions.create({
-    model: "gpt-4",
+    model: "gpt-4o-mini",
     messages: [{ role: "user", content: prompt }],
-    temperature: 0.7,
+    temperature: 0,
   });
 
   const response = completion.choices[0]?.message?.content;
+  console.log("🧠 RAW AI RESPONSE:\n", response);
+  // Remove markdown formatting if it's included
+  const cleanedResponse = response?.replace(/```json|```/g, "").trim();
 
-  return NextResponse.json({ data: JSON.parse(response ?? "{}") });
+  try {
+    const parsed = JSON.parse(cleanedResponse ?? "{}");
+    return NextResponse.json({ data: parsed });
+  } catch (err) {
+    console.error("Failed to parse JSON from OpenAI:", err);
+    console.error("Response was:", cleanedResponse);
+    return NextResponse.json({ error: "Invalid response format from OpenAI" }, { status: 500 });
+  }
 }
