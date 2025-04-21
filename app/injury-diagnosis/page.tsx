@@ -23,11 +23,11 @@ export default function InjuryDiagnosisSearchPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-
+  
     const form = e.currentTarget
     const onsetType = (form.elements.namedItem("onset_type") as RadioNodeList)?.value
     const cause = (form.elements.namedItem("injury_cause") as HTMLTextAreaElement)?.value
-
+  
     const payload = {
       location,
       onsetType,
@@ -36,59 +36,66 @@ export default function InjuryDiagnosisSearchPage() {
       strengthLevel: strength,
       mobilityLevel: mobility,
     }
-
+  
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       window.location.href = "/login?redirect=/injury-diagnosis"
       return
     }
-
+  
     setIsLoading(true)
-
+  
     try {
+      // 👉 Step 1: Call the AI
       const res = await fetch("/api/ai/injury-diagnosis", {
         method: "POST",
         body: JSON.stringify(payload),
       })
-
+  
       const ai = await res.json()
-
-      // Save to Supabase
+  
+      // 👉 Step 2: Create complaint (main concern)
       const { data: complaint, error } = await supabase
-        .from("primary_complaints")
+        .from("complaints")
         .insert({
           user_id: user.id,
-          body_area: location,
-          onset: onsetType,
+          location,
+          onset_type: onsetType,
           cause,
-          description: `${location} - ${cause}`,
           summary_label: ai.summaryLabel,
         })
         .select()
         .single()
-
-      await supabase.from("user_metrics").insert({
-        primary_complaint_id: complaint.id,
+  
+      if (error) throw error
+  
+      // 👉 Step 3: Log the initial pain/mobility/strength snapshot
+      await supabase.from("complaint_progress_logs").insert({
+        user_id: user.id,
+        complaint_id: complaint.id,
         pain_level: pain,
         strength_level: strength,
         mobility_level: mobility,
       })
-
-      await supabase.from("injury_options").insert(
+  
+      // 👉 Step 4: Saving injuries 
+      await supabase.from("injury_suggestions").insert(
         ai.injuries.map((injury: any) => ({
-          primary_complaint_id: complaint.id,
-          injury_name: injury.title,
+          complaint_id: complaint.id,
+          title: injury.title,
           description: injury.description,
           self_test: injury.selfTest,
-          source: "ai",
         }))
       )
+      
+  
       router.push(`/injury-results?complaintId=${complaint.id}`)
     } catch (err) {
       console.error("Submission error:", err)
       setIsLoading(false)
     }
   }
+  
 
   return (
     <>

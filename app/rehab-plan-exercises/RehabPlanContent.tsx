@@ -15,7 +15,7 @@ import {
 
 export default function RehabPlanExercisesPage() {
   const [exercises, setExercises] = useState<any[]>([])
-  const [weekPlan, setWeekPlan] = useState<any[]>([])
+  const [weekPlan, setWeekPlan] = useState<any>({ weekPlan: [], warmupAdvice: "", cooldownAdvice: "" })    
   const [loading, setLoading] = useState(true);
 
   const params = useSearchParams();
@@ -50,42 +50,42 @@ export default function RehabPlanExercisesPage() {
         .single();
 
       const summary = complaint?.summary_label;
+      console.log("🛑 Skipping cache check — always calling AI");
+    //   // 1. Check if rehab plan already exists
+    //   const { data: plan } = await supabase
+    //     .from("rehab_plans")
+    //     .select("*")
+    //     .eq("injury_name", injuryName)
+    //     .eq("context_summary", summary)
+    //     .single();
 
-      // 1. Check if rehab plan already exists
-      const { data: plan } = await supabase
-        .from("rehab_plans")
-        .select("*")
-        .eq("injury_name", injuryName)
-        .eq("context_summary", summary)
-        .single();
+    //   if (plan) {
+    //     // Fetch structured_sessions & exercises
+    //     const { data: sessions } = await supabase
+    //       .from("structured_sessions")
+    //       .select("*")
+    //       .eq("rehab_plan_id", plan.id);
 
-      if (plan) {
-        // Fetch structured_sessions & exercises
-        const { data: sessions } = await supabase
-          .from("structured_sessions")
-          .select("*")
-          .eq("rehab_plan_id", plan.id);
+    //     const sessionIds = sessions?.map((s) => s.exercise_ids).flat() || [];
 
-        const sessionIds = sessions?.map((s) => s.exercise_ids).flat() || [];
+    //     const { data: exerciseData } = await supabase
+    //       .from("exercises")
+    //       .select("*")
+    //       .in("id", sessionIds);
 
-        const { data: exerciseData } = await supabase
-          .from("exercises")
-          .select("*")
-          .in("id", sessionIds);
+    //     // Save link to user_rehab_instances
+    //     await supabase.from("user_rehab_instances").insert({
+    //       user_id: user.id,
+    //       primary_complaint_id: complaintId,
+    //       rehab_plan_id: plan.id,
+    //       context_summary: summary,
+    //     });
 
-        // Save link to user_rehab_instances
-        await supabase.from("user_rehab_instances").insert({
-          user_id: user.id,
-          primary_complaint_id: complaintId,
-          rehab_plan_id: plan.id,
-          context_summary: summary,
-        });
-
-        setExercises(exerciseData || []);
-        setWeekPlan(plan.week_plan ? JSON.parse(plan.week_plan) : []);
-        setLoading(false);
-        return;
-      }
+    //     setExercises(exerciseData || []);
+    //     setWeekPlan(plan.week_plan ? JSON.parse(plan.week_plan) : []);
+    //     setLoading(false);
+    //     return;
+    //   }
 
       // 2. If not cached, call OpenAI
       try {
@@ -94,12 +94,12 @@ export default function RehabPlanExercisesPage() {
           fetch("/api/ai/exercise-list", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ injury: injuryName }),
+            body: JSON.stringify({ injury: injuryName, context: summary  }),
           }),
           fetch("/api/ai/rehab-week-plan", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ injury: injuryName }),
+            body: JSON.stringify({ injury: injuryName, context: summary  }),
           }),
         ]);
 
@@ -177,7 +177,7 @@ export default function RehabPlanExercisesPage() {
         });
 
         setExercises(newExercises);
-        setWeekPlan(newWeekPlan);
+        setWeekPlan(weekPlanData.data || {});
       } catch (err) {
         console.error("Failed to fetch AI data", err);
       } finally {
@@ -235,62 +235,39 @@ export default function RehabPlanExercisesPage() {
                 <div key={i} className="border rounded-xl p-4 bg-muted">
                   <h3 className="text-lg font-semibold mb-2">{day.day}</h3>
 
-                  {/* Warmup */}
-                  {day.warmup && day.warmup.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="font-semibold">🔄 Warmup</h4>
-                      <div className="space-y-2 mt-1">
-                        {day.warmup.map((item: any, idx: number) => (
-                          <div key={idx} className="text-sm border rounded p-3 bg-background">
-                            <p><strong>{item.name}</strong></p>
-                            <p>📋 {item.instructions}</p>
-                            <p>⏱️ Duration: {item.duration}</p>
-                            {item.notes && <p>🧠 {item.notes}</p>}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
 
-                  {/* Exercises */}
-                  {day.exercises && day.exercises.length > 0 && (
-                    <div className="mb-4">
-                      <h4 className="font-semibold">💪 Main Exercises</h4>
-                      <div className="space-y-2 mt-1">
-                        {day.exercises.map((ex: any, idx: number) => (
-                          <div key={idx} className="text-sm border rounded p-3 bg-background">
-                            <p><strong>{ex.name}</strong></p>
-                            <p>📋 {ex.instructions}</p>
-                            <p>🔁 {ex.reps} reps x {ex.sets} sets</p>
-                            {ex.notes && <p>🧠 {ex.notes}</p>}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Cooldown */}
-                  {day.cooldown && day.cooldown.length > 0 && (
-                    <div className="mb-2">
-                      <h4 className="font-semibold">🧘 Cooldown</h4>
-                      <div className="space-y-2 mt-1">
-                        {day.cooldown.map((item: any, idx: number) => (
-                          <div key={idx} className="text-sm border rounded p-3 bg-background">
-                            <p><strong>{item.name}</strong></p>
-                            <p>📋 {item.instructions}</p>
-                            <p>⏱️ Duration: {item.duration}</p>
-                            {item.notes && <p>🧠 {item.notes}</p>}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                {/* New global warmup/cooldown tips */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="p-5 bg-muted/80">
+                    <h3 className="text-xl font-semibold mb-2">🔄 Before You Start</h3>
+                    <p className="text-muted-foreground text-sm">{weekPlan?.warmupAdvice}</p>
+                </Card>
+                <Card className="p-5 bg-muted/80">
+                    <h3 className="text-xl font-semibold mb-2">🧘 After You Finish</h3>
+                    <p className="text-muted-foreground text-sm">{weekPlan?.cooldownAdvice}</p>
+                </Card>
                 </div>
-              ))}
-            </div>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
+
+                {/* Exercises */}
+                <div className="mb-4">
+                  <h4 className="font-semibold">💪 Main Exercises</h4>
+                  <div className="space-y-2 mt-1">
+                    {day.exercises.map((ex: any, idx: number) => (
+                      <div key={idx} className="text-sm border rounded p-3 bg-background">
+                        <p><strong>{ex.name}</strong></p>
+                        <p>📋 {ex.instructions}</p>
+                        <p>🔁 {ex.reps} reps x {ex.sets} sets</p>
+                        {ex.notes && <p>🧠 {ex.notes}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </TabsContent>
+    </Tabs>
+  </div>
+);
 }

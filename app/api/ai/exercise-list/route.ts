@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
@@ -7,40 +6,75 @@ const openai = new OpenAI({
 });
 
 export async function POST(req: Request) {
-  const { injury } = await req.json();
-
-  const prompt = `
-You are a rehabilitation expert. Based on the injury provided, return the top 6 most recommended rehab exercises. 
-Respond with JSON in the following format:
-{
-  "exercises": [
-    {
-      "name": "Exercise Name",
-      "description": "Brief description",
-      "reps": "Reps or duration"
-    }
-  ]
-}
-Injury: ${injury}
-  `;
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0,
-  });
-
-  const response = completion.choices[0]?.message?.content;
-  console.log("🧠 RAW AI RESPONSE:\n", response);
-  // Remove markdown formatting if it's included
-  const cleanedResponse = response?.replace(/```json|```/g, "").trim();
+  const { injury, context } = await req.json();
 
   try {
-    const parsed = JSON.parse(cleanedResponse ?? "{}");
-    return NextResponse.json({ data: parsed });
-  } catch (err) {
-    console.error("Failed to parse JSON from OpenAI:", err);
-    console.error("Response was:", cleanedResponse);
-    return NextResponse.json({ error: "Invalid response format from OpenAI" }, { status: 500 });
+    const response = await openai.responses.create({
+      model: "gpt-4o-mini",
+      input: [
+        {
+          role: "system",
+          content: "You are a certified physical therapist and rehabilitation expert.",
+        },
+        {
+          role: "user",
+          content: `Create a personalized 7-day rehab plan for a patient with the following:
+
+- Injury: ${injury}
+- Context: ${context}
+
+Only include a structured week plan of exercises (no warm-ups or cooldowns inside each day). Also return two short advice statements — one for how to warm up before workouts, and one for how to cool down after workouts. Each statement should be no more than 2 sentences, and written in a friendly, helpful tone.
+
+Respond strictly in JSON using the schema.`,
+        },
+      ],
+      text: {
+        format: {
+          type: "json_schema",
+          name: "rehab_plan",
+          schema: {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              weekPlan: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  properties: {
+                    day: { type: "string" },
+                    exercises: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        additionalProperties: false,
+                        properties: {
+                          name: { type: "string" },
+                          instructions: { type: "string" },
+                          reps: { type: "string" },
+                          sets: { type: "string" },
+                          notes: { type: "string" },
+                        },
+                        required: ["name", "instructions", "reps", "sets", "notes"],
+                      },
+                    },
+                  },
+                  required: ["day", "exercises"],
+                },
+              },
+              warmupAdvice: { type: "string" },
+              cooldownAdvice: { type: "string" },
+            },
+            required: ["weekPlan", "warmupAdvice", "cooldownAdvice"],
+          },
+        },
+      },
+    });
+
+    const structured = JSON.parse(response.output_text);
+    return NextResponse.json({ data: structured });
+  } catch (error) {
+    console.error("❌ Structured output error:", error);
+    return NextResponse.json({ error: "Failed to fetch rehab plan from OpenAI." }, { status: 500 });
   }
 }

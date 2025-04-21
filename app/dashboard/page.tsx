@@ -7,63 +7,113 @@ import DashboardCard from "@/components/DashboardCard";
 import { Clipboard } from "lucide-react";
 import RecentlyViewed from "@/components/RecentlyViewed"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
+import { Button } from "@/components/ui/button"
+import { toTitleCase } from "@/lib/utils"
 
 export default function DashboardPage() {
-  console.log("🚀 Dashboard page loaded");
-
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const [user, setUser] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [userComplaints, setUserComplaints] = useState<any[]>([])
+  const [injuriesByComplaint, setInjuriesByComplaint] = useState<Record<string, any[]>>({})
+  const router = useRouter()
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      
+    const getUserAndComplaints = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
 
-      if (data?.user) {
-        setUser(data.user);
+      if (!user) {
+        router.push("/login")
+        return
       }
 
-      setLoading(false);
-    };
+      setUser(user)
 
-    getUser();
-  }, []);
+      const { data: complaints, error: complaintsError } = await supabase
+        .from("complaints")
+        .select("id, location, summary_label, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
 
-  // ✅ Wait for Supabase to finish
+      if (complaintsError) {
+        console.error("❌ Failed to fetch complaints:", complaintsError)
+        return
+      }
+
+      setUserComplaints(complaints)
+
+      // Now fetch all injuries linked to each complaint
+      const { data: injuries, error: injuriesError } = await supabase
+        .from("injury_details")
+        .select("id, complaint_id, injury_title")
+        .eq("user_id", user.id)
+
+      if (injuriesError) {
+        console.error("❌ Failed to fetch injuries:", injuriesError)
+        return
+      }
+
+      const grouped = complaints.reduce((acc: Record<string, any[]>, complaint) => {
+        acc[complaint.id] = injuries.filter(i => i.complaint_id === complaint.id)
+        return acc
+      }, {})
+
+      setInjuriesByComplaint(grouped)
+      setLoading(false)
+    }
+
+    getUserAndComplaints()
+  }, [router])
+
   if (loading) return <LoadingOverlay show message="Loading your dashboard..." />
 
-  // ✅ Only redirect after we *know* there's no user
-  if (!user) {
-    console.log("🚨 No user found, redirecting to login");
-    router.push("/login");
-    return null;
-  }
-
-  // ✅ Fake saved items array for testing
-  const userSavedItems: any[] = []; // TEMP - will replace with real DB data
-
-
   return (
-<div className="flex flex-col items-center px-4 py-10 w-full max-w-4xl mx-auto">
-  <h1 className="mb-4 animate-fade-in text-4xl sm:text-5xl font-bold leading-tight py-6 text-center">
-    <span className="block">Welcome</span>
-            <span className="block text-lg sm:text-2xl text-muted-foreground mt-2">
-              <span className="gradient-text">{user.email}</span>
-            </span>
-            </h1>
+    <div className="flex flex-col items-center px-4 py-10 w-full max-w-4xl mx-auto">
+      <h1 className="mb-4 animate-fade-in text-4xl sm:text-5xl font-bold leading-tight py-6 text-center">
+        <span className="block">Welcome</span>
+        <span className="block text-lg sm:text-2xl text-muted-foreground mt-2">
+          <span className="gradient-text">{user.email}</span>
+        </span>
+      </h1>
+
       <section className="w-full max-w-6xl">
-        <h2 className="text-2xl font-bold mb-6 text-center">Your Saved Programs</h2>
-  
+        <h2 className="text-2xl font-bold mb-6 text-center">Your Rehab Cases</h2>
+
         <div className="grid grid-cols-1 gap-6">
-          {userSavedItems.length > 0 ? (
-            userSavedItems.map((item, i) => (
+          {userComplaints.length > 0 ? (
+            userComplaints.map((complaint, i) => (
               <DashboardCard
                 key={i}
-                title={item.title}
-                description={item.description}
+                title={toTitleCase(complaint.location)}
+                description={complaint.summary_label ?? "No summary yet"}
                 icon={Clipboard}
-                link={`/dashboard/item/${item.id}`}
+                footer={
+                  <div className="space-y-2">
+                    <Button
+                      className="w-full hero-button-primary"
+                      onClick={() => router.push(`/injury-results?complaintId=${complaint.id}`)}
+                    >
+                      View Injury Suggestions
+                    </Button>
+                    {injuriesByComplaint[complaint.id]?.map((injury) => (
+                      <DashboardCard
+                        key={injury.id}
+                        title={injury.injury_title}
+                        description="Saved Injury Detail"
+                        icon={Clipboard}
+                        footer={
+                          <Button
+                            className="w-full hero-button-primary"
+                            onClick={() =>
+                              router.push(`/injury-detail?id=${injury.id}`)
+                            }
+                          >
+                            View Details
+                          </Button>
+                        }
+                      />
+                    ))}
+                  </div>
+                }
               />
             ))
           ) : (
@@ -76,12 +126,11 @@ export default function DashboardPage() {
           )}
         </div>
       </section>
+
       <section className="w-full max-w-6xl mt-10">
         <h2 className="text-2xl font-bold mb-6 text-center">Recently Viewed Injuries</h2>
-
         <RecentlyViewed userId={user.id} />
       </section>
     </div>
   );
-  
-}
+} 

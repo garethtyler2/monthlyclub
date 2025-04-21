@@ -6,45 +6,94 @@ const openai = new OpenAI({
 });
 
 export async function POST(req: Request) {
-  const { injury } = await req.json();
-
-  const prompt = `
-You are a certified physical therapist and rehabilitation expert. Create a detailed 1-week rehabilitation workout program for the following injury: "${injury}". 
-
-Include:
-- Day-by-day breakdown (Day 1 through Day 7)
-- Each day's exercises, with name, instructions, reps or duration, and any important notes or precautions.
-- Include warm-up, main rehab exercises, and cooldown/stretching where relevant.
-
-Respond in this JSON format:
-{
-  "weekPlan": [
-    {
-      "day": "Day 1",
-      "warmup": [...],
-      "exercises": [...],
-      "cooldown": [...]
-    },
-    ...
-  ]
-}
-  `;
-
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.3,
-  });
-
-  const response = completion.choices[0]?.message?.content;
-  console.log("🧠 RAW AI RESPONSE:\n", response);
-  const cleaned = response?.replace(/```json|```/g, "").trim();
+  const { injury, context  } = await req.json();
 
   try {
-    const parsed = JSON.parse(cleaned ?? "{}");
-    return NextResponse.json({ data: parsed });
-  } catch (err) {
-    console.error("Failed to parse JSON from OpenAI:", err);
-    return NextResponse.json({ error: "Invalid JSON from OpenAI" }, { status: 500 });
+    const response = await openai.responses.create({
+      model: "gpt-4o-mini",
+      input: [
+        {
+          role: "system",
+          content: "You are a certified physical therapist and rehabilitation expert.",
+        },
+        {
+          role: "user",
+          content: `Create a 7-day rehab plan for: "${injury}". The context of the injury is: "${context}". Include warm-up, exercises, cooldown for each day.`,
+        },
+      ],
+      text: {
+        format: {
+          type: "json_schema",
+          name: "rehab_plan",
+          schema: {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              weekPlan: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  properties: {
+                    day: { type: "string" },
+                    warmup: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        additionalProperties: false,
+                        properties: {
+                          name: { type: "string" },
+                          instructions: { type: "string" },
+                          duration: { type: "string" },
+                          notes: { type: "string" },
+                        },
+                        required: ["name", "instructions", "duration", "notes"],
+                      },
+                    },
+                    exercises: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        additionalProperties: false,
+                        properties: {
+                          name: { type: "string" },
+                          instructions: { type: "string" },
+                          reps: { type: "string" },
+                          sets: { type: "string" },
+                          notes: { type: "string" },
+                        },
+                        required: ["name", "instructions", "reps", "sets", "notes"],
+                      },
+                    },
+                    cooldown: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        additionalProperties: false,
+                        properties: {
+                          name: { type: "string" },
+                          instructions: { type: "string" },
+                          duration: { type: "string" },
+                          notes: { type: "string" },
+                        },
+                        required: ["name", "instructions", "duration", "notes"],
+                      },
+                    },
+                  },
+                  required: ["day", "warmup", "exercises", "cooldown"],
+                },
+              },
+            },
+            required: ["weekPlan"],
+          },
+        },
+      },
+    });
+
+    const structured = JSON.parse(response.output_text);
+    return NextResponse.json({ data: structured });
+  } catch (error) {
+    console.error("❌ Structured output error:", error);
+    return NextResponse.json({ error: "Failed to fetch rehab plan from OpenAI." }, { status: 500 });
   }
 }

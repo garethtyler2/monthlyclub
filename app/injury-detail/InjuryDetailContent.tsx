@@ -8,20 +8,7 @@ import { Button } from "@/components/ui/button"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
 import { Dumbbell, TestTube2, AlertTriangle, Lightbulb } from "lucide-react"
 
-type SelfTest = {
-  name: string
-  instructions: string
-  interpretation: string
-}
-
-type EarlyExercise = {
-  name: string
-  instructions: string
-  reps: string
-  tip: string
-}
-
-type InjuryDetail = {
+export type InjuryDetail = {
   title: string
   detailedDescription: string
   symptoms: string[]
@@ -36,125 +23,130 @@ export default function InjuryDetailPage() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
+  const id = searchParams.get("id")
   const complaintId = searchParams.get("complaintId")
   const injuryName = searchParams.get("injury")
 
   useEffect(() => {
-    const fetchInjuryDetail = async () => {
-      if (!complaintId || !injuryName) return
+    const fetchDetail = async () => {
+      if (id && id !== "undefined") {
+        // ✅ LOAD BY ID
+        console.log("🔎 Fetching injury detail by ID:", id)
+        const { data, error } = await supabase
+          .from("injury_details")
+          .select("full_json")
+          .eq("id", id)
+          .single()
 
-      setIsLoading(true)
+        if (error || !data?.full_json) {
+          console.error("❌ Failed to fetch injury detail by ID:", error)
+          return
+        }
 
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        router.push("/login")
+        setDetail(JSON.parse(data.full_json))
+        setIsLoading(false)
         return
       }
 
-      // Get summary label from complaint
-      const { data: complaint, error: complaintError } = await supabase
-        .from("primary_complaints")
+      // 🚨 No ID? Try to fetch via complaintId + injuryName
+      if (!complaintId || !injuryName) {
+        console.warn("⚠️ Missing complaintId or injuryName in URL")
+        return
+      }
+
+      console.log("🧾 Loading detail via AI for:", complaintId, injuryName)
+
+      const { data: complaint, error } = await supabase
+        .from("complaints")
         .select("summary_label")
         .eq("id", complaintId)
         .single()
 
-      if (complaintError || !complaint?.summary_label) {
-        console.error("Error fetching summary label:", complaintError)
-        setIsLoading(false)
+      if (error || !complaint?.summary_label) {
+        console.error("❌ Error fetching complaint summary:", error)
         return
       }
 
       const summary = complaint.summary_label
+      const res = await fetch("/api/ai/injury-detail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          injury: {
+            title: injuryName,
+            context: summary,
+          },
+        }),
+      })
 
-      // Check if injury detail already exists
-      const { data: existingDetail } = await supabase
-        .from("injury_details")
-        .select("*")
-        .eq("injury_name", injuryName)
-        .eq("context_summary", summary)
-        .single()
-
-      if (existingDetail) {
-        setDetail({
-          title: existingDetail.injury_name,
-          detailedDescription: existingDetail.description,
-          symptoms: [], // optional: parse from DB if needed
-          selfTests: JSON.parse(existingDetail.diagnostic_tests || "[]"),
-          earlyExercises: [], // optional: preload if needed
-          tips: JSON.parse(existingDetail.red_flags || "[]"),
-        })
-
-        await supabase.from("selected_injuries").insert({
-          user_id: user.id,
-          primary_complaint_id: complaintId,
-          injury_name: injuryName,
-          injury_detail_id: existingDetail.id,
-        })
-
-        setIsLoading(false)
+      const aiData = await res.json()
+      if (!aiData?.title) {
+        console.error("❌ AI response missing title:", aiData)
         return
       }
 
-      // Otherwise, call AI
-      try {
-        const { data: metrics } = await supabase
-          .from("user_metrics")
-          .select("pain_level, strength_level, mobility_level")
-          .eq("primary_complaint_id", complaintId)
-          .order("recorded_at", { ascending: true })
-          .limit(1)
-          .single()
+      setDetail(aiData)
 
-        const res = await fetch("/api/ai/injury-detail", {
-          method: "POST",
-          body: JSON.stringify({
-            injury: { title: injuryName, context: summary },
-            levels: metrics,
-          }),
-        })
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser()
 
-        const data = await res.json()
-
-        setDetail(data)
-
-        // Save to injury_details
-        const { data: savedDetail } = await supabase
-          .from("injury_details")
-          .insert({
-            injury_name: data.title,
-            context_summary: summary,
-            description: data.detailedDescription,
-            causes: "", // optional
-            diagnostic_tests: JSON.stringify(data.selfTests),
-            red_flags: JSON.stringify(data.tips),
-          })
-          .select()
-          .single()
-
-        // Save to selected_injuries
-        await supabase.from("selected_injuries").insert({
-          user_id: user.id,
-          primary_complaint_id: complaintId,
-          injury_name: data.title,
-          injury_detail_id: savedDetail.id,
-        })
-
-        setIsLoading(false)
-      } catch (err) {
-        console.error("Error fetching or saving AI data:", err)
-        setIsLoading(false)
+      if (!user || userError) {
+        console.error("❌ User not authenticated when trying to save:", userError)
+        return
       }
+
+      // 🧠 Check if this injury already exists to avoid duplicates
+      const { data: existing, error: lookupError } = await supabase
+        .from("injury_details")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("complaint_id", complaintId)
+        .eq("injury_title", aiData.title)
+        .limit(1)
+
+      if (lookupError) {
+        console.error("❌ Error checking for existing injury detail:", lookupError)
+      }
+
+      if (existing && existing.length > 0 && existing[0].id) {
+        console.log("⚠️ Injury already exists. Redirecting to existing record:", existing[0].id)
+        router.replace(`/injury-detail?id=${existing[0].id}`)
+        return
+      }
+
+      const insertPayload = {
+        user_id: user.id,
+        complaint_id: complaintId,
+        injury_title: aiData.title,
+        full_json: JSON.stringify(aiData),
+      }
+
+      const { data: saved, error: saveError } = await supabase
+        .from("injury_details")
+        .insert(insertPayload)
+        .select()
+        .single()
+
+      if (saveError) {
+        console.error("❌ Failed to save new injury detail to Supabase:", saveError)
+      } else {
+        console.log("✅ Saved new injury detail to Supabase")
+        router.replace(`/injury-detail?id=${saved.id}`)
+      }
+
+      setIsLoading(false)
     }
 
-    fetchInjuryDetail()
-  }, [injuryName, complaintId, router, searchParams])
+    fetchDetail()
+  }, [id, complaintId, injuryName])
 
   const handleClick = () => {
     if (detail?.title) {
       router.push(
         `/rehab-plan-exercises?injury=${encodeURIComponent(detail.title)}&complaintId=${complaintId}`
       )
-      
     }
   }
 
@@ -162,6 +154,8 @@ export default function InjuryDetailPage() {
   if (!detail) return <p className="text-center mt-10 text-muted-foreground">No data available.</p>
 
   return (
+
+
     <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">
       <div className="space-y-6">
         <div className="text-center">
@@ -199,7 +193,7 @@ export default function InjuryDetailPage() {
           <div className="flex items-center gap-2 text-xl font-semibold">
             <Dumbbell size={20} /> Starter Exercises
           </div>
-          <div className="">
+          <div className="space-y-4">
             {detail.earlyExercises.map((ex, i) => (
               <div key={i} className="border rounded-xl p-4 bg-muted">
                 <h4 className="text-lg font-semibold">{ex.name}</h4>

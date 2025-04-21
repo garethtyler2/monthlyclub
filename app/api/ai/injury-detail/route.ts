@@ -1,81 +1,103 @@
-// /app/api/ai/injury-detail/route.ts
-import { OpenAI } from "openai"
-import { NextResponse } from "next/server"
-import type { ChatCompletionMessageParam } from "openai/resources"
+import { OpenAI } from "openai";
+import { NextResponse } from "next/server";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 export async function POST(req: Request) {
   const body = await req.json()
   const { injury, levels } = body
 
+  console.log("🛠 AI ROUTE - Received:", { injury, levels })
+
   if (!injury?.title || !injury?.context) {
+    console.error("❌ Missing injury title or context:", injury)
     return NextResponse.json({ error: "Missing injury data" }, { status: 400 })
   }
 
-  const messages: ChatCompletionMessageParam[] = [
-    {
-      role: "system",
-      content: "You are a helpful AI physiotherapist assistant.",
-    },
-    {
-      role: "user",
-      content: `
-The user has selected the following injury:
-
-- Title: ${injury.title}
-- Context: ${injury.context} (summary of their complaint)
-
-Their pain level is ${levels.painLevel}/10,
-strength level is ${levels.strengthLevel}/10,
-mobility level is ${levels.mobilityLevel}/10.
-
-Please return detailed information in this format:
-
-{
-  "title": "Injury name again",
-  "detailedDescription": "Explanation of the injury, causes, anatomy",
-  "symptoms": ["symptom 1", "symptom 2"],
-  "selfTests": [
-    {
-      "name": "Test name",
-      "instructions": "How to perform the test",
-      "interpretation": "What the result means"
-    }
-  ],
-  "earlyExercises": [
-    {
-      "name": "Exercise name",
-      "instructions": "How to perform it",
-      "reps": "3 sets of 10",
-      "tip": "What to watch out for"
-    }
-  ],
-  "tips": ["Helpful advice", "What to avoid"],
-}
-Return only valid, strict JSON.
-All keys must be double-quoted.
-Do not include markdown formatting, comments, or explanations.
-Do not include any text before or after the JSON.
-
-      `,
-    },
-  ]
-
   try {
-    const chat = await openai.chat.completions.create({
-      model: "gpt-4o-mini", 
-      messages,
-      temperature: 0,
+    const response = await openai.responses.create({
+      model: "gpt-4o-mini", // ✅ make sure this model is supported for your OpenAI plan
+      input: [
+        {
+          role: "system",
+          content: "You are a helpful AI physiotherapist assistant. Return structured JSON only.",
+        },
+        {
+          role: "user",
+          content: `
+A user is experiencing "${injury.title}" in the context of "${injury.context}".
+Their pain level is ${levels?.painLevel || "unknown"}/10,
+strength is ${levels?.strengthLevel || "unknown"}/10,
+mobility is ${levels?.mobilityLevel || "unknown"}/10.
+
+Return injury details in structured JSON format.
+          `,
+        },
+      ],
+      text: {
+        format: {
+          type: "json_schema",
+          name: "injury_detail",
+          schema: {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              title: { type: "string" },
+              detailedDescription: { type: "string" },
+              symptoms: {
+                type: "array",
+                items: { type: "string" },
+              },
+              selfTests: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  properties: {
+                    name: { type: "string" },
+                    instructions: { type: "string" },
+                    interpretation: { type: "string" },
+                  },
+                  required: ["name", "instructions", "interpretation"],
+                },
+              },
+              earlyExercises: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  properties: {
+                    name: { type: "string" },
+                    instructions: { type: "string" },
+                    reps: { type: "string" },
+                    tip: { type: "string" },
+                  },
+                  required: ["name", "instructions", "reps", "tip"],
+                },
+              },
+              tips: {
+                type: "array",
+                items: { type: "string" },
+              },
+            },
+            required: [
+              "title",
+              "detailedDescription",
+              "symptoms",
+              "selfTests",
+              "earlyExercises",
+              "tips",
+            ],
+          },
+        },
+      },
     })
 
-    const responseText = chat.choices[0].message.content || ""
-    const cleaned = responseText.replace(/```json|```/g, "").trim()
-    const parsed = JSON.parse(cleaned)
+    console.log("✅ OpenAI response:", response)
+    const structured = JSON.parse(response.output_text)
+    return NextResponse.json(structured)
 
-    return NextResponse.json(parsed)
   } catch (error) {
-    console.error("AI error:", error)
+    console.error("❌ Failed to fetch injury detail from OpenAI:", error)
     return NextResponse.json({ error: "Failed to fetch from AI" }, { status: 500 })
   }
 }

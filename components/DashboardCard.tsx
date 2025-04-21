@@ -1,10 +1,17 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import { type LucideIcon } from "lucide-react";
+import { ReactNode } from "react";
 
 type DashboardCardProps = {
   title: string;
@@ -12,6 +19,7 @@ type DashboardCardProps = {
   icon?: LucideIcon;
   link?: string;
   fallback?: boolean;
+  footer?: ReactNode;
 };
 
 const DashboardCard = ({
@@ -19,14 +27,12 @@ const DashboardCard = ({
   description,
   icon: Icon = AlertTriangle,
   link,
-  fallback = false,
+  footer,
 }: DashboardCardProps) => {
-  const cardClass = fallback
-    ? "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent"
-    : "border-destructive/20 bg-gradient-to-b from-destructive/10 to-transparent";
+
 
   return (
-    <Card className={cn("border rounded-xl overflow-hidden animate-fade-in", cardClass)}>
+    <Card className={cn("border rounded-xl overflow-hidden animate-fade-in border-brand-indigo/20 bg-gradient-to-b from-brand-indigo/10 to-transparent", )}>
       <CardHeader>
         <div className="h-12 w-12 rounded-lg bg-background flex items-center justify-center mb-4">
           <Icon className="h-6 w-6 text-primary" />
@@ -41,6 +47,12 @@ const DashboardCard = ({
           </Link>
         )}
       </CardContent>
+
+      {footer && (
+        <div className="px-6 pb-6">
+          {footer}
+        </div>
+      )}
     </Card>
   );
 };

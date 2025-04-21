@@ -6,43 +6,50 @@ import { supabase } from "@/lib/supabase/client"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { LoadingOverlay } from "@/components/ui/loading-overlay"
+
 
 type Injury = {
-  injury_name: string
+  title: string
   description: string
   self_test: string
 }
+
 
 export default function InjuryResultsPage() {
   const [injuries, setInjuries] = useState<Injury[]>([])
   const searchParams = useSearchParams()
   const router = useRouter()
+  const [loading, setLoading] = useState(true)
 
   const complaintId = searchParams.get("complaintId")
 
   useEffect(() => {
     const fetchInjuries = async () => {
       if (!complaintId) return
-
+  
       const { data, error } = await supabase
-        .from("injury_options")
-        .select("injury_name, description, self_test")
-        .eq("primary_complaint_id", complaintId)
-
+        .from("injury_suggestions")
+        .select("title, description, self_test")
+        .eq("complaint_id", complaintId)
+  
       if (error) {
         console.error("Failed to load injuries", error)
-        return
+      } else {
+        setInjuries(data)
       }
-
-      setInjuries(data)
+  
+      setLoading(false) // ✅ end loading after data is handled
     }
-
+  
     fetchInjuries()
   }, [complaintId])
+  
 
   const handleSelectInjury = (injury: string) => {
     router.push(`/injury-detail?complaintId=${complaintId}&injury=${encodeURIComponent(injury)}`)
   }
+  if (loading) return <LoadingOverlay show message="Loading injury results..." />
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
@@ -54,7 +61,7 @@ export default function InjuryResultsPage() {
         {injuries.map((injury, i) => (
           <Card key={i} className="p-6 space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">{injury.injury_name}</h2>
+              <h2 className="text-xl font-semibold">{injury.title}</h2>
               <Badge variant="outline">#{i + 1}</Badge>
             </div>
             <p className="text-sm text-muted-foreground">{injury.description}</p>
@@ -64,7 +71,7 @@ export default function InjuryResultsPage() {
             </div>
             <Button
               className="mt-4 hero-button-primary"
-              onClick={() => handleSelectInjury(injury.injury_name)}
+              onClick={() => handleSelectInjury(injury.title)}
             >
               Continue
             </Button>
