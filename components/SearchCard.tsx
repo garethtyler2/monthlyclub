@@ -1,0 +1,81 @@
+import React from "react";
+import SavedItemCard from "./SavedItemCard";
+import { Button } from "./ui/button";
+import { Trash } from "lucide-react";
+
+interface SavedItem {
+  id: string;
+  title: string;
+  description?: string;
+  parentComplaintId: string;
+}
+
+interface Props {
+  title: string;
+  subtitle?: string;
+  complaintId: string;
+  savedItems: SavedItem[];
+  onRemoveInjury: (injuryId: string, parentComplaintId: string) => void;
+  onRemoveComplaint: (complaintId: string) => void;
+}
+
+const SearchCard: React.FC<Props> = ({
+  title,
+  subtitle,
+  complaintId,
+  savedItems,
+  onRemoveInjury,
+  onRemoveComplaint
+}) => (
+  <div className="bg-card rounded-2xl shadow-2xl p-4 w-full flex flex-col animate-fade-in min-h-[340px] relative">
+
+    {/* Title + delete button */}
+    <div className="flex items-start justify-between mb-4">
+      <div>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-primary">{title}</h2>
+        {subtitle && (
+          <p className="text-muted-foreground text-sm sm:text-base mt-1">{subtitle}</p>
+        )}
+      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="text-destructive hover:bg-red-100"
+        aria-label="Delete complaint"
+        onClick={() => onRemoveComplaint(complaintId)}
+      >
+        <Trash className="w-4 h-4 sm:w-5 sm:h-5" />
+      </Button>
+    </div>
+
+    {/* View suggestions */}
+    <Button
+      className="mb-6 w-full sm:w-auto"
+      variant="secondary"
+      onClick={() => window.location.href = `/injury-results?complaintId=${complaintId}`}
+    >
+      View Injury Suggestions
+    </Button>
+
+    {/* Saved injuries */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-1">
+      {savedItems.length > 0 ? (
+        savedItems.map((item) => (
+          <SavedItemCard
+            key={item.id}
+            title={item.title}
+            description={item.description}
+            onDelete={() => onRemoveInjury(item.id, item.parentComplaintId)}
+            injuryId={item.id}
+          />
+        ))
+      ) : (
+        <div className="text-gray-400 text-center col-span-full">
+          No saved items (yet!)
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+export default SearchCard;
