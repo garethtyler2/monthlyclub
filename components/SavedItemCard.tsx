@@ -20,7 +20,7 @@ const SavedItemCard: React.FC<Props> = ({ title, description, onDelete, injuryId
     <Button
       variant="ghost"
       size="icon"
-      className="text-destructive hover:bg-red-100"
+      className="text-destructive hover:bg-white-100"
       aria-label="Delete item"
       onClick={onDelete}
     >
@@ -42,7 +42,7 @@ const SavedItemCard: React.FC<Props> = ({ title, description, onDelete, injuryId
       }
     }}
   >
-    View item
+    Information
   </Button>
 </div>
 

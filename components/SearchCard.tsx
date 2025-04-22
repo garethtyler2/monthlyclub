@@ -40,7 +40,7 @@ const SearchCard: React.FC<Props> = ({
       <Button
         variant="ghost"
         size="icon"
-        className="text-destructive hover:bg-red-100"
+        className="text-destructive hover:bg-white-100"
         aria-label="Delete complaint"
         onClick={() => onRemoveComplaint(complaintId)}
       >
@@ -50,7 +50,7 @@ const SearchCard: React.FC<Props> = ({
 
     {/* View suggestions */}
     <Button
-      className="mb-6 w-full sm:w-auto"
+      className="mb-6 w-full hover:text-red-400 sm:w-auto"
       variant="secondary"
       onClick={() => window.location.href = `/injury-results?complaintId=${complaintId}`}
     >
@@ -71,7 +71,7 @@ const SearchCard: React.FC<Props> = ({
         ))
       ) : (
         <div className="text-gray-400 text-center col-span-full">
-          No saved items (yet!)
+          Injuries you view in detail will be saved here automatically.
         </div>
       )}
     </div>

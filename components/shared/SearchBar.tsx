@@ -25,18 +25,19 @@ const SearchBar = ({
 }: SearchBarProps) => {
   const dynamicPlaceholder = useTypingPlaceholder(placeholderList);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (onSearch) onSearch(value);
-  };
-
   const clearSearch = () => {
     onChange("");
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      if (onSearch) onSearch(value);
+    }
+  };
+
   return (
-    <form
-      onSubmit={handleSubmit}
+    <div
       className={cn(
         "relative flex flex-col sm:flex-row items-center w-full max-w-md",
         className
@@ -49,9 +50,10 @@ const SearchBar = ({
 
         <Input
           type="text"
-          name="query" // ✅ so it can be picked up in forms if needed
+          name="query"
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onKeyDown={handleKeyDown} // ✅ Trigger search on Enter key
           placeholder={
             placeholderList?.length ? dynamicPlaceholder : placeholder
           }
@@ -68,7 +70,7 @@ const SearchBar = ({
           </button>
         )}
       </div>
-    </form>
+    </div>
   );
 };
 
