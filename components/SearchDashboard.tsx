@@ -25,7 +25,7 @@ interface Props {
 
 const SearchDashboard: React.FC<Props> = ({ searches, onRemoveInjury, onRemoveComplaint }) => {
   return (
-    <div className="w-full py-10 px-4 flex flex-col gap-10">
+    <div className="max-w-6xl mx-auto w-full py-10 px-4 flex flex-col gap-10">
 
 
       {searches.map((search) => (

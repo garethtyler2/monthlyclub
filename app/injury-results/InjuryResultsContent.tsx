@@ -24,32 +24,39 @@ export default function InjuryResultsPage() {
 
   const complaintId = searchParams.get("complaintId")
 
-  useEffect(() => {
-    const fetchInjuries = async () => {
-      if (!complaintId) return
+// useEffect fetches all injuries linked to a specific complaint via the complaint_injuries join table.
+// It sets the result to the local injuries state after extracting nested injury records.
+useEffect(() => {
+  const fetchInjuries = async () => {
+    // Exit early if no complaintId is available in the URL.
+    if (!complaintId) return
 
-      // ✅ Fetch linked injuries via join table
-      const { data, error } = await supabase
-        .from("complaint_injuries")
-        .select("injuries(title, description, self_test)")
-        .eq("complaint_id", complaintId)
+    // ✅ Fetch linked injuries via join table
+    const { data, error } = await supabase
+      .from("complaint_injuries")
+      .select("injuries(title, description, self_test)")
+      .eq("complaint_id", complaintId)
 
-      if (error) {
-        console.error("Failed to load injuries", error)
-      } else {
-        // ✅ Extract nested injury records from each row
-        setInjuries(data.map((entry: any) => entry.injuries))
-      }
-
-      setLoading(false)
+    if (error) {
+      console.error("Failed to load injuries", error)
+    } else {
+      // Each entry contains a nested 'injuries' object due to the join query — we extract and flatten these.
+      setInjuries(data.map((entry: any) => entry.injuries))
     }
 
-    fetchInjuries()
-  }, [complaintId])
-
-  const handleSelectInjury = (injury: string) => {
-    router.push(`/injury-detail?complaintId=${complaintId}&injury=${encodeURIComponent(injury)}&loading=true`);
+    setLoading(false)
   }
+
+  fetchInjuries()
+}, [complaintId])
+
+// Navigate to the injury detail page for the selected injury, keeping track of complaintId in the URL.
+const handleSelectInjury = (injury: string) => {
+  router.push(
+    `/injury-detail?complaintId=${complaintId}&injury=${encodeURIComponent(injury)}&loading=true`
+    // Note: `loading=true` likely triggers a loading state in the next page.
+  );
+}
 
   if (loading) return <LoadingOverlay show message="Loading injury results..." />
 

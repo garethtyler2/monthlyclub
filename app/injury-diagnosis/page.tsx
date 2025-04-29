@@ -1,3 +1,5 @@
+// This page allows users to input pain details, cause of injury, and rate their symptoms.
+// The AI then diagnoses likely injuries and creates related database records.
 "use client"
 
 import { useState } from "react"
@@ -21,6 +23,11 @@ export default function InjuryDiagnosisSearchPage() {
   const [location, setLocation] = useState("")
   const router = useRouter()
 
+  // handleSubmit processes the injury diagnosis form:
+  // 1. Calls AI to get injury suggestions
+  // 2. Creates a complaint record
+  // 3. Logs pain/mobility/strength snapshot
+  // 4. Upserts injuries and links them to the complaint
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
@@ -48,7 +55,7 @@ export default function InjuryDiagnosisSearchPage() {
     setIsLoading(true);
   
     try {
-      // 👉 Step 1: Call the AI
+      // Step 1: Call the AI service to get a list of probable injuries
       const res = await fetch("/api/ai/injury-diagnosis", {
         method: "POST",
         body: JSON.stringify(payload),
@@ -60,7 +67,7 @@ export default function InjuryDiagnosisSearchPage() {
         throw new Error("AI did not return any injuries.");
       }
   
-      // 👉 Step 2: Create complaint (main concern)
+      // Step 2: Save the user's complaint (their main concern) into the database
       const { data: complaint, error } = await supabase
         .from("complaints")
         .insert({
@@ -75,7 +82,7 @@ export default function InjuryDiagnosisSearchPage() {
   
       if (error) throw error;
   
-      // 👉 Step 3: Log the initial pain/mobility/strength snapshot
+      // Step 3: Save the user's initial symptom ratings (pain, strength, mobility)
       await supabase.from("complaint_progress_logs").insert({
         user_id: user.id,
         complaint_id: complaint.id,
@@ -84,7 +91,7 @@ export default function InjuryDiagnosisSearchPage() {
         mobility_level: mobility,
       });
   
-      // 👉 Step 4: Save injuries to `injuries` and link them
+      // Step 4: Save suggested injuries into the injuries table (avoiding duplicates)
       const { data: insertedInjuries, error: insertError } = await supabase
         .from("injuries")
         .upsert(
@@ -100,7 +107,7 @@ export default function InjuryDiagnosisSearchPage() {
   
       if (insertError) throw insertError;
   
-      // 👉 Step 5: Link each inserted injury to the complaint
+      // Step 5: Link injuries to the complaint
       await supabase.from("complaint_injuries").insert(
         insertedInjuries.map((injury: any) => ({
           complaint_id: complaint.id,
@@ -116,8 +123,8 @@ export default function InjuryDiagnosisSearchPage() {
     }
   };
   
-  
 
+  // Render the form for users to input injury-related information
   return (
     <>
       <LoadingOverlay show={isLoading} message="Diagnosing..." />

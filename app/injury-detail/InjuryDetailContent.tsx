@@ -1,3 +1,5 @@
+"// This component handles the detailed view of an injury, including data fetching from Supabase or OpenAI if needed,"
+"// and displays symptoms, self-tests, early exercises, and rehab tips."
 "use client"
 
 import { useEffect, useState } from "react"
@@ -27,10 +29,14 @@ export default function InjuryDetailPage() {
   const complaintId = searchParams.get("complaintId")
   const injuryName = searchParams.get("injury")
 
+  // useEffect runs once the component mounts and handles fetching the injury detail.
+  // It first tries to get the injury from Supabase using the `id` from the URL.
+  // If no data exists, it falls back to fetching it from the OpenAI API.
   useEffect(() => {
     const fetchDetail = async () => {
       let globalInjury = null
 
+      // If an injury ID is present in the query, attempt to fetch injury details by ID from Supabase.
       if (id && id !== "undefined") {
         console.log("🔎 Fetching injury detail by ID:", id)
         const { data, error } = await supabase
@@ -64,6 +70,7 @@ export default function InjuryDetailPage() {
         console.log("📭 Injury has no details — going to fetch from AI...")
       }
 
+      // If we don't have enough info to fetch by name and complaintId, warn and exit.
       // Fallback to injuryName + complaintId if no details found via ID
       if (!injuryName || !complaintId) {
         console.warn("⚠️ Missing injuryName or complaintId in URL")
@@ -86,6 +93,7 @@ export default function InjuryDetailPage() {
         globalInjury = data || null
       }
 
+      // If no details exist, generate injury detail using OpenAI and either update or insert in Supabase.
       if (!globalInjury?.details) {
         // Need to fetch full data from OpenAI
         const res = await fetch("/api/ai/injury-detail", {
@@ -139,6 +147,7 @@ export default function InjuryDetailPage() {
         setDetail(JSON.parse(globalInjury.details))
       }
 
+      // Ensure that the injury is linked to the complaint in the complaint_injuries table.
       // Step: Link to complaint if not already linked
       const { data: existingLink, error: linkError } = await supabase
         .from("complaint_injuries")
@@ -178,6 +187,7 @@ export default function InjuryDetailPage() {
     fetchDetail()
   }, [id, complaintId, injuryName])
 
+  // Navigate to the rehab plan exercises page when the user clicks the button.
   const handleClick = () => {
     if (detail?.title) {
       router.push(
@@ -186,9 +196,11 @@ export default function InjuryDetailPage() {
     }
   }
 
+  // Show a loading screen while data is being fetched.
   if (isLoading) return <LoadingOverlay show message="Loading injury details..." />
   if (!detail) return <p className="text-center mt-10 text-muted-foreground">No data available.</p>
 
+  // Render the detailed injury content including symptoms, tests, exercises, and tips.
   return (
 
 

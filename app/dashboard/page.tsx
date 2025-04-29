@@ -17,6 +17,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const getUserAndComplaints = async () => {
+      // Step 1: Authenticate and get the logged-in user
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
@@ -26,6 +27,7 @@ export default function DashboardPage() {
 
       setUser(user);
 
+      // Step 2: Fetch all complaints tied to the user
       const { data: complaints, error: complaintsError } = await supabase
         .from("complaints")
         .select("id, location, summary_label, created_at")
@@ -39,21 +41,54 @@ export default function DashboardPage() {
 
       setUserComplaints(complaints);
 
-      const { data: injuries, error: injuriesError } = await supabase
-        .from("injury_details")
-        .select("id, complaint_id, injury_title, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+      // Step 3: Fetch all injuries tied to those complaints by joining complaint_injuries and injuries tables
+      // First, get all complaint IDs
+      const complaintIds = complaints.map(c => c.id);
 
-      if (injuriesError) {
-        console.error("❌ Failed to fetch injuries:", injuriesError);
+      if (complaintIds.length === 0) {
+        // No complaints, so no injuries
+        setInjuriesByComplaint({});
+        setLoading(false);
         return;
       }
 
-      const grouped = complaints.reduce((acc: Record<string, any[]>, complaint) => {
-        acc[complaint.id] = injuries.filter(i => i.complaint_id === complaint.id);
-        return acc;
-      }, {});
+      // Fetch injuries linked to complaints
+      // Assuming a join between complaint_injuries and injuries tables
+      const { data: complaintInjuries, error: complaintInjuriesError } = await supabase
+      .from("complaint_injuries")
+      .select(`
+        id,
+        complaint_id,
+        created_at,
+        injuries (
+          id,
+          title,
+          description,
+          self_test,
+          created_at
+        )
+      `)
+      .in("complaint_id", complaintIds)
+      .order("created_at", { foreignTable: "injuries", ascending: false });
+
+      if (complaintInjuriesError) {
+        console.error("❌ Failed to fetch complaint injuries:", complaintInjuriesError);
+        return;
+      }
+
+      // Step 4: Group injuries by complaint for dashboard display
+      const grouped: Record<string, any[]> = {};
+
+      complaintInjuries.forEach(ci => {
+        const complaintId = ci.complaint_id;
+        const injury = ci.injuries;
+        if (!grouped[complaintId]) {
+          grouped[complaintId] = [];
+        }
+        if (injury) {
+          grouped[complaintId].push(injury);
+        }
+      });
 
       setInjuriesByComplaint(grouped);
       setLoading(false);
@@ -79,7 +114,11 @@ export default function DashboardPage() {
       return copy;
     });
 
-    const { error } = await supabase.from("injury_details").delete().eq("id", injuryId);
+    // Delete from complaint_injuries join table using both injury_id and complaint_id
+    // to ensure the correct association is removed.
+    const { error } = await supabase.from("complaint_injuries").delete()
+      .eq("injury_id", injuryId)
+      .eq("complaint_id", parentComplaintId);
     if (error) console.error("Failed to remove injury:", error);
   };
 
@@ -90,7 +129,7 @@ export default function DashboardPage() {
     subtitle: complaint.summary_label ?? "",
     savedItems: injuriesByComplaint[complaint.id]?.map(injury => ({
       id: injury.id,
-      title: injury.injury_title,
+      title: toTitleCase(injury.title),
       description: injury.created_at
         ? `💾 Saved on ${new Date(injury.created_at).toLocaleDateString(undefined, {
             year: "numeric",
