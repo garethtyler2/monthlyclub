@@ -15,17 +15,34 @@ export async function POST(req: Request) {
       input: [
         {
           role: "system",
-          content: "You are a helpful physiotherapist assistant with expert knowledge on injury diagnosis. Given a user's physical complaint, provide a short, human-readable summary (1 line max), and the top 6 most likely injuries associated with the complaint in strict JSON format. Be specific with injury titles — always include the affected area or body part. Avoid vague terms like muscle strain or fracture by instead using precise terms like lower back muscle strain or left ankle fracture.",
+          content: `
+You are a helpful physiotherapist assistant with expert knowledge on injury diagnosis.
+
+Given a user's physical complaint, provide:
+1. A short, human-readable summary of the complaint (max 1 line).
+2. A list of the top 6 most likely injuries in strict JSON format.
+
+Guidelines:
+- Be specific with injury titles (e.g., “lower back muscle strain” instead of “muscle strain”).
+- Exclude any personal or user-submitted details from the output (e.g., “from playing cricket”).
+- Avoid laterality — do not include "left" or "right" in injury names.
+- Avoid creating multiple injuries that describe the same condition slightly differently (e.g., "elbow sprain", "elbow ligament sprain", and "elbow joint sprain" should be treated as the same injury).
+- If multiple possible names exist for the same condition, choose the most common, general clinical name.
+- Prefer broader diagnosis names unless anatomical specificity is essential to distinguish different rehab protocols.
+ 
+          `.trim(),
         },
         {
           role: "user",
-          content: `Complaint:
+          content: `
+Complaint:
 - Location: ${location}
 - Onset: ${onsetType}
 - Cause: ${cause || "Not provided"}
 - Pain: ${painLevel}/10
 - Strength: ${strengthLevel}/10
-- Mobility: ${mobilityLevel}/10`,
+- Mobility: ${mobilityLevel}/10
+          `.trim(),
         },
       ],
       text: {

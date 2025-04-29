@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
+import { toTitleCase } from "@/lib/utils";
 
 
 type Injury = {
@@ -14,7 +15,6 @@ type Injury = {
   description: string
   self_test: string
 }
-
 
 export default function InjuryResultsPage() {
   const [injuries, setInjuries] = useState<Injury[]>([])
@@ -27,33 +27,35 @@ export default function InjuryResultsPage() {
   useEffect(() => {
     const fetchInjuries = async () => {
       if (!complaintId) return
-  
+
+      // ✅ Fetch linked injuries via join table
       const { data, error } = await supabase
-        .from("injury_suggestions")
-        .select("title, description, self_test")
+        .from("complaint_injuries")
+        .select("injuries(title, description, self_test)")
         .eq("complaint_id", complaintId)
-  
+
       if (error) {
         console.error("Failed to load injuries", error)
       } else {
-        setInjuries(data)
+        // ✅ Extract nested injury records from each row
+        setInjuries(data.map((entry: any) => entry.injuries))
       }
-  
-      setLoading(false) // ✅ end loading after data is handled
+
+      setLoading(false)
     }
-  
+
     fetchInjuries()
   }, [complaintId])
-  
 
   const handleSelectInjury = (injury: string) => {
-    router.push(`/injury-detail?complaintId=${complaintId}&injury=${encodeURIComponent(injury)}`)
+    router.push(`/injury-detail?complaintId=${complaintId}&injury=${encodeURIComponent(injury)}&loading=true`);
   }
+
   if (loading) return <LoadingOverlay show message="Loading injury results..." />
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
-      <h1 className="text-3xl pt-10 font-bold">Possible Injuries</h1>
+      <h1 className="text-center font-bold">Possible Injuries</h1>
 
       {injuries.length === 0 && <p className="text-muted-foreground">No injuries found.</p>}
 
@@ -61,7 +63,7 @@ export default function InjuryResultsPage() {
         {injuries.map((injury, i) => (
           <Card key={i} className="p-6 space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">{injury.title}</h2>
+              <h2 className="text-xl font-semibold">{toTitleCase(injury.title)}</h2>
               <Badge variant="outline">#{i + 1}</Badge>
             </div>
             <p className="text-sm text-muted-foreground">{injury.description}</p>

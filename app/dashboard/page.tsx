@@ -92,7 +92,7 @@ export default function DashboardPage() {
       id: injury.id,
       title: injury.injury_title,
       description: injury.created_at
-        ? `Saved on ${new Date(injury.created_at).toLocaleDateString(undefined, {
+        ? `💾 Saved on ${new Date(injury.created_at).toLocaleDateString(undefined, {
             year: "numeric",
             month: "long",
             day: "numeric",

@@ -29,111 +29,147 @@ export default function InjuryDetailPage() {
 
   useEffect(() => {
     const fetchDetail = async () => {
+      let globalInjury = null
+
       if (id && id !== "undefined") {
-        // ✅ LOAD BY ID
         console.log("🔎 Fetching injury detail by ID:", id)
         const { data, error } = await supabase
-          .from("injury_details")
-          .select("full_json")
+          .from("injuries")
+          .select("id, title, details")
           .eq("id", id)
           .single()
 
-        if (error || !data?.full_json) {
-          console.error("❌ Failed to fetch injury detail by ID:", error)
+        if (error) {
+          console.error("❌ Supabase error while fetching by ID:", error)
           return
         }
 
-        setDetail(JSON.parse(data.full_json))
-        setIsLoading(false)
+        if (!data) {
+          console.error("❌ No injury found for ID:", id)
+          return
+        }
+
+        globalInjury = data
+
+        if (data.details) {
+          try {
+            setDetail(JSON.parse(data.details))
+          } catch (err) {
+            console.error("❌ Failed to parse injury details JSON:", err)
+          }
+          setIsLoading(false)
+          return
+        }
+
+        console.log("📭 Injury has no details — going to fetch from AI...")
+      }
+
+      // Fallback to injuryName + complaintId if no details found via ID
+      if (!injuryName || !complaintId) {
+        console.warn("⚠️ Missing injuryName or complaintId in URL")
         return
       }
 
-      // 🚨 No ID? Try to fetch via complaintId + injuryName
-      if (!complaintId || !injuryName) {
-        console.warn("⚠️ Missing complaintId or injuryName in URL")
-        return
+      if (!globalInjury) {
+        // Lookup by injury title
+        const { data, error } = await supabase
+          .from("injuries")
+          .select("id, title, details")
+          .eq("title", injuryName)
+          .single()
+
+        if (error && error.code !== "PGRST116") {
+          console.error("❌ Supabase error while looking up injury:", error)
+          return
+        }
+
+        globalInjury = data || null
       }
 
-      console.log("🧾 Loading detail via AI for:", complaintId, injuryName)
+      if (!globalInjury?.details) {
+        // Need to fetch full data from OpenAI
+        const res = await fetch("/api/ai/injury-detail", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ injury: { title: injuryName } }),
+        })
 
-      const { data: complaint, error } = await supabase
-        .from("complaints")
-        .select("summary_label")
-        .eq("id", complaintId)
-        .single()
+        const aiData = await res.json()
 
-      if (error || !complaint?.summary_label) {
-        console.error("❌ Error fetching complaint summary:", error)
-        return
-      }
+        if (!aiData?.title) {
+          console.error("❌ AI did not return valid injury data:", aiData)
+          return
+        }
 
-      const summary = complaint.summary_label
-      const res = await fetch("/api/ai/injury-detail", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          injury: {
-            title: injuryName,
-            context: summary,
-          },
-        }),
-      })
+        setDetail(aiData)
 
-      const aiData = await res.json()
-      if (!aiData?.title) {
-        console.error("❌ AI response missing title:", aiData)
-        return
-      }
+        if (globalInjury?.id) {
+          // Update existing injury with details
+          const { error } = await supabase
+            .from("injuries")
+            .update({ details: JSON.stringify(aiData) })
+            .eq("id", globalInjury.id)
 
-      setDetail(aiData)
+          if (error) {
+            console.error("❌ Failed to update existing injury record:", error)
+          } else {
+            console.log("✅ Updated existing injury with AI details")
+          }
+        } else {
+          // Create new injury in DB
+          const { data: newInjury, error: insertError } = await supabase
+            .from("injuries")
+            .insert({
+              title: aiData.title,
+              details: JSON.stringify(aiData),
+            })
+            .select()
+            .single()
 
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser()
+          if (insertError) {
+            console.error("❌ Failed to insert new injury record:", insertError)
+            return
+          }
 
-      if (!user || userError) {
-        console.error("❌ User not authenticated when trying to save:", userError)
-        return
-      }
-
-      // 🧠 Check if this injury already exists to avoid duplicates
-      const { data: existing, error: lookupError } = await supabase
-        .from("injury_details")
-        .select("id")
-        .eq("user_id", user.id)
-        .eq("complaint_id", complaintId)
-        .eq("injury_title", aiData.title)
-        .limit(1)
-
-      if (lookupError) {
-        console.error("❌ Error checking for existing injury detail:", lookupError)
-      }
-
-      if (existing && existing.length > 0 && existing[0].id) {
-        console.log("⚠️ Injury already exists. Redirecting to existing record:", existing[0].id)
-        router.replace(`/injury-detail?id=${existing[0].id}`)
-        return
-      }
-
-      const insertPayload = {
-        user_id: user.id,
-        complaint_id: complaintId,
-        injury_title: aiData.title,
-        full_json: JSON.stringify(aiData),
-      }
-
-      const { data: saved, error: saveError } = await supabase
-        .from("injury_details")
-        .insert(insertPayload)
-        .select()
-        .single()
-
-      if (saveError) {
-        console.error("❌ Failed to save new injury detail to Supabase:", saveError)
+          globalInjury = newInjury
+          console.log("✅ Created new global injury:", newInjury.id)
+        }
       } else {
-        console.log("✅ Saved new injury detail to Supabase")
-        router.replace(`/injury-detail?id=${saved.id}`)
+        // Load existing injury details
+        setDetail(JSON.parse(globalInjury.details))
+      }
+
+      // Step: Link to complaint if not already linked
+      const { data: existingLink, error: linkError } = await supabase
+        .from("complaint_injuries")
+        .select("id")
+        .eq("complaint_id", complaintId)
+        .eq("injury_id", globalInjury.id)
+        .maybeSingle()
+
+      if (linkError) {
+        console.error("❌ Failed to check for existing complaint link:", linkError)
+        return
+      }
+
+      if (!existingLink) {
+        const { error: insertLinkError } = await supabase
+          .from("complaint_injuries")
+          .insert({
+            complaint_id: complaintId,
+            injury_id: globalInjury.id,
+          })
+
+        if (insertLinkError) {
+          console.error("❌ Failed to link injury to complaint:", insertLinkError)
+        } else {
+          console.log("✅ Linked injury to complaint")
+        }
+      }
+
+      // Optional redirect to simplify future reloads
+      if (!id) {
+        router.replace(`/injury-detail?id=${globalInjury.id}`)
       }
 
       setIsLoading(false)
@@ -145,7 +181,7 @@ export default function InjuryDetailPage() {
   const handleClick = () => {
     if (detail?.title) {
       router.push(
-        `/rehab-plan-exercises?injury=${encodeURIComponent(detail.title)}&complaintId=${complaintId}`
+        `/rehab-plan-exercises?injury=${encodeURIComponent(detail.title)}&complaintId=${complaintId}&loading=true`
       )
     }
   }

@@ -22,11 +22,13 @@ export default function InjuryDiagnosisSearchPage() {
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
   
-    const form = e.currentTarget
-    const onsetType = (form.elements.namedItem("onset_type") as RadioNodeList)?.value
-    const cause = (form.elements.namedItem("injury_cause") as HTMLTextAreaElement)?.value
+    const form = e.currentTarget;
+    const onsetTypeRaw = (form.elements.namedItem("onset_type") as RadioNodeList)?.value;
+    const onsetType = onsetTypeRaw || null; // 👈 fallback to null if none selected
+  
+    const cause = (form.elements.namedItem("injury_cause") as HTMLTextAreaElement)?.value;
   
     const payload = {
       location,
@@ -35,24 +37,28 @@ export default function InjuryDiagnosisSearchPage() {
       painLevel: pain,
       strengthLevel: strength,
       mobilityLevel: mobility,
-    }
+    };
   
-    const { data: { user } } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      window.location.href = "/login?redirect=/injury-diagnosis"
-      return
+      window.location.href = "/login?redirect=/injury-diagnosis";
+      return;
     }
   
-    setIsLoading(true)
+    setIsLoading(true);
   
     try {
       // 👉 Step 1: Call the AI
       const res = await fetch("/api/ai/injury-diagnosis", {
         method: "POST",
         body: JSON.stringify(payload),
-      })
+      });
   
-      const ai = await res.json()
+      const ai = await res.json();
+  
+      if (!ai?.injuries?.length) {
+        throw new Error("AI did not return any injuries.");
+      }
   
       // 👉 Step 2: Create complaint (main concern)
       const { data: complaint, error } = await supabase
@@ -65,9 +71,9 @@ export default function InjuryDiagnosisSearchPage() {
           summary_label: ai.summaryLabel,
         })
         .select()
-        .single()
+        .single();
   
-      if (error) throw error
+      if (error) throw error;
   
       // 👉 Step 3: Log the initial pain/mobility/strength snapshot
       await supabase.from("complaint_progress_logs").insert({
@@ -76,25 +82,40 @@ export default function InjuryDiagnosisSearchPage() {
         pain_level: pain,
         strength_level: strength,
         mobility_level: mobility,
-      })
+      });
   
-      // 👉 Step 4: Saving injuries 
-      await supabase.from("injury_suggestions").insert(
-        ai.injuries.map((injury: any) => ({
+      // 👉 Step 4: Save injuries to `injuries` and link them
+      const { data: insertedInjuries, error: insertError } = await supabase
+        .from("injuries")
+        .upsert(
+          ai.injuries.map((injury: any) => ({
+            title: injury.title.toLowerCase(), // 👈 lowercase when saving
+            description: injury.description,
+            self_test: injury.selfTest,
+            // details: injury.details ?? {}  // if using full detail JSON later
+          })),
+          { onConflict: "title" } // ✅ make sure no duplicates
+        )
+        .select(); // ✅ get the ids back
+  
+      if (insertError) throw insertError;
+  
+      // 👉 Step 5: Link each inserted injury to the complaint
+      await supabase.from("complaint_injuries").insert(
+        insertedInjuries.map((injury: any) => ({
           complaint_id: complaint.id,
-          title: injury.title,
-          description: injury.description,
-          self_test: injury.selfTest,
+          injury_id: injury.id,
         }))
-      )
-      
+      );
   
-      router.push(`/injury-results?complaintId=${complaint.id}`)
-    } catch (err) {
-      console.error("Submission error:", err)
-      setIsLoading(false)
+      router.push(`/injury-results?complaintId=${complaint.id}`);
+    } catch (err: any) {
+      console.error("Submission error:", err?.message || err);
+      console.dir(err, { depth: null });
+      setIsLoading(false);
     }
-  }
+  };
+  
   
 
   return (

@@ -4,32 +4,35 @@ import { NextResponse } from "next/server";
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 export async function POST(req: Request) {
   const body = await req.json()
-  const { injury, levels } = body
+  const { injury } = body
 
-  console.log("🛠 AI ROUTE - Received:", { injury, levels })
+  console.log("🛠 AI ROUTE - Received:", { injury })
 
-  if (!injury?.title || !injury?.context) {
-    console.error("❌ Missing injury title or context:", injury)
-    return NextResponse.json({ error: "Missing injury data" }, { status: 400 })
+  if (!injury?.title) {
+    console.error("❌ Missing injury title:", injury)
+    return NextResponse.json({ error: "Missing injury title" }, { status: 400 })
   }
 
   try {
     const response = await openai.responses.create({
-      model: "gpt-4o-mini", // ✅ make sure this model is supported for your OpenAI plan
+      model: "gpt-4o-mini",
       input: [
         {
           role: "system",
-          content: "You are a helpful AI physiotherapist assistant. Return structured JSON only.",
+          content: "You are a knowledgeable AI physiotherapy assistant. Always respond with structured JSON only — no conversational text, no explanation.",
         },
         {
           role: "user",
           content: `
-A user is experiencing "${injury.title}" in the context of "${injury.context}".
-Their pain level is ${levels?.painLevel || "unknown"}/10,
-strength is ${levels?.strengthLevel || "unknown"}/10,
-mobility is ${levels?.mobilityLevel || "unknown"}/10.
+Provide detailed and clinically accurate information about the injury: "${injury.title}".
 
-Return injury details in structured JSON format.
+The output must include:
+- A clear, patient-friendly description of the injury
+- A list of common symptoms
+- Self-tests with instructions and interpretations
+- General recovery tips
+
+Return the information using the exact JSON schema provided.
           `,
         },
       ],
