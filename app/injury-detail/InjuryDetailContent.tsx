@@ -176,6 +176,19 @@ export default function InjuryDetailPage() {
         }
       }
 
+      // Step: Mark as viewed by the user
+      const { error: viewUpdateError } = await supabase
+        .from("complaint_injuries")
+        .update({ viewed_by_user: true })
+        .eq("complaint_id", complaintId)
+        .eq("injury_id", globalInjury.id);
+
+      if (viewUpdateError) {
+        console.error("❌ Failed to update viewed_by_user:", viewUpdateError);
+      } else {
+        console.log("✅ Marked injury as viewed by user");
+      }
+
       // Optional redirect to simplify future reloads
       if (!id) {
         router.replace(`/injury-detail?id=${globalInjury.id}`)

@@ -139,14 +139,7 @@ export default function InjuryDiagnosisSearchPage() {
             searchValue={location}
             onSearchChange={setLocation}
             onSearch={setLocation}
-            cta={
-              <Button className="hero-button-primary" asChild>
-                <Link href="/direct-rehab">
-                  Already know your injury?
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            }
+
           />
 
           <div className="space-y-3">

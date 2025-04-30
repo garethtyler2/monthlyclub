@@ -69,6 +69,7 @@ export default function DashboardPage() {
         )
       `)
       .in("complaint_id", complaintIds)
+      .eq("viewed_by_user", true)
       .order("created_at", { foreignTable: "injuries", ascending: false });
 
       if (complaintInjuriesError) {
