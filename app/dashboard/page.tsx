@@ -160,6 +160,20 @@ export default function DashboardPage() {
     onRemoveInjury={handleRemoveInjury}
     onRemoveComplaint={handleRemoveComplaint}
   />
+  {userComplaints.length === 0 && (
+    <div className="text-center mb-10 animate-fade-in">
+      <h2 className="text-2xl font-semibold mb-4">No activity yet</h2>
+      <p className="text-muted-foreground mb-6">
+        Ready to start your recovery journey?
+      </p>
+      <button
+        onClick={() => router.push("/injury-diagnosis")}
+        className="hero-button-primary"
+      >
+        Get Started with Injury Diagnosis
+      </button>
+    </div>
+  )}
 </>
 
   );

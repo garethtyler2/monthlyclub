@@ -29,7 +29,7 @@ Provide detailed and clinically accurate information about the injury: "${injury
 The output must include:
 - A clear, patient-friendly description of the injury
 - A list of common symptoms
-- Self-tests with instructions and interpretations
+- Common mistakes people make when recovering from this injury
 - General recovery tips
 
 Return the information using the exact JSON schema provided.
@@ -63,19 +63,9 @@ Return the information using the exact JSON schema provided.
                   required: ["name", "instructions", "interpretation"],
                 },
               },
-              earlyExercises: {
+              commonMistakes: {
                 type: "array",
-                items: {
-                  type: "object",
-                  additionalProperties: false,
-                  properties: {
-                    name: { type: "string" },
-                    instructions: { type: "string" },
-                    reps: { type: "string" },
-                    tip: { type: "string" },
-                  },
-                  required: ["name", "instructions", "reps", "tip"],
-                },
+                items: { type: "string" },
               },
               tips: {
                 type: "array",
@@ -87,7 +77,7 @@ Return the information using the exact JSON schema provided.
               "detailedDescription",
               "symptoms",
               "selfTests",
-              "earlyExercises",
+              "commonMistakes",
               "tips",
             ],
           },

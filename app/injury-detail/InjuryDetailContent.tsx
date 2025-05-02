@@ -15,7 +15,7 @@ export type InjuryDetail = {
   detailedDescription: string
   symptoms: string[]
   selfTests: { name: string; instructions: string; interpretation: string }[]
-  earlyExercises: { name: string; instructions: string; reps: string; tip: string }[]
+  commonMistakes: string[]
   tips: string[]
 }
 
@@ -204,7 +204,7 @@ export default function InjuryDetailPage() {
   const handleClick = () => {
     if (detail?.title) {
       router.push(
-        `/rehab-plan-exercises?injury=${encodeURIComponent(detail.title)}&complaintId=${complaintId}&loading=true`
+        `/rehab-plan?injury=${encodeURIComponent(detail.title)}&complaintId=${complaintId}&loading=true`
       )
     }
   }
@@ -252,18 +252,13 @@ export default function InjuryDetailPage() {
 
         <Card className="p-5 space-y-4">
           <div className="flex items-center gap-2 text-xl font-semibold">
-            <Dumbbell size={20} /> Starter Exercises
+            <AlertTriangle size={20} /> Common Mistakes
           </div>
-          <div className="space-y-4">
-            {detail.earlyExercises.map((ex, i) => (
-              <div key={i} className="border rounded-xl p-4 bg-muted">
-                <h4 className="text-lg font-semibold">{ex.name}</h4>
-                <p className="text-sm mt-1">💪 {ex.instructions}</p>
-                <p className="text-sm mt-1">Reps: {ex.reps}</p>
-                <p className="text-sm text-muted-foreground mt-1">{ex.tip}</p>
-              </div>
+          <ul className="list-disc list-inside space-y-1">
+            {detail.commonMistakes.map((mistake, i) => (
+              <li key={i}>{mistake}</li>
             ))}
-          </div>
+          </ul>
         </Card>
 
         <Card className="p-5 space-y-4">
@@ -277,7 +272,7 @@ export default function InjuryDetailPage() {
 
         <div className="pt-4">
           <Button onClick={handleClick} className="w-full hero-button-primary">
-          Rehab Exercises & Weekly Plan
+          Best Exercises
           </Button>
         </div>
       </div>

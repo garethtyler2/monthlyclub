@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase/client"
-import DashboardCard from "@/components/DashboardCard"
+import DashboardCard from "@/components/deprecated/DashboardCard"
 import { History } from "lucide-react"
 
 type RecentlyViewed = {
