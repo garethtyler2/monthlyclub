@@ -18,54 +18,46 @@ export async function POST(req: Request) {
         },
         {
           role: "user",
-          content: `Create a personalized 7-day rehab plan for a patient with the following:
+          content: `You're a highly specialized physical therapist with deep expertise in injury rehab.
+
+Please provide a JSON-formatted response that includes the top 10 most useful rehabilitation exercises for the injury below.
 
 - Injury: ${injury}
 - Context: ${context}
 
-Only include a structured week plan of exercises (no warm-ups or cooldowns inside each day). Also return two short advice statements — one for how to warm up before workouts, and one for how to cool down after workouts. Each statement should be no more than 2 sentences, and written in a friendly, helpful tone.
+Requirements:
+- Exercises must be ordered by usefulness (most essential first)
+- Each should be clearly explained and easy for patients to follow
+- Include sets, reps, instructions, and a brief note on why it's important
 
-Respond strictly in JSON using the schema.`,
+Do not include warm-ups, cooldowns, or general advice. Return only the top 10 rehab exercises in JSON format using the schema.`,
         },
       ],
       text: {
         format: {
           type: "json_schema",
-          name: "rehab_plan",
+          name: "top_exercises",
           schema: {
             type: "object",
             additionalProperties: false,
             properties: {
-              weekPlan: {
+              topExercises: {
                 type: "array",
                 items: {
                   type: "object",
                   additionalProperties: false,
                   properties: {
-                    day: { type: "string" },
-                    exercises: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        additionalProperties: false,
-                        properties: {
-                          name: { type: "string" },
-                          instructions: { type: "string" },
-                          reps: { type: "string" },
-                          sets: { type: "string" },
-                          notes: { type: "string" },
-                        },
-                        required: ["name", "instructions", "reps", "sets", "notes"],
-                      },
-                    },
+                    name: { type: "string" },
+                    instructions: { type: "string" },
+                    reps: { type: "string" },
+                    sets: { type: "string" },
+                    note: { type: "string" }
                   },
-                  required: ["day", "exercises"],
-                },
-              },
-              warmupAdvice: { type: "string" },
-              cooldownAdvice: { type: "string" },
+                  required: ["name", "instructions", "reps", "sets", "note"]
+                }
+              }
             },
-            required: ["weekPlan", "warmupAdvice", "cooldownAdvice"],
+            required: ["topExercises"]
           },
         },
       },

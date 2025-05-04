@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase/client"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
-import { Dumbbell, TestTube2, AlertTriangle, Lightbulb } from "lucide-react"
+import { TestTube2, AlertTriangle, Lightbulb } from "lucide-react"
 
 export type InjuryDetail = {
   title: string
@@ -198,14 +198,14 @@ export default function InjuryDetailPage() {
     }
 
     fetchDetail()
-  }, [id, complaintId, injuryName])
+  }, [id, complaintId, injuryName, router])
 
-  // Navigate to the rehab plan exercises page when the user clicks the button.
-  const handleClick = () => {
-    if (detail?.title) {
-      router.push(
-        `/rehab-plan?injury=${encodeURIComponent(detail.title)}&complaintId=${complaintId}&loading=true`
-      )
+// Navigate to the top exercises page when the user clicks the button.
+const handleClick = () => {
+  if (detail?.title) {
+    router.push(
+      `/exercise-list?injury=${encodeURIComponent(detail.title)}&complaintId=${complaintId}`
+    )
     }
   }
 
