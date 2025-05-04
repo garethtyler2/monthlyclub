@@ -272,7 +272,7 @@ const handleClick = () => {
 
         <div className="pt-4">
           <Button onClick={handleClick} className="w-full hero-button-primary">
-          Best Exercises
+          Exercises
           </Button>
         </div>
       </div>

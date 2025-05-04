@@ -50,7 +50,7 @@ const SearchCard: React.FC<Props> = ({
 
     {/* View suggestions */}
     <Button
-      className="mb-6 w-full hover:text-red-400 sm:w-auto"
+      className="mb-6 w-full hover:text-blue-400 sm:w-auto"
       variant="secondary"
       onClick={() => window.location.href = `/injury-results?complaintId=${complaintId}`}
     >

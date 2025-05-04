@@ -32,18 +32,32 @@ const SavedItemCard: React.FC<Props> = ({ title, description, onDelete, injuryId
     <div className="text-gray-500 text-sm mb-3">{description}</div>
   )}
 
-  <Button
-    size="sm"
-    variant="outline"
-    className="mt-auto self-start"
-    onClick={() => {
-      if (injuryId) {
-        window.location.href = `/injury-detail?id=${injuryId}`;
-      }
-    }}
-  >
-    Information
-  </Button>
+  <div className="flex gap-2 mt-auto self-start">
+    <Button
+      size="sm"
+      variant="outline"
+      onClick={() => {
+        if (injuryId) {
+          window.location.href = `/injury-detail?id=${injuryId}`;
+        }
+      }}
+    >
+      Information
+    </Button>
+
+    <Button
+      className="hero-button-primary"
+      size="sm"
+      onClick={() => {
+        if (title) {
+          const encodedTitle = encodeURIComponent(title);
+          window.location.href = `/exercise-list?injury=${encodedTitle}&complaintId=123`;
+        }
+      }}
+    >
+    Exercises
+    </Button>
+  </div>
 </div>
 
 );
