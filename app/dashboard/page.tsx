@@ -60,6 +60,7 @@ export default function DashboardPage() {
         id,
         complaint_id,
         created_at,
+        viewed_at,
         injuries (
           id,
           title,
@@ -87,7 +88,11 @@ export default function DashboardPage() {
           grouped[complaintId] = [];
         }
         if (injury) {
-          grouped[complaintId].push(injury);
+          grouped[complaintId].push({
+            ...injury,
+            added_at: ci.created_at,
+            viewed_at: ci.viewed_at,
+          });
         }
       });
 
@@ -131,8 +136,8 @@ export default function DashboardPage() {
     savedItems: injuriesByComplaint[complaint.id]?.map(injury => ({
       id: injury.id,
       title: toTitleCase(injury.title),
-      description: injury.created_at
-        ? `💾 Saved on ${new Date(injury.created_at).toLocaleDateString(undefined, {
+      description: injury.viewed_at
+        ? `💾 Saved on ${new Date(injury.viewed_at).toLocaleDateString(undefined, {
             year: "numeric",
             month: "long",
             day: "numeric",

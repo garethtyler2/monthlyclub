@@ -179,7 +179,10 @@ export default function InjuryDetailPage() {
       // Step: Mark as viewed by the user
       const { error: viewUpdateError } = await supabase
         .from("complaint_injuries")
-        .update({ viewed_by_user: true })
+        .update({ 
+          viewed_by_user: true,
+          viewed_at: new Date().toISOString(),
+         })
         .eq("complaint_id", complaintId)
         .eq("injury_id", globalInjury.id);
 
