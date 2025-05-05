@@ -57,9 +57,9 @@ const PersonalTraining = () => {
   ]);
   return (
     <div className="min-h-screen">
-      <div className="container px-3 py-8 md:py-16 max-w-4xl mx-auto">
+      <div className="container px-3 py-4 md:py-8 max-w-4xl mx-auto">
         <div className="text-center mb-10 animate-fade-in">
-        <h1 className="animate-fade-in pb-4" style={{ animationDelay: "400ms" }}>
+        <h1 className="animate-fade-in pb-4 sm:text-5xl text-3xl" style={{ animationDelay: "400ms" }}>
             <span className="block">Your AI-Powered</span>
             <span className="gradient-text">
             Personal Training Plan
@@ -76,7 +76,7 @@ const PersonalTraining = () => {
             {/* Timeframe Selection */}
             <div className="space-y-3 ">
               <h3 className="text-xl font-semibold flex items-center gap-2">
-                <Clock className="h-5 w-5  " /> 
+                <Clock className="h-5 w-5" /> 
                 How long would you like the workout programme for?
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-zinc-900">

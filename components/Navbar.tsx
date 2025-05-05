@@ -45,21 +45,18 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4">
-          <Link href="/prehab-search" className="text-sm font-medium hover:text-white transition-colors">
+          <Link href="/prehab" className="text-sm font-medium hover:text-white transition-colors">
             Prehab
           </Link>
           <Link href="/injury-diagnosis" className="text-sm font-medium hover:text-white transition-colors">
             Injury Diagnosis
-          </Link>
-          <Link href="/direct-rehab" className="text-sm font-medium hover:text-white transition-colors">
-            Injury Rehab
           </Link>
           <Link href="/personal-training" className="text-sm font-medium hover:text-white transition-colors">
             Personal Training
           </Link>
 
           <Link href="/insights" className="text-sm font-medium hover:text-white transition-colors">
-            Insights
+            The Rehab Hub
           </Link>
           {user && (
             <Button className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90">
@@ -101,7 +98,7 @@ const Navbar = () => {
         <div className="md:hidden border-t border-white/10 animate-fade-in">
           <div className="container mx-auto px-4 py-4 flex flex-col space-y-3">
             <Link
-              href="/prehab-search"
+              href="/prehab"
               className="text-sm font-medium hover:text-white transition-colors p-2"
               onClick={() => setIsMenuOpen(false)}
             >
@@ -114,13 +111,7 @@ const Navbar = () => {
             >
               Injury Diagnosis
             </Link>
-            <Link
-              href="/direct-rehab"
-              className="text-sm font-medium hover:text-white transition-colors p-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Injury Rehab
-            </Link>
+
             <Link
               href="/personal-training"
               className="text-sm font-medium hover:text-white transition-colors p-2"
@@ -139,7 +130,7 @@ const Navbar = () => {
               className="text-sm font-medium hover:text-white transition-colors p-2"
               onClick={() => setIsMenuOpen(false)}
             >
-              Insights
+              The Rehab Hub
             </Link>
 
             {/* Auth links for mobile */}

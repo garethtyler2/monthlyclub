@@ -151,7 +151,7 @@ export default function InjuryDiagnosisSearchPage() {
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-xl font-semibold">Did anything specific happen to cause it?</h3>
+            <h3 className="text-xl font-semibold">What caused it, and anything else you'd like us to know?</h3>
             <Textarea
               name="injury_cause"
               placeholder="e.g. I fell down the stairs, I twisted it during football..."
