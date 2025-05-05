@@ -13,24 +13,38 @@ function ExerciseContent() {
   const [exercises, setExercises] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   // State to track which exercises the current user has recommended
-  const [userRecommended, setUserRecommended] = useState<number[]>([]);
+  const [userRecommended, setUserRecommended] = useState<string[]>([]);
 
   // Extract query parameters from the URL: injury name and complaint ID
   const params = useSearchParams();
   const injuryName = params.get("injury");
   const complaintId = params.get("complaintId");
 
+  const fetchUserRecommendations = async (injuryName: string, exerciseIdsFromLinks: number[]) => {
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData?.user;
+    if (!user) return;
+
+    const { data: recommendations, error } = await supabase
+      .from("exercise_recommendations")
+      .select("exercise_id")
+      .eq("user_id", user.id)
+      .eq("injury_name", injuryName);
+
+    if (!error && recommendations) {
+      const recommendedIds = recommendations.map((r) => r.exercise_id);
+      setUserRecommended(recommendedIds);
+    }
+  };
+
   // useEffect to fetch exercises and user's recommendations whenever injuryName or complaintId changes
   useEffect(() => {
-    const fetchExercisesAndRecommendations = async () => {
+    const fetchExercisesAndLinks = async () => {
       if (!injuryName || !complaintId) return;
 
-      // --- Get user info ---
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData.user;
-      // We'll need user for recommendations below
+      setLoading(true);
 
-      // --- Check if exercises already exist in the database for this injury ---
+      // Check if any exercises are already linked to this injury
       const { data: existingLinks, error: existingError } = await supabase
         .from("exercise_injury_links")
         .select(`
@@ -51,22 +65,13 @@ function ExerciseContent() {
         .order("recommendations", { ascending: false })
         .order("rank", { ascending: true });
 
-      let exercisesOnly = [];
-      if (existingLinks && existingLinks.length > 0) {
-        exercisesOnly = existingLinks.map((link: any) => ({
-          ...link.exercises,
-          recommendations: link.recommendations || 0,
-          linkId: link.id,
-          rank: link.rank
-        }));
-        setExercises(exercisesOnly);
-      } else {
-        // --- No existing exercises found, so fetch user info (already done above) ---
-        if (!user) {
-          setLoading(false);
-          return;
-        }
-        // Fetch the complaint summary to provide context for AI generation
+      if (existingError) {
+        setLoading(false);
+        return;
+      }
+
+      if (!existingLinks || existingLinks.length === 0) {
+
         const { data: complaint } = await supabase
           .from("complaints")
           .select("summary_label")
@@ -74,23 +79,33 @@ function ExerciseContent() {
           .single();
 
         const summary = complaint?.summary_label || "";
+        const aiRes = await fetch("/api/ai/exercise-list", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ injury: injuryName, context: summary }),
+        });
 
-        try {
-          // --- Call AI API to generate a list of top exercises ---
-          const aiRes = await fetch("/api/ai/exercise-list", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ injury: injuryName, context: summary }),
-          });
+        const aiData = await aiRes.json();
 
-          const aiData = await aiRes.json();
-          const topExercises = aiData.data?.topExercises || [];
+        const topExercises = aiData?.data?.topExercises || [];
 
-          const savedExercises = [];
+        for (let i = 0; i < topExercises.length; i++) {
+          const ex = topExercises[i];
 
-          // --- Save each AI-generated exercise to the database ---
-          for (const ex of topExercises) {
-            const { data: inserted, error } = await supabase
+          // Step 1: Check if the exercise already exists by name
+          const { data: existingExercise, error: findError } = await supabase
+            .from("exercises")
+            .select("id")
+            .eq("name", ex.name)
+            .maybeSingle();
+
+          let exerciseId = null;
+
+          if (existingExercise) {
+            exerciseId = existingExercise.id;
+          } else {
+            // Step 2: Insert new exercise
+            const { data: insertedExercise, error: insertError } = await supabase
               .from("exercises")
               .insert({
                 name: ex.name,
@@ -102,60 +117,83 @@ function ExerciseContent() {
               .select()
               .single();
 
-            // If insert successful, link exercise to injury with rank order
-            if (!error && inserted) {
-              savedExercises.push({
-                ...inserted,
-                recommendations: 0,
-                rank: savedExercises.length + 1,
-              });
-
-              await supabase.from("exercise_injury_links").insert({
-                exercise_id: inserted.id,
-                injury_name: injuryName,
-                rank: savedExercises.length,
-                recommendations: 0,
-              });
+            if (insertError || !insertedExercise) {
+              continue;
             }
+
+            exerciseId = insertedExercise.id;
           }
 
-          // Update state with the newly saved exercises
-          exercisesOnly = savedExercises;
-          setExercises(savedExercises);
-        } catch (err) {
-          // Log any errors that occur during fetch or save
-          console.error("❌ Failed to fetch or save exercises:", err);
-        }
-      }
+          // Step 3: Check if the link exists
+          const { data: linkExists, error: linkError } = await supabase
+            .from("exercise_injury_links")
+            .select("id")
+            .eq("injury_name", injuryName)
+            .eq("exercise_id", exerciseId)
+            .maybeSingle();
 
-      // --- Fetch user recommendations for these exercises ---
-      if (user && exercisesOnly.length > 0) {
-        const exerciseIds = exercisesOnly.map((ex: any) => ex.id);
-        // Get all recommendations for this user, injury, and exercise IDs
-        const { data: recs, error: recsError } = await supabase
-          .from("exercise_recommendations")
-          .select("exercise_id")
-          .eq("user_id", user.id)
-          .eq("injury_name", injuryName)
-          .in("exercise_id", exerciseIds);
-        if (!recsError && Array.isArray(recs)) {
-          setUserRecommended(recs.map((r) => r.exercise_id));
-        } else {
-          setUserRecommended([]);
+          if (!linkExists) {
+            const { error: linkInsertError } = await supabase.from("exercise_injury_links").insert({
+              injury_name: injuryName,
+              exercise_id: exerciseId,
+              rank: i + 1,
+              recommendations: 0,
+            });
+
+          }
         }
+
+        // Fetch updated links after linking all 10
+        const { data: newLinks, error: newLinksError } = await supabase
+          .from("exercise_injury_links")
+          .select(`
+            id,
+            rank,
+            recommendations,
+            exercise_id,
+            exercises (
+              id,
+              name,
+              instructions,
+              sets,
+              reps,
+              notes
+            )
+          `)
+          .eq("injury_name", injuryName)
+          .order("recommendations", { ascending: false })
+          .order("rank", { ascending: true });
+
+        if (newLinksError) {
+          setLoading(false);
+          return;
+        }
+
+        setExercises(newLinks.map((link: any) => ({
+          ...link.exercises,
+          recommendations: link.recommendations,
+          rank: link.rank
+        })));
+
+        await fetchUserRecommendations(injuryName, newLinks.map((link: any) => link.exercise_id));
       } else {
-        setUserRecommended([]);
+        setExercises(existingLinks.map((link: any) => ({
+          ...link.exercises,
+          recommendations: link.recommendations,
+          rank: link.rank
+        })));
+
+        await fetchUserRecommendations(injuryName, existingLinks.map((link: any) => link.exercise_id));
       }
 
       setLoading(false);
     };
 
-    fetchExercisesAndRecommendations();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchExercisesAndLinks();
   }, [injuryName, complaintId]);
 
   // Handler to recommend or remove recommend for an exercise
-  const handleRecommend = async (exerciseId: number) => {
+  const handleRecommend = async (exerciseId: string) => {
     if (!injuryName) return;
     setLoading(true);
     try {
@@ -176,7 +214,6 @@ function ExerciseContent() {
         .single();
 
       if (linkError || !linkData) {
-        console.error("❌ Could not find exercise injury link to update recommendations.");
         setLoading(false);
         return;
       }
@@ -233,7 +270,6 @@ function ExerciseContent() {
         });
       });
     } catch (err) {
-      console.error("❌ Error recommending exercise:", err);
     } finally {
       setLoading(false);
     }
