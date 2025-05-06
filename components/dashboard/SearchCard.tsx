@@ -1,7 +1,7 @@
 import React from "react";
 import SavedItemCard from "./SavedItemCard";
 import { Button } from "../ui/button";
-import { Trash } from "lucide-react";
+import { Trash, ChevronDown, ChevronUp } from "lucide-react";
 import ComplaintChart from './ComplaintChart';
 import UpdateProgressModal from './UpdateProgressModal';
 
@@ -41,9 +41,13 @@ const SearchCard: React.FC<Props> = ({
     {/* Title + delete button */}
     <div className="flex items-start justify-between mb-4">
       <div>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-primary">{title}</h2>
+        <h2 className="text-xl sm:text-2xl font-semibold text-muted-foreground mb-1">Complaint</h2>
+        <p className="text-white font-semibold text-sm sm:text-base">{title}</p>
         {subtitle && (
-          <p className="text-muted-foreground text-sm sm:text-base mt-1">{subtitle}</p>
+          <>
+            <p className="text-sm font-semibold text-muted-foreground mt-4 mb-1">💡 AI Summary</p>
+            <p className="text-muted-foreground text-sm sm:text-base">{subtitle}</p>
+          </>
         )}
       </div>
       <Button
@@ -57,27 +61,26 @@ const SearchCard: React.FC<Props> = ({
       </Button>
     </div>
 
-    {/* View suggestions */}
-    <Button
-      className="mb-6 w-full hover:text-blue-400 sm:w-auto"
-      variant="secondary"
-      onClick={() => window.location.href = `/injury-results?complaintId=${complaintId}`}
-    >
-      View Injury Suggestions
-    </Button>
-
-    <div className="flex gap-2 mb-4">
+    <div className="flex flex-col sm:flex-row gap-2 mb-4">
       {onToggleChart && (
         <Button
-          className="hero-button-primary"
+          className="hero-button-primary w-full sm:w-auto"
           onClick={onToggleChart}
         >
-          {showChart ? "Hide Chart" : "Show Chart"}
+          {showChart ? (
+            <>
+              Hide Chart <ChevronUp className="ml-2 h-4 w-4" />
+            </>
+          ) : (
+            <>
+              Show Chart <ChevronDown className="ml-2 h-4 w-4" />
+            </>
+          )}
         </Button>
       )}
       <Button
         variant="outline"
-        className="mb-4 self-start"
+        className="w-full sm:w-auto"
         onClick={() => setModalOpen(true)}
       >
         Update Progress
@@ -117,6 +120,14 @@ const SearchCard: React.FC<Props> = ({
         </div>
       )}
     </div>
+
+    <Button
+      className="mb-6 mt-6 w-full hover:text-blue-400 sm:w-auto"
+      variant="secondary"
+      onClick={() => window.location.href = `/injury-results?complaintId=${complaintId}`}
+    >
+      See Other Injury Suggestions
+    </Button>
   </div>
   );
 }
