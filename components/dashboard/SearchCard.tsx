@@ -41,8 +41,8 @@ const SearchCard: React.FC<Props> = ({
     {/* Title + delete button */}
     <div className="flex items-start justify-between mb-4">
       <div>
-        <h2 className="text-xl sm:text-2xl font-semibold text-muted-foreground mb-1">Complaint</h2>
-        <p className="text-white font-semibold text-sm sm:text-base">{title}</p>
+        <h2 className="text-xl sm:text-2xl gradient-text mb-1">Complaint</h2>
+        <p className="text-white font-semibold text-sm sm:text-base">"{title}"</p>
         {subtitle && (
           <>
             <p className="text-sm font-semibold text-muted-foreground mt-4 mb-1">💡 AI Summary</p>
