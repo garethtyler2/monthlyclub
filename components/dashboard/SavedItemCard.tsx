@@ -1,6 +1,6 @@
 // src/components/SavedItemCard.tsx
 import React from "react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { Trash } from "lucide-react";
 
 interface Props {

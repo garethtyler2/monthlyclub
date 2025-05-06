@@ -1,7 +1,9 @@
 import React from "react";
 import SavedItemCard from "./SavedItemCard";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { Trash } from "lucide-react";
+import ComplaintChart from './ComplaintChart';
+import UpdateProgressModal from './UpdateProgressModal';
 
 interface SavedItem {
   id: string;
@@ -17,6 +19,8 @@ interface Props {
   savedItems: SavedItem[];
   onRemoveInjury: (injuryId: string, parentComplaintId: string) => void;
   onRemoveComplaint: (complaintId: string) => void;
+  showChart?: boolean;
+  onToggleChart?: () => void;
 }
 
 const SearchCard: React.FC<Props> = ({
@@ -25,9 +29,14 @@ const SearchCard: React.FC<Props> = ({
   complaintId,
   savedItems,
   onRemoveInjury,
-  onRemoveComplaint
-}) => (
-  <div className="bg-card rounded-2xl shadow-2xl p-4 w-full flex flex-col animate-fade-in min-h-[340px] relative">
+  onRemoveComplaint,
+  showChart,
+  onToggleChart
+}) => {
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [chartKey, setChartKey] = React.useState(0);
+  return (
+    <div className="bg-card rounded-2xl shadow-2xl p-4 w-full flex flex-col animate-fade-in min-h-[340px] relative">
 
     {/* Title + delete button */}
     <div className="flex items-start justify-between mb-4">
@@ -57,6 +66,39 @@ const SearchCard: React.FC<Props> = ({
       View Injury Suggestions
     </Button>
 
+    <div className="flex gap-2 mb-4">
+      {onToggleChart && (
+        <Button
+          className="hero-button-primary"
+          onClick={onToggleChart}
+        >
+          {showChart ? "Hide Chart" : "Show Chart"}
+        </Button>
+      )}
+      <Button
+        variant="outline"
+        className="mb-4 self-start"
+        onClick={() => setModalOpen(true)}
+      >
+        Update Progress
+      </Button>
+    </div>
+
+    <UpdateProgressModal
+      open={modalOpen}
+      onClose={() => {
+        setModalOpen(false);
+        setChartKey(prev => prev + 1);
+      }}
+      complaintId={complaintId}
+    />
+
+    {showChart && (
+      <div className="mb-6 w-full border rounded-lg p-1 bg-muted">
+        <ComplaintChart key={chartKey} complaintId={complaintId} />
+      </div>
+    )}
+
     {/* Saved injuries */}
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-1">
       {savedItems.length > 0 ? (
@@ -76,6 +118,7 @@ const SearchCard: React.FC<Props> = ({
       )}
     </div>
   </div>
-);
+  );
+}
 
 export default SearchCard;

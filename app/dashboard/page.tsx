@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
-import SearchDashboard from "@/components/SearchDashboard";
+import SearchDashboard from "@/components/dashboard/SearchDashboard";
 import { toTitleCase } from "@/lib/utils";
 
 export default function DashboardPage() {
@@ -13,7 +13,14 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [userComplaints, setUserComplaints] = useState<any[]>([]);
   const [injuriesByComplaint, setInjuriesByComplaint] = useState<Record<string, any[]>>({});
+  const [showChartMap, setShowChartMap] = useState<Record<string, boolean>>({});
   const router = useRouter();
+  const toggleChart = (complaintId: string) => {
+    setShowChartMap(prev => ({
+      ...prev,
+      [complaintId]: !prev[complaintId],
+    }));
+  };
 
   useEffect(() => {
     const getUserAndComplaints = async () => {
@@ -164,6 +171,8 @@ export default function DashboardPage() {
     searches={transformed}
     onRemoveInjury={handleRemoveInjury}
     onRemoveComplaint={handleRemoveComplaint}
+    showChartMap={showChartMap}
+    onToggleChart={toggleChart}
   />
   {userComplaints.length === 0 && (
     <div className="text-center mb-10 animate-fade-in">
