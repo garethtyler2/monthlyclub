@@ -1,12 +1,14 @@
 'use client';
 export const dynamic = "force-dynamic";
 
+import { toast } from "sonner";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Dumbbell } from "lucide-react";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
+import { Toaster } from "@/components/ui/sonner";
 
 function ExerciseContent() {
   // State to hold the list of exercises and loading status
@@ -15,10 +17,20 @@ function ExerciseContent() {
   // State to track which exercises the current user has recommended
   const [userRecommended, setUserRecommended] = useState<string[]>([]);
 
+useEffect(() => {
+  console.log("Mounted");
+  toast("👍 Recommend!", {
+    description: "Don't forget to recommend an exercise if it helped you — your feedback supports the whole community.",
+    duration: 6000,
+    className: "text-white shadow-lg border !bg-gradient-to-r from-brand-purple to-brand-blue border-white/10",
+
+  });
+}, []);
   // Extract query parameters from the URL: injury name and complaint ID
   const params = useSearchParams();
   const injuryName = params.get("injury");
   const complaintId = params.get("complaintId");
+
 
   const fetchUserRecommendations = async (injuryName: string, exerciseIdsFromLinks: number[]) => {
     const { data: userData } = await supabase.auth.getUser();
@@ -237,6 +249,7 @@ function ExerciseContent() {
           .eq("id", linkData.id);
         // Update local state
         setUserRecommended((prev) => [...prev, exerciseId]);
+
       } else {
         // Remove recommendation
         newCount = Math.max(newCount - 1, 0);
@@ -254,6 +267,7 @@ function ExerciseContent() {
           .eq("id", linkData.id);
         // Update local state
         setUserRecommended((prev) => prev.filter((id) => id !== exerciseId));
+
       }
 
       // Update local recommendations count for this exercise
@@ -288,6 +302,13 @@ function ExerciseContent() {
         </p>
       </div>
 
+      <details className="text-sm text-end text-muted-foreground mb-4">
+        <summary className="cursor-pointer font-medium">🤝 Why recommend exercises?</summary>
+        <p className="mt-2">
+          Exercises are ordered based on community experience. When you recommend one that helped you, it helps others recover more effectively.
+        </p>
+      </details>
+
       <Card className="p-2 space-y-4 mt-4">
         <div className="flex items-center gap-2 text-xl font-semibold">
           <Dumbbell size={20} /> Exercises
@@ -321,6 +342,7 @@ function ExerciseContent() {
           })}
         </div>
       </Card>
+      <Toaster />
     </div>
   );
 }
