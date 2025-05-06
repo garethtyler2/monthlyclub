@@ -167,6 +167,23 @@ export default function DashboardPage() {
     </h1>
   </div>
 
+  <div className="flex justify-center mt-6 mb-4">
+    <div className="inline-flex items-center justify-center rounded-lg border border-border bg-muted p-1">
+      {["Rehab", "Prehab", "Personal Training"].map((tab) => (
+        <button
+          key={tab}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            tab === "Rehab"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {tab}
+        </button>
+      ))}
+    </div>
+  </div>
+
   <SearchDashboard
     searches={transformed}
     onRemoveInjury={handleRemoveInjury}
