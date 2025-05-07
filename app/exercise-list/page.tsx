@@ -16,6 +16,7 @@ function ExerciseContent() {
   const [loading, setLoading] = useState(true);
   // State to track which exercises the current user has recommended
   const [userRecommended, setUserRecommended] = useState<string[]>([]);
+  const [recommendingId, setRecommendingId] = useState<string | null>(null);
 
 useEffect(() => {
   console.log("Mounted");
@@ -207,13 +208,12 @@ useEffect(() => {
   // Handler to recommend or remove recommend for an exercise
   const handleRecommend = async (exerciseId: string) => {
     if (!injuryName) return;
-    setLoading(true);
+    setRecommendingId(exerciseId);
     try {
       // Get current user
       const { data: userData } = await supabase.auth.getUser();
       const user = userData.user;
       if (!user) {
-        setLoading(false);
         return;
       }
 
@@ -226,7 +226,6 @@ useEffect(() => {
         .single();
 
       if (linkError || !linkData) {
-        setLoading(false);
         return;
       }
 
@@ -285,7 +284,7 @@ useEffect(() => {
       });
     } catch (err) {
     } finally {
-      setLoading(false);
+      setRecommendingId(null);
     }
   };
 
@@ -327,11 +326,12 @@ useEffect(() => {
                 {ex.notes && <p className="text-xs mt-1 mb-0">🧠 {ex.notes}</p>}
                 <div className="flex justify-end mt-2">
                   <button
-                    className={
+                    disabled={recommendingId === ex.id}
+                    className={`text-xs text-white px-3 py-1 rounded transition ${
                       isRecommended
-                        ? "text-xs text-white px-3 py-1 rounded transition bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800"
-                        : "text-xs text-white px-3 py-1 rounded transition bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
-                    }
+                        ? "bg-gradient-to-r from-green-500 to-green-700 hover:from-green-600 hover:to-green-800"
+                        : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+                    } ${recommendingId === ex.id ? "opacity-50 cursor-wait" : ""}`}
                     onClick={() => handleRecommend(ex.id)}
                   >
                     {isRecommended ? "Recommended" : "Recommend"}
