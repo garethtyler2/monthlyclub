@@ -1,8 +1,8 @@
-import Features from "@/components/Features";
-import Hero from "@/components/HeroSection";
-import Testimonials from "@/components/Testimonials";
-import Metrics from "@/components/Metrics"; 
-import MultiCTASection from "@/components/MultiCTASection";
+import Features from "@/components/Homepage/Features";
+import Hero from "@/components/Homepage/HeroSection";
+import Testimonials from "@/components/Homepage/Testimonials";
+import Metrics from "@/components/Homepage/Metrics"; 
+import MultiCTASection from "@/components/Homepage/MultiCTASection";
 
 export default function HomePage() {
   return (

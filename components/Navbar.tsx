@@ -95,65 +95,77 @@ const Navbar = () => {
 
       {/* Mobile Navigation Menu */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-white/10 animate-fade-in">
-          <div className="container mx-auto px-4 py-4 flex flex-col space-y-3">
-            <Link
-              href="/injury-diagnosis"
-              className="text-sm font-medium hover:text-white transition-colors p-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Rehab
-            </Link>
-            <Link
-              href="/prehab"
-              className="text-sm font-medium hover:text-white transition-colors p-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Prehab
-            </Link>
+        <div className="relative">
+          <div
+            className="fixed inset-0 bg-black/50 z-40"
+            onClick={() => setIsMenuOpen(false)}
+          />
+          <div className="md:hidden border-t border-white/10 animate-fade-in relative z-50">
+            <div className="container mx-auto px-4 py-4 flex flex-col space-y-3">
+              <Link
+                href="/injury-diagnosis"
+                className="text-sm font-medium hover:text-white transition-colors p-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Rehab
+              </Link>
+              <Link
+                href="/prehab"
+                className="text-sm font-medium hover:text-white transition-colors p-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Prehab
+              </Link>
 
-            <Link
-              href="/personal-training"
-              className="text-sm font-medium hover:text-white transition-colors p-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Personal Training
-            </Link>
-            {user && (
-                <Button className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90">
-                    <Link href="/dashboard" className="text-white">Dashboard</Link>
-                </Button>
-                )}
+              <Link
+                href="/personal-training"
+                className="text-sm font-medium hover:text-white transition-colors p-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Personal Training
+              </Link>
 
-            <Link
-              href="/insights"
-              className="text-sm font-medium hover:text-white transition-colors p-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              The Rehab Hub
-            </Link>
+              <Link
+                href="/insights"
+                className="text-sm font-medium hover:text-white transition-colors p-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                The Rehab Hub
+              </Link>
 
-            {/* Auth links for mobile */}
-            <div className="flex flex-col pt-2 border-t border-white/10 space-y-2">
-              {user ? (
+              {user && (
                 <Button
-                  className="w-full justify-start px-2"
-                  variant="ghost"
-                  onClick={handleLogout}
+                  className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90 p-2 "
+                  onClick={() => setIsMenuOpen(false)}
                 >
-                  Logout
+                  <Link href="/dashboard" className="text-white w-full ">
+                    Dashboard
+                  </Link>
                 </Button>
-              ) : (
-                <>
-
-                  <Button
-                    className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90 w-full"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Link href="/login" className="text-white">Access AI-Rehab</Link>
-                  </Button>
-                </>
               )}
+
+              {/* Auth links for mobile */}
+              <div className="flex flex-col pt-2 border-t border-white/10 space-y-2">
+                {user ? (
+                  <Button
+                    className="w-full justify-start px-2"
+                    variant="ghost"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </Button>
+                ) : (
+                  <>
+
+                    <Button
+                      className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90 w-full"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Link href="/login" className="text-white">Access AI-Rehab</Link>
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>

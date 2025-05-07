@@ -32,10 +32,6 @@ const CTAButtons = [
     link: "/prehab-search"
   },
   {
-    text: "Get Rehab Information",
-    link: "/direct-rehab"
-  },
-  {
     text: "Start Personal Training",
     link: "/personal-training"
   }
@@ -68,7 +64,7 @@ const CTA = () => {
             ))}
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             {CTAButtons.map((button, index) => (
               <Button key={index} variant={index % 2 === 0 ? "default" : "outline"} className={index % 2 === 0 ? "hero-button-primary" : "hero-button-secondary"} asChild>
                 <Link href={button.link}>
