@@ -194,7 +194,7 @@ export default function InjuryDetailPage() {
 
       // Optional redirect to simplify future reloads
       if (!id) {
-        router.replace(`/injury-detail?id=${globalInjury.id}`)
+        router.replace(`/injury-detail?id=${globalInjury.id}&complaintId=${complaintId}`)
       }
 
       setIsLoading(false)

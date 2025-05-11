@@ -20,7 +20,8 @@ export default function InjuryDiagnosisSearchPage() {
   const [strength, setStrength] = useState(5)
   const [mobility, setMobility] = useState(5)
   const [isLoading, setIsLoading] = useState(false)
-  const [location, setLocation] = useState("")
+  const [bodyRegion, setBodyRegion] = useState<"upper" | "lower" | "">("");
+  const [location, setLocation] = useState("");
   const router = useRouter()
 
   // handleSubmit processes the injury diagnosis form:
@@ -129,56 +130,130 @@ export default function InjuryDiagnosisSearchPage() {
     <>
       <LoadingOverlay show={isLoading} message="Diagnosing..." />
 
+      <div className="container mx-auto px-4">
+        <div className="text-center max-w-3xl mx-auto mb-8">
+          <h1 className="mb-4 mt-4 animate-fade-in text-4xl sm:text-5xl font-bold leading-tight">
+            <span className="block">AI Injury Diagnosis</span>
+            <span className="block text-lg sm:text-2xl text-muted-foreground mt-2">
+              <span className="gradient-text">Identify Your Injury with AI Assistance</span>
+            </span>
+          </h1>
+        </div>
+      </div>
+
       <div className="max-w-3xl mx-auto px-4">
         <form onSubmit={handleSubmit} className="space-y-8">
-          <SearchBarTemplate
-            titleStart="AI Injury Diagnosis"
-            titleHighlight="Identify Your Injury with AI Assistance"
-            placeholderList={["Neck ache", "Lower back pain", "Sore wrist", "Pain when I sit"]}
-            description="Tip: You can search by body part or a symptom."
-            searchValue={location}
-            onSearchChange={setLocation}
-            onSearch={setLocation}
-
-          />
-
-          <div className="space-y-3">
-            <h3 className="text-xl font-semibold">How did the pain start?</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-zinc-900">
-              <RadioCard id="onset_sudden" name="onset_type" value="sudden" label="Suddenly" />
-              <RadioCard id="onset_gradual" name="onset_type" value="gradual" label="Gradually" />
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-xl font-semibold">What caused it, and anything else you'd like us to know?</h3>
-            <Textarea
-              name="injury_cause"
-              placeholder="e.g. I fell down the stairs, I twisted it during football..."
-              className="min-h-[100px]"
-            />
-          </div>
-
           <div className="space-y-6">
-            <h3 className="text-xl font-semibold">Rate the following from 1 to 10</h3>
-
-            <div className="space-y-2">
-              <label className="block font-medium">Pain Level</label>
-              <Slider value={[pain]} onValueChange={(val) => setPain(val[0])} min={1} max={10} step={1} />
+            <h3 className="text-xl text-center font-semibold text-white">Where is the pain located?</h3>
+            
+            <div className="flex justify-center">
+              <div className="inline-flex items-center justify-center rounded-lg border border-border bg-muted p-1">
+                {[
+                  { key: "upper", label: "Upper Body" },
+                  { key: "lower", label: "Lower Body" },
+                ].map(({ key, label }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => {
+                      setBodyRegion(key as "upper" | "lower");
+                      setLocation("");
+                    }}
+                    className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                      bodyRegion === key
+                        ? "bg-background text-white shadow-sm"
+                        : "text-muted-foreground hover:text-white"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="block font-medium">Strength Level</label>
-              <Slider value={[strength]} onValueChange={(val) => setStrength(val[0])} min={1} max={10} step={1} />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block font-medium">Mobility Level</label>
-              <Slider value={[mobility]} onValueChange={(val) => setMobility(val[0])} min={1} max={10} step={1} />
-            </div>
+            {bodyRegion && (
+              <div>
+                <label className="block mt-4 mb-2 font-medium text-white">Select Area</label>
+                <select
+                  value={location}
+                  onChange={(e) => {
+                    setLocation(e.target.value);
+                    e.target.setCustomValidity("");
+                  }}
+                  onInvalid={(e) => {
+                    (e.target as HTMLSelectElement).setCustomValidity("Please select an area.");
+                  }}
+                  className="w-full px-4 py-2 border rounded shadow-sm text-white bg-zinc-800"
+                  required
+                >
+                  <option value="" disabled className="text-white bg-zinc-800">Select a location</option>
+                  {bodyRegion === "upper" && [
+                    "Head & Neck", "Shoulder", "Arm", "Elbow", "Wrist & Hand", "Chest", "Upper Back", "Lower Back", "Front Abdominals (Abs)", "Side (Obliques)",
+                    
+                  ]
+                  // Remove legacy "Side/Rib Area" if present; add new "Side (Obliques)" entry
+                  .filter(area => area !== "Side/Rib Area")
+                  .map((area) => (
+                    <option key={area} value={area} className="text-white bg-zinc-800">{area}</option>
+                  ))}
+                  {bodyRegion === "lower" && [
+                    "Hip", "Groin", "Buttocks (Glutes)", "Front Thigh (Quads)", "Back Thigh (Hamstrings)", "Inner Thigh (Adductors)",
+                    "Outer Thigh (IT Band)", "Knee", "Front Lower Leg (Shin)", "Back Lower Leg (Calf)", "Ankle", "Foot",
+                  ].map((area) => (
+                    <option key={area} value={area} className="text-white bg-zinc-800">{area}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
-          <Button type="submit" className="w-full mt-4 hero-button-primary">Submit</Button>
+          {bodyRegion && (
+            <>
+              <div className="space-y-3">
+                <h3 className="text-xl font-semibold">How did the pain start?</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-zinc-900">
+                  <RadioCard id="onset_sudden" name="onset_type" value="sudden" label="Suddenly" />
+                  <RadioCard id="onset_gradual" name="onset_type" value="gradual" label="Gradually" />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h3 className="text-xl font-semibold">What caused it, and anything else you'd like us to know?</h3>
+                <Textarea
+                  name="injury_cause"
+                  placeholder="e.g. I fell down the stairs, I twisted it during football..."
+                  className="min-h-[100px]"
+                />
+              </div>
+
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold">Rate the following from 1 to 10</h3>
+
+                <div className="space-y-2">
+                  <label className="block font-medium">Pain Level</label>
+                  <Slider value={[pain]} onValueChange={(val) => setPain(val[0])} min={1} max={10} step={1} />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block font-medium">Strength Level</label>
+                  <Slider value={[strength]} onValueChange={(val) => setStrength(val[0])} min={1} max={10} step={1} />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block font-medium">Mobility Level</label>
+                  <Slider value={[mobility]} onValueChange={(val) => setMobility(val[0])} min={1} max={10} step={1} />
+                </div>
+              </div>
+            </>
+          )}
+
+          <Button
+            type="submit"
+            className="w-full mt-4 hero-button-primary"
+            disabled={!bodyRegion || !location}
+          >
+            Submit
+          </Button>
         </form>
       </div>
 

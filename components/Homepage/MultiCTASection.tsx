@@ -29,7 +29,7 @@ const CTAButtons = [
   },
   {
     text: "Explore Prehab",
-    link: "/prehab-search"
+    link: "/prehab"
   },
   {
     text: "Start Personal Training",

@@ -38,7 +38,7 @@ const SavedItemCard: React.FC<Props> = ({ title, description, onDelete, injuryId
       variant="outline"
       onClick={() => {
         if (injuryId) {
-          window.location.href = `/injury-detail?id=${injuryId}`;
+          window.location.href = `/injury-detail?id=${injuryId}&complaintId=${injuryId}`;
         }
       }}
     >
@@ -49,9 +49,9 @@ const SavedItemCard: React.FC<Props> = ({ title, description, onDelete, injuryId
       className="hero-button-primary"
       size="sm"
       onClick={() => {
-        if (title) {
+        if (title && injuryId) {
           const encodedTitle = encodeURIComponent(title);
-          window.location.href = `/exercise-list?injury=${encodedTitle}&complaintId=123`;
+          window.location.href = `/exercise-list?injury=${encodedTitle}&complaintId=${injuryId}`;
         }
       }}
     >

@@ -6,7 +6,7 @@ const openai = new OpenAI({
 });
 
 export async function POST(req: Request) {
-  const { injury, context  } = await req.json();
+  const { injury, context, topExercises = [] } = await req.json();
 
   try {
     const response = await openai.responses.create({
@@ -18,7 +18,12 @@ export async function POST(req: Request) {
         },
         {
           role: "user",
-          content: `Create a 7-day rehab plan for: "${injury}". The context of the injury is: "${context}". Include warm-up, exercises, cooldown for each day.`,
+          content: `Create a 7-day rehab plan for a patient with: "${injury}". 
+The context of the injury is: "${context}". 
+You must base the core of the plan on these exercises: ${topExercises.map((e: string) => `"${e}"`).join(", ")} 
+and you may add others you feel are appropriate. 
+Do not include warm-up or cooldown per day. Just list the exercises for each day, with reps, sets, instructions, and notes if needed. 
+Also include a general warmupAdvice and cooldownAdvice at the top level of the plan.`,
         },
       ],
       text: {
@@ -36,20 +41,6 @@ export async function POST(req: Request) {
                   additionalProperties: false,
                   properties: {
                     day: { type: "string" },
-                    warmup: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        additionalProperties: false,
-                        properties: {
-                          name: { type: "string" },
-                          instructions: { type: "string" },
-                          duration: { type: "string" },
-                          notes: { type: "string" },
-                        },
-                        required: ["name", "instructions", "duration", "notes"],
-                      },
-                    },
                     exercises: {
                       type: "array",
                       items: {
@@ -65,26 +56,14 @@ export async function POST(req: Request) {
                         required: ["name", "instructions", "reps", "sets", "notes"],
                       },
                     },
-                    cooldown: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        additionalProperties: false,
-                        properties: {
-                          name: { type: "string" },
-                          instructions: { type: "string" },
-                          duration: { type: "string" },
-                          notes: { type: "string" },
-                        },
-                        required: ["name", "instructions", "duration", "notes"],
-                      },
-                    },
                   },
-                  required: ["day", "warmup", "exercises", "cooldown"],
+                  required: ["day", "exercises"],
                 },
               },
+              warmupAdvice: { type: "string" },
+              cooldownAdvice: { type: "string" },
             },
-            required: ["weekPlan"],
+            required: ["weekPlan", "warmupAdvice", "cooldownAdvice"],
           },
         },
       },

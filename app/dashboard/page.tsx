@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import SearchDashboard from "@/components/dashboard/SearchDashboard";
 import { toTitleCase } from "@/lib/utils";
+import { useRehabParams } from '@/hooks/useRehabParams';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
@@ -14,7 +15,9 @@ export default function DashboardPage() {
   const [userComplaints, setUserComplaints] = useState<any[]>([]);
   const [injuriesByComplaint, setInjuriesByComplaint] = useState<Record<string, any[]>>({});
   const [showChartMap, setShowChartMap] = useState<Record<string, boolean>>({});
+  const [complaintIdsWithRehab, setComplaintIdsWithRehab] = useState<Set<string>>(new Set());
   const router = useRouter();
+  const { injury, complaintId, isValid } = useRehabParams();
   const toggleChart = (complaintId: string) => {
     setShowChartMap(prev => ({
       ...prev,
@@ -104,6 +107,19 @@ export default function DashboardPage() {
       });
 
       setInjuriesByComplaint(grouped);
+
+      // Step 5: Fetch user rehab instances to check which complaints have plans
+      const { data: rehabInstances, error: rehabError } = await supabase
+        .from("user_rehab_instances")
+        .select("complaint_id")
+        .eq("user_id", user.id);
+
+      if (rehabError) {
+        console.error("❌ Failed to fetch rehab instances:", rehabError);
+      }
+
+      setComplaintIdsWithRehab(new Set(rehabInstances?.map(r => r.complaint_id)));
+
       setLoading(false);
     };
 
@@ -152,6 +168,7 @@ export default function DashboardPage() {
         : "Saved Injury Detail",
       parentComplaintId: complaint.id,
     })) || [],
+    hasRehabPlan: complaintIdsWithRehab.has(complaint.id),
   }));
   
   
@@ -185,7 +202,12 @@ export default function DashboardPage() {
   </div>
 
   <SearchDashboard
-    searches={transformed}
+    searches={transformed.map(search => ({
+      ...search,
+      injuryName: search.id === complaintId ? injury : undefined,
+      urlComplaintId: complaintId,
+      hasRehabPlan: search.hasRehabPlan,
+    }))}
     onRemoveInjury={handleRemoveInjury}
     onRemoveComplaint={handleRemoveComplaint}
     showChartMap={showChartMap}

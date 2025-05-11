@@ -342,6 +342,16 @@ useEffect(() => {
           })}
         </div>
       </Card>
+      <div className="text-center mt-8">
+        {injuryName && complaintId && complaintId.length === 36 && (
+          <a
+            href={`/rehab-plan?injury=${injuryName}&complaintId=${complaintId}`}
+            className="hero-button-primary"
+          >
+            Generate Rehab Plan
+          </a>
+        )}
+      </div>
       <Toaster />
     </div>
   );

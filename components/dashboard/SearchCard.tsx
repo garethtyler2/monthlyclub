@@ -1,7 +1,7 @@
 import React from "react";
 import SavedItemCard from "./SavedItemCard";
 import { Button } from "../ui/button";
-import { Trash, ChevronDown, ChevronUp } from "lucide-react";
+import { Trash, ChevronDown, ChevronUp, ClipboardList, BarChart2, RefreshCcw } from "lucide-react";
 import ComplaintChart from './ComplaintChart';
 import UpdateProgressModal from './UpdateProgressModal';
 
@@ -21,6 +21,9 @@ interface Props {
   onRemoveComplaint: (complaintId: string) => void;
   showChart?: boolean;
   onToggleChart?: () => void;
+  injuryName?: string;
+  urlComplaintId?: string;
+  hasRehabPlan?: boolean;
 }
 
 const SearchCard: React.FC<Props> = ({
@@ -31,8 +34,16 @@ const SearchCard: React.FC<Props> = ({
   onRemoveInjury,
   onRemoveComplaint,
   showChart,
-  onToggleChart
+  onToggleChart,
+  injuryName,
+  urlComplaintId,
+  hasRehabPlan,
 }) => {
+  console.log("🧪 SearchCard props:", {
+    complaintId,
+    hasRehabPlan,
+    savedItems,
+  });
   const [modalOpen, setModalOpen] = React.useState(false);
   const [chartKey, setChartKey] = React.useState(0);
   return (
@@ -61,30 +72,41 @@ const SearchCard: React.FC<Props> = ({
       </Button>
     </div>
 
-    <div className="flex flex-col sm:flex-row gap-2 mb-4">
+    <div className="flex flex-row flex-wrap gap-2 mb-6 items-center justify-start">
+    <div className="text-center mt-8">
+        {hasRehabPlan && (
+          <a
+            href={`/rehab-plan?complaintId=${complaintId}`}
+            className="hero-button-primary"
+          >
+            View Rehab Plan
+          </a>
+        )}
+      </div>
+
       {onToggleChart && (
         <Button
-          className="hero-button-primary w-full sm:w-auto"
+          variant="outline"
+          className="w-auto sm:w-auto flex items-center justify-center"
           onClick={onToggleChart}
+          aria-label={showChart ? "Hide Chart" : "Show Chart"}
         >
-          {showChart ? (
-            <>
-              Hide Chart <ChevronUp className="ml-2 h-4 w-4" />
-            </>
-          ) : (
-            <>
-              Show Chart <ChevronDown className="ml-2 h-4 w-4" />
-            </>
-          )}
+          <BarChart2 className="w-4 h-4" />
+          {showChart ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />}
         </Button>
       )}
-      <Button
-        variant="outline"
-        className="w-full sm:w-auto"
-        onClick={() => setModalOpen(true)}
-      >
-        Update Progress
-      </Button>
+
+      {showChart && (
+        <Button
+          variant="outline"
+          className="w-auto sm:w-auto flex items-center justify-center gap-2"
+          onClick={() => setModalOpen(true)}
+          aria-label="Update Progress"
+        >
+          <RefreshCcw className="w-4 h-4" />
+          Update Progress
+        </Button>
+      )}
     </div>
 
     <UpdateProgressModal

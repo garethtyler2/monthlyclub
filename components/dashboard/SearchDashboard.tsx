@@ -16,8 +16,10 @@ interface Search {
   savedItems: SavedItem[];
   showChart?: boolean;
   onToggleChart?: () => void;
+  injuryName?: string;
+  urlComplaintId?: string;
+  hasRehabPlan?: boolean;
 }
-  
 
 interface Props {
   searches: Search[];
@@ -47,6 +49,9 @@ const SearchDashboard: React.FC<Props> = ({
           onRemoveComplaint={onRemoveComplaint}
           showChart={showChartMap[search.id]}
           onToggleChart={() => onToggleChart(search.id)}
+          injuryName={search.injuryName}
+          urlComplaintId={search.urlComplaintId}
+          hasRehabPlan={search.hasRehabPlan}
         />
       ))}
     </div>
