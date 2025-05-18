@@ -11,9 +11,9 @@ import { toTitleCase } from "@/lib/utils";
 
 
 type Injury = {
-  title: string
-  description: string
-  self_test: string
+  injury_code: number;
+  title: string;
+  description: string;
 }
 
 export default function InjuryResultsPage() {
@@ -24,37 +24,63 @@ export default function InjuryResultsPage() {
 
   const complaintId = searchParams.get("complaintId")
 
-// useEffect fetches all injuries linked to a specific complaint via the complaint_injuries join table.
-// It sets the result to the local injuries state after extracting nested injury records.
+// useEffect fetches rankedInjuryCodes from complaints table and then fetches full injury details for those codes.
+// It sorts injuries according to the ranking and sets them to local injuries state.
 useEffect(() => {
   const fetchInjuries = async () => {
-    // Exit early if no complaintId is available in the URL.
     if (!complaintId) return
 
-    // ✅ Fetch linked injuries via join table
-    const { data, error } = await supabase
-      .from("complaint_injuries")
-      .select("injuries(title, description, self_test)")
-      .eq("complaint_id", complaintId)
+    console.log("Fetching complaint for ID:", complaintId);
 
-    if (error) {
-      console.error("Failed to load injuries", error)
-    } else {
-      // Each entry contains a nested 'injuries' object due to the join query — we extract and flatten these.
-      setInjuries(data.map((entry: any) => entry.injuries))
+    const { data: complaint, error } = await supabase
+      .from("complaints")
+      .select("rankedInjuryCodes")
+      .eq("id", complaintId)
+      .single();
+
+    if (!complaint) {
+      console.error("No complaint found for ID:", complaintId);
+      setLoading(false);
+      return;
     }
 
+    if (error) {
+      console.error("Failed to load complaint", error)
+      setLoading(false)
+      return
+    }
+
+    if (!complaint?.rankedInjuryCodes || complaint.rankedInjuryCodes.length === 0) {
+      setInjuries([])
+      setLoading(false)
+      return
+    }
+
+    const { data: injuriesData, error: injuriesError } = await supabase
+      .from("injuries")
+      .select("injury_code, title, description")
+      .in("injury_code", complaint.rankedInjuryCodes);
+
+    if (injuriesError) {
+      console.error("Failed to load injuries", injuriesError)
+      setLoading(false)
+      return
+    }
+
+    const sortedInjuries = complaint.rankedInjuryCodes.map((code: number) =>
+      injuriesData.find((inj: any) => inj.injury_code === code)
+    ).filter(Boolean);
+
+    setInjuries(sortedInjuries as Injury[])
     setLoading(false)
   }
 
   fetchInjuries()
 }, [complaintId])
 
-// Navigate to the injury detail page for the selected injury, keeping track of complaintId in the URL.
 const handleSelectInjury = (injury: string) => {
   router.push(
     `/injury-detail?complaintId=${complaintId}&injury=${encodeURIComponent(injury)}&loading=true`
-    // Note: `loading=true` likely triggers a loading state in the next page.
   );
 }
 
@@ -74,10 +100,6 @@ const handleSelectInjury = (injury: string) => {
               <Badge variant="outline">#{i + 1}</Badge>
             </div>
             <p className="text-sm text-muted-foreground">{injury.description}</p>
-            <div>
-              <h4 className="text-sm font-large text-white">Self Test</h4>
-              <p className="text-sm text-muted-foreground">{injury.self_test}</p>
-            </div>
             <Button
               className="mt-4 hero-button-primary"
               onClick={() => handleSelectInjury(injury.title)}

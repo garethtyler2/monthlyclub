@@ -46,6 +46,24 @@ export default function InjuryDiagnosisSearchPage() {
       strengthLevel: strength,
       mobilityLevel: mobility,
     };
+
+    // Step 0: Fetch injuries for the selected location from Supabase
+    const { data: areaInjuries, error: fetchError } = await supabase
+      .from("injuries")
+      .select("injury_code, title, description")
+      .eq("area", location);
+
+    if (fetchError) throw fetchError;
+
+    const aiPayload = {
+      location,
+      onsetType,
+      cause,
+      painLevel: pain,
+      strengthLevel: strength,
+      mobilityLevel: mobility,
+      injuries: areaInjuries,
+    };
   
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -59,13 +77,13 @@ export default function InjuryDiagnosisSearchPage() {
       // Step 1: Call the AI service to get a list of probable injuries
       const res = await fetch("/api/ai/injury-diagnosis", {
         method: "POST",
-        body: JSON.stringify(payload),
+        body: JSON.stringify(aiPayload),
       });
   
       const ai = await res.json();
-  
-      if (!ai?.injuries?.length) {
-        throw new Error("AI did not return any injuries.");
+      console.log("AI response:", ai);
+      if (!ai?.rankedInjuryCodes?.length) {
+        throw new Error("AI did not return any ranked injury codes.");
       }
   
       // Step 2: Save the user's complaint (their main concern) into the database
@@ -80,8 +98,9 @@ export default function InjuryDiagnosisSearchPage() {
         })
         .select()
         .single();
-  
+
       if (error) throw error;
+      console.log("Inserted complaint:", complaint);
   
       // Step 3: Save the user's initial symptom ratings (pain, strength, mobility)
       await supabase.from("complaint_progress_logs").insert({
@@ -92,29 +111,16 @@ export default function InjuryDiagnosisSearchPage() {
         mobility_level: mobility,
       });
   
-      // Step 4: Save suggested injuries into the injuries table (avoiding duplicates)
-      const { data: insertedInjuries, error: insertError } = await supabase
-        .from("injuries")
-        .upsert(
-          ai.injuries.map((injury: any) => ({
-            title: injury.title.toLowerCase(), // 👈 lowercase when saving
-            description: injury.description,
-            self_test: injury.selfTest,
-            // details: injury.details ?? {}  // if using full detail JSON later
-          })),
-          { onConflict: "title" } // ✅ make sure no duplicates
-        )
-        .select(); // ✅ get the ids back
-  
-      if (insertError) throw insertError;
-  
-      // Step 5: Link injuries to the complaint
-      await supabase.from("complaint_injuries").insert(
-        insertedInjuries.map((injury: any) => ({
-          complaint_id: complaint.id,
-          injury_id: injury.id,
-        }))
-      );
+      // Step 4: Store the rankedInjuryCodes directly on the complaint
+      const { data: updatedComplaint, error: updateError } = await supabase
+        .from("complaints")
+        .update({ rankedInjuryCodes: ai.rankedInjuryCodes })
+        .eq("id", complaint.id)
+        .select()
+        .single();
+
+      console.log("Updated complaint:", updatedComplaint);
+      if (updateError) console.error("Update error:", updateError);
   
       router.push(`/injury-results?complaintId=${complaint.id}`);
     } catch (err: any) {
@@ -188,17 +194,15 @@ export default function InjuryDiagnosisSearchPage() {
                 >
                   <option value="" disabled className="text-white bg-zinc-800">Select a location</option>
                   {bodyRegion === "upper" && [
-                    "Head & Neck", "Shoulder", "Arm", "Elbow", "Wrist & Hand", "Chest", "Upper Back", "Lower Back", "Front Abdominals (Abs)", "Side (Obliques)",
+                    "Head & Neck", "Shoulder", "Upper Arm", "Elbow", "Forearm", "Wrist & Hand", "Chest", "Upper Back", "Lower Back", "Core (Abs / Side)",
                     
                   ]
-                  // Remove legacy "Side/Rib Area" if present; add new "Side (Obliques)" entry
-                  .filter(area => area !== "Side/Rib Area")
                   .map((area) => (
                     <option key={area} value={area} className="text-white bg-zinc-800">{area}</option>
                   ))}
                   {bodyRegion === "lower" && [
-                    "Hip", "Groin", "Buttocks (Glutes)", "Front Thigh (Quads)", "Back Thigh (Hamstrings)", "Inner Thigh (Adductors)",
-                    "Outer Thigh (IT Band)", "Knee", "Front Lower Leg (Shin)", "Back Lower Leg (Calf)", "Ankle", "Foot",
+                    "Hip & Groin", "Buttocks (Glutes)", "Front Thigh (Quads)", "Back Thigh (Hamstrings)", "Inner/Outer Thigh (Adductors / IT Band)",
+                    "Knee", "Front Lower Leg (Shin)", "Back Lower Leg (Calf)", "Ankle", "Foot",
                   ].map((area) => (
                     <option key={area} value={area} className="text-white bg-zinc-800">{area}</option>
                   ))}

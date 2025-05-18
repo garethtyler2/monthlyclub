@@ -18,9 +18,9 @@ export async function POST(req: Request) {
           content: `
 You are a helpful physiotherapist assistant with expert knowledge on injury diagnosis.
 
-Given a user's physical complaint, provide:
+Given a user's physical complaint and a list of possible injuries, provide:
 1. A short, human-readable summary of the complaint (max 1 line).
-2. A list of the top 6 most likely injuries in strict JSON format.
+2. A ranked list (most likely first) of all relevant injury_code values only — no titles or descriptions.
 
 Guidelines:
 - Be specific with injury titles (e.g., “lower back muscle strain” instead of “muscle strain”).
@@ -29,7 +29,6 @@ Guidelines:
 - Avoid creating multiple injuries that describe the same condition slightly differently (e.g., "elbow sprain", "elbow ligament sprain", and "elbow joint sprain" should be treated as the same injury).
 - If multiple possible names exist for the same condition, choose the most common, general clinical name.
 - Prefer broader diagnosis names unless anatomical specificity is essential to distinguish different rehab protocols.
- 
           `.trim(),
         },
         {
@@ -42,7 +41,14 @@ Complaint:
 - Pain: ${painLevel}/10
 - Strength: ${strengthLevel}/10
 - Mobility: ${mobilityLevel}/10
-          `.trim(),
+
+Injury options (injury_code, title, description):
+${body.injuries.map((inj: any) => `• ${inj.injury_code} — ${inj.title}: ${inj.description}`).join("\n")}
+
+From the list above, return:
+1. A one-line summary of the complaint
+2. A ranked list (most likely first) of all relevant injury_code values only — no titles or descriptions.
+          `.trim()
         },
       ],
       text: {
@@ -54,21 +60,12 @@ Complaint:
             additionalProperties: false,
             properties: {
               summaryLabel: { type: "string" },
-              injuries: {
+              rankedInjuryCodes: {
                 type: "array",
-                items: {
-                  type: "object",
-                  additionalProperties: false,
-                  properties: {
-                    title: { type: "string" },
-                    description: { type: "string" },
-                    selfTest: { type: "string" },
-                  },
-                  required: ["title", "description", "selfTest"],
-                },
-              },
+                items: { type: "number" }
+              }
             },
-            required: ["summaryLabel", "injuries"],
+            required: ["summaryLabel", "rankedInjuryCodes"]
           },
         },
       },
@@ -78,7 +75,7 @@ Complaint:
 
     return NextResponse.json({
       summaryLabel: parsed.summaryLabel,
-      injuries: parsed.injuries,
+      rankedInjuryCodes: parsed.rankedInjuryCodes,
     });
   } catch (error) {
     console.error("❌ Failed to get structured diagnosis from AI:", error);

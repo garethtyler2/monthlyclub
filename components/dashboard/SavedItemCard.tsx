@@ -7,11 +7,12 @@ interface Props {
     title: string;
     description?: string;
     onDelete: () => void;
-    injuryId?: string; // ✅ Add this
+    injuryId?: string;
+    parentComplaintId: string;
   }
   
 
-const SavedItemCard: React.FC<Props> = ({ title, description, onDelete, injuryId }) => (
+const SavedItemCard: React.FC<Props> = ({ title, description, onDelete, injuryId, parentComplaintId }) => (
 <div className="border rounded-xl overflow-hidden animate-fade-in border-brand-indigo/20 bg-gradient-to-b from-brand-indigo/10 to-transparent p-4 flex flex-col min-w-[200px] relative">
   <div className="flex justify-between items-start gap-2 mb-1">
     <div className="font-semibold text-md text-white">
@@ -38,7 +39,7 @@ const SavedItemCard: React.FC<Props> = ({ title, description, onDelete, injuryId
       variant="outline"
       onClick={() => {
         if (injuryId) {
-          window.location.href = `/injury-detail?id=${injuryId}&complaintId=${injuryId}`;
+          window.location.href = `/injury-detail?injury=${encodeURIComponent(title)}&complaintId=${parentComplaintId}`;
         }
       }}
     >
@@ -51,7 +52,7 @@ const SavedItemCard: React.FC<Props> = ({ title, description, onDelete, injuryId
       onClick={() => {
         if (title && injuryId) {
           const encodedTitle = encodeURIComponent(title);
-          window.location.href = `/exercise-list?injury=${encodedTitle}&complaintId=${injuryId}`;
+          window.location.href = `/exercise-list?injury=${encodedTitle}&complaintId=${parentComplaintId}`;
         }
       }}
     >

@@ -20,17 +20,27 @@ export async function POST(req: Request) {
           role: "user",
           content: `You're a highly specialized physical therapist with deep expertise in injury rehab.
 
-Please provide a JSON-formatted response that includes the top 10 most useful rehabilitation exercises for the injury below.
+Please provide a JSON-formatted response that includes the top 10 most useful rehabilitation exercises for the injury below:
 
 - Injury: ${injury}
 - Context: ${context}
 
-Requirements:
-- Exercises must be ordered by usefulness (most essential first)
-- Each should be clearly explained and easy for patients to follow
-- Include sets, reps, instructions, and a brief note on why it's important
+🏷️ **Naming Rules**:
+- Use the **base, singular form** (e.g., "Push Up", "Glute Bridge")
+- ❌ Do NOT include gerunds, plural forms, or modifiers: "Push Ups", "Bridging", "Bird Dog Hold", "Push Up Variation"
+- ❌ Avoid all variations or modifiers like "Banded", "Weighted", "Wall", or "Isometric"
+- ❌ Do NOT use suffixes like "Hold", "Stretch", or "Against Wall"
+- ✅ If multiple versions of the same exercise exist, use the most **standardized, canonical** name
+- ✅ Keep names consistent across requests to ensure deduplication
 
-Do not include warm-ups, cooldowns, or general advice. Return only the top 10 rehab exercises in JSON format using the schema.`,
+📦 **Formatting Requirements**:
+- Return exercises in order of usefulness (most essential first)
+- Include sets, reps, instructions, and a short clinical note on why each is important
+- Return exactly 10 exercises, unless fewer are truly appropriate
+
+Do not include warm-ups, cooldowns, or general advice.
+
+Return only the list of exercises in structured JSON using the provided schema.`,
         },
       ],
       text: {

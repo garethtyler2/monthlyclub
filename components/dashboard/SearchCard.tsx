@@ -134,6 +134,7 @@ const SearchCard: React.FC<Props> = ({
             description={item.description}
             onDelete={() => onRemoveInjury(item.id, item.parentComplaintId)}
             injuryId={item.id}
+            parentComplaintId={item.parentComplaintId}
           />
         ))
       ) : (
