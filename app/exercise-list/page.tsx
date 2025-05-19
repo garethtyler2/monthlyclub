@@ -19,13 +19,26 @@ function ExerciseContent() {
   const [recommendingId, setRecommendingId] = useState<string | null>(null);
 
 useEffect(() => {
-  console.log("Mounted");
-  toast("👍 Recommend!", {
-    description: "Don't forget to recommend an exercise if it helped you — your feedback supports the whole community.",
-    duration: 6000,
-    className: "text-white shadow-lg border !bg-gradient-to-r from-brand-purple to-brand-blue border-white/10",
-
-  });
+  const hasDismissed = localStorage.getItem("dismissRecommendPopup") === "true";
+  if (!hasDismissed) {
+    toast.custom((t) => (
+      <div className="max-w-md w-full bg-gradient-to-r from-brand-purple to-brand-blue border border-white/10 text-white shadow-lg rounded-lg p-4 flex flex-col space-y-4">
+        <div className="font-semibold">👍 Recommend!</div>
+        <div className="text-sm">
+          Don't forget to recommend an exercise if it helped you — your feedback supports the whole community.
+        </div>
+        <button
+          onClick={() => {
+            localStorage.setItem("dismissRecommendPopup", "true");
+            toast.dismiss((t as any).id);
+          }}
+          className="self-center px-4 py-1 bg-white text-sm text-black font-semibold rounded hover:bg-gray-200 transition"
+        >
+          Don’t show again
+        </button>
+      </div>
+    ));
+  }
 }, []);
   // Extract query parameters from the URL: injury name and complaint ID
   const params = useSearchParams();
@@ -146,13 +159,14 @@ useEffect(() => {
             .maybeSingle();
 
           if (!linkExists) {
-            const { error: linkInsertError } = await supabase.from("exercise_injury_links").insert({
+            await supabase.from("exercise_injury_links").upsert({
               injury_name: injuryName,
               exercise_id: exerciseId,
               rank: i + 1,
               recommendations: 0,
+            }, {
+              onConflict: 'injury_name,exercise_id'
             });
-
           }
         }
 
@@ -342,7 +356,7 @@ useEffect(() => {
           })}
         </div>
       </Card>
-      <div className="text-center mt-8">
+      {/* <div className="text-center mt-8">
         {injuryName && complaintId && complaintId.length === 36 && (
           <a
             href={`/rehab-plan?injury=${injuryName}&complaintId=${complaintId}`}
@@ -351,7 +365,7 @@ useEffect(() => {
             Generate Rehab Plan
           </a>
         )}
-      </div>
+      </div> */}
       <Toaster />
     </div>
   );

@@ -7,7 +7,6 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
-import { toTitleCase } from "@/lib/utils";
 
 
 type Injury = {
@@ -96,7 +95,7 @@ const handleSelectInjury = (injury: string) => {
         {injuries.map((injury, i) => (
           <Card key={i} className="p-6 space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">{toTitleCase(injury.title)}</h2>
+              <h2 className="text-xl font-semibold">{(injury.title)}</h2>
               <Badge variant="outline">#{i + 1}</Badge>
             </div>
             <p className="text-sm text-muted-foreground">{injury.description}</p>

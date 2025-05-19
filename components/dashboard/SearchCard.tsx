@@ -23,7 +23,6 @@ interface Props {
   onToggleChart?: () => void;
   injuryName?: string;
   urlComplaintId?: string;
-  hasRehabPlan?: boolean;
 }
 
 const SearchCard: React.FC<Props> = ({
@@ -37,11 +36,9 @@ const SearchCard: React.FC<Props> = ({
   onToggleChart,
   injuryName,
   urlComplaintId,
-  hasRehabPlan,
 }) => {
   console.log("🧪 SearchCard props:", {
     complaintId,
-    hasRehabPlan,
     savedItems,
   });
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -73,16 +70,6 @@ const SearchCard: React.FC<Props> = ({
     </div>
 
     <div className="flex flex-row flex-wrap gap-2 mb-6 items-center justify-start">
-    <div className="text-center mt-8">
-        {hasRehabPlan && (
-          <a
-            href={`/rehab-plan?complaintId=${complaintId}`}
-            className="hero-button-primary"
-          >
-            View Rehab Plan
-          </a>
-        )}
-      </div>
 
       {onToggleChart && (
         <Button
@@ -125,24 +112,32 @@ const SearchCard: React.FC<Props> = ({
     )}
 
     {/* Saved injuries */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-1">
-      {savedItems.length > 0 ? (
-        savedItems.map((item) => (
-          <SavedItemCard
-            key={item.id}
-            title={item.title}
-            description={item.description}
-            onDelete={() => onRemoveInjury(item.id, item.parentComplaintId)}
-            injuryId={item.id}
-            parentComplaintId={item.parentComplaintId}
-          />
-        ))
-      ) : (
-        <div className="text-gray-400 text-center col-span-full">
-          Injuries you view in detail will be saved here automatically.
+    {
+      // Deduplicate items by id
+    }
+    {(() => {
+      const uniqueItems = Array.from(new Map(savedItems.map(item => [item.id, item])).values());
+      return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-1">
+          {uniqueItems.length > 0 ? (
+            uniqueItems.map((item) => (
+              <SavedItemCard
+                key={item.id}
+                title={item.title}
+                description={item.description}
+                onDelete={() => onRemoveInjury(item.id, item.parentComplaintId)}
+                injuryId={item.id}
+                parentComplaintId={item.parentComplaintId}
+              />
+            ))
+          ) : (
+            <div className="text-gray-400 text-center col-span-full">
+              Injuries you view in detail will be saved here automatically.
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      );
+    })()}
 
     <Button
       className="mb-6 mt-6 w-full hover:text-blue-400 sm:w-auto"

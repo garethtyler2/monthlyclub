@@ -145,7 +145,7 @@ export default function RehabPlanExercisesPage() {
             .eq("name", ex.name)
             .single();
 
-          if (existing) {
+          if (existing && existing.id) {
             weekPlanSavedExercises.push(existing);
             continue;
           }
@@ -159,7 +159,9 @@ export default function RehabPlanExercisesPage() {
             .select()
             .single();
 
-          weekPlanSavedExercises.push(inserted);
+          if (inserted && inserted.id) {
+            weekPlanSavedExercises.push(inserted);
+          }
         }
 
         // Combine all saved exercises (from AI exercises and week plan)
@@ -198,6 +200,16 @@ export default function RehabPlanExercisesPage() {
           })
           .select()
           .single();
+
+        // Save link between rehab plan and each exercise
+        for (const ex of weekPlanSavedExercises) {
+          await supabase.from("rehab_plan_exercises").insert({
+            rehab_plan_id: savedPlan.id,
+            exercise_id: ex.id,
+            day_number: null,
+            order_in_day: null,
+          });
+        }
 
         // Link all exercises to this injury context if not already linked
         for (const ex of allSavedExercises) {
@@ -248,7 +260,9 @@ export default function RehabPlanExercisesPage() {
           console.error("❌ Failed to insert user_rehab_instance:", instanceInsertError);
         }
 
-        setExercises(newExercises);
+        console.log("🧩 Week plan saved exercises:", weekPlanSavedExercises.map(e => e.name));
+
+        setExercises(weekPlanSavedExercises);
         setWeekPlan(newWeekPlan);
       } catch (err) {
         console.error("Failed to fetch AI data", err);
@@ -261,6 +275,7 @@ export default function RehabPlanExercisesPage() {
   }, [injuryName, complaintId]);
 
   async function handleRecommend(exerciseId: number) {
+    console.log("🔘 handleRecommend clicked for:", exerciseId);
     if (!injuryName) return;
     setRecommendingId(exerciseId);
 
@@ -270,19 +285,65 @@ export default function RehabPlanExercisesPage() {
       setRecommendingId(null);
       return;
     }
+    console.log("👤 Logged in user:", user.id);
 
     try {
-      // Insert recommendation linking this exercise and injury for this user
-      await supabase.from("exercise_recommendations").insert({
-        user_id: user.id,
-        exercise_id: exerciseId,
-        injury_name: injuryName,
-      });
+      const { data: linkData, error: linkError } = await supabase
+        .from("exercise_injury_links")
+        .select("id, recommendations")
+        .eq("injury_name", injuryName)
+        .eq("exercise_id", exerciseId)
+        .single();
 
-      setUserRecommended((prev) => [...prev, exerciseId]);
+      console.log("🔗 Link data:", linkData);
+      if (linkError) console.error("❌ Link fetch error:", linkError);
+
+      // Null check for linkData to prevent runtime errors
+      if (!linkData) {
+        console.warn("⚠️ No linkData returned — recommend button will not work.");
+        setRecommendingId(null);
+        return;
+      }
+
+      const alreadyRecommended = userRecommended.includes(exerciseId);
+      let newCount = linkData.recommendations || 0;
+
+      if (!alreadyRecommended) {
+        console.log("🔼 Adding recommendation");
+        newCount += 1;
+        console.log("➡️ New recommendation count will be:", newCount);
+        await supabase.from("exercise_recommendations").insert({
+          user_id: user.id,
+          exercise_id: exerciseId,
+          injury_name: injuryName,
+        });
+        await supabase
+          .from("exercise_injury_links")
+          .update({ recommendations: newCount })
+          .eq("id", linkData.id);
+        setUserRecommended((prev) => [...prev, exerciseId]);
+      } else {
+        console.log("🔽 Removing recommendation");
+        newCount = Math.max(newCount - 1, 0);
+        console.log("➡️ New recommendation count will be:", newCount);
+        await supabase
+          .from("exercise_recommendations")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("exercise_id", exerciseId)
+          .eq("injury_name", injuryName);
+        await supabase
+          .from("exercise_injury_links")
+          .update({ recommendations: newCount })
+          .eq("id", linkData.id);
+        setUserRecommended((prev) => prev.filter((id) => id !== exerciseId));
+      }
+
+      // Optionally update exercise list if needed
     } catch (error) {
-      console.error("Failed to recommend exercise", error);
+      console.error("Failed to handle recommendation", error);
     } finally {
+      console.log("✅ Finished handling recommendation for", exerciseId);
       setRecommendingId(null);
     }
   }
@@ -304,18 +365,18 @@ export default function RehabPlanExercisesPage() {
           <TabsTrigger value="week">7-Day Plan</TabsTrigger>
         </TabsList>
         <TabsContent value="week">
-          <Card className="p-5 space-y-4 mt-4">
+          <Card className="p-2 space-y-4 mt-4">
             <div className="flex items-center gap-2 text-xl font-semibold">
               <CalendarDays size={20} /> 7-Day Rehab Plan
             </div>
 
             {/* Global warmup/cooldown cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <Card className="p-5 bg-muted/80">
+              <Card className="p-3 bg-muted/80">
                 <h3 className="text-xl font-semibold mb-2">🔄 Before You Start</h3>
                 <p className="text-muted-foreground text-sm">{dummyWarmupAdvice}</p>
               </Card>
-              <Card className="p-5 bg-muted/80">
+              <Card className="p-3 bg-muted/80">
                 <h3 className="text-xl font-semibold mb-2">🧘 After You Finish</h3>
                 <p className="text-muted-foreground text-sm">{dummyCooldownAdvice}</p>
               </Card>
@@ -323,30 +384,38 @@ export default function RehabPlanExercisesPage() {
 
             <div className="space-y-6">
               {weekPlan.map((day: any, i: number) => (
-                <div key={i} className="border rounded-xl p-4 bg-muted">
+                <div key={i} className="border rounded-xl p-2 bg-muted">
                   <h3 className="text-lg font-semibold mb-4">{day.day}</h3>
 
                   {/* Exercises */}
                   <div className="space-y-4">
-                    {day.exercises.map((ex: any, idx: number) => (
-                      <div key={idx} className="border rounded p-4 bg-background flex flex-col gap-2">
-                        <p className="font-semibold text-base">{ex.name}</p>
-                        <p className="text-sm">📋 {ex.instructions}</p>
-                        <p className="text-sm">🔁 {ex.reps} reps x {ex.sets} sets</p>
-                        {ex.notes && <p className="text-sm">🧠 {ex.notes}</p>}
-                        <button
-                          disabled={userRecommended.includes(ex.id) || recommendingId === ex.id}
-                          onClick={() => handleRecommend(ex.id)}
-                          className={`mt-2 w-max px-3 py-1 rounded bg-blue-600 text-white text-sm hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed`}
-                        >
-                          {userRecommended.includes(ex.id)
-                            ? "Recommended"
-                            : recommendingId === ex.id
-                              ? "Recommending..."
-                              : "Recommend"}
-                        </button>
-                      </div>
-                    ))}
+                    {day.exercises.map((ex: any, idx: number) => {
+                      console.log("🔍 Attempting match for:", ex.name);
+                      const matched = exercises.find((e) => e.name === ex.name);
+                      console.log("📌 Checking match for:", ex.name, "→ matched:", matched?.id);
+                      return (
+                        <div key={idx} className="border rounded p-2 bg-background flex flex-col gap-2">
+                          <p className="font-semibold text-base">{ex.name}</p>
+                          <p className="text-sm">📋 {ex.instructions}</p>
+                          <p className="text-sm">🔁 {ex.reps} reps x {ex.sets} sets</p>
+                          {ex.notes && <p className="text-sm">🧠 {ex.notes}</p>}
+                          <button
+                            onClick={() => matched?.id && handleRecommend(matched.id)}
+                            className={`mt-2 mb-2 w-max px-3 py-1 rounded ${
+                              matched?.id && userRecommended.includes(matched.id)
+                                ? "bg-green-600 hover:bg-green-700"
+                                : "bg-blue-600 hover:bg-blue-700"
+                            } text-white text-sm`}
+                          >
+                            {matched?.id && userRecommended.includes(matched.id)
+                              ? "Recommended"
+                              : recommendingId === matched?.id
+                                ? "Recommending..."
+                                : "Recommend"}
+                          </button>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ))}

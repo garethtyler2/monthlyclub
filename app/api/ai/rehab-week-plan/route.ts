@@ -21,7 +21,7 @@ export async function POST(req: Request) {
           content: `Create a 7-day rehab plan for a patient with: "${injury}". 
 The context of the injury is: "${context}". 
 You must base the core of the plan on these exercises: ${topExercises.map((e: string) => `"${e}"`).join(", ")} 
-and you may add others you feel are appropriate. 
+DO NOT CHANGE ANY NAMES OF EXERCISES OR ADD NEW EXERCISES. 
 Do not include warm-up or cooldown per day. Just list the exercises for each day, with reps, sets, instructions, and notes if needed. 
 Also include a general warmupAdvice and cooldownAdvice at the top level of the plan.`,
         },
