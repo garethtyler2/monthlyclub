@@ -320,7 +320,7 @@ useEffect(() => {
       <div className="mb-4">
         <div className="flex flex-wrap justify-center gap-4 mb-4">
           <button
-            onClick={() => setInfoTab("how")}
+            onClick={() => setInfoTab(infoTab === "how" ? null : "how")}
             className={`px-4 py-2 rounded-lg text-base font-semibold transition shadow-sm border border-transparent
               ${infoTab === "how"
                 ? "bg-brand-blue text-white"
@@ -330,7 +330,7 @@ useEffect(() => {
             🧠 How to use this list
           </button>
           <button
-            onClick={() => setInfoTab("why")}
+            onClick={() => setInfoTab(infoTab === "why" ? null : "why")}
             className={`px-4 py-2 rounded-lg text-base font-semibold transition shadow-sm border border-transparent
               ${infoTab === "why"
                 ? "bg-brand-blue text-white"
@@ -346,8 +346,8 @@ useEffect(() => {
             {infoTab === "how" && (
               <ul className="list-disc pl-5 space-y-2">
                 <li>This list shows the most effective rehab exercises for your selected injury, ranked by usefulness and community recommendations.</li>
+                <li>Begin with the first few — they are ranked by importance.</li>
                 <li>Try performing 3–5 of these exercises on alternate days (e.g., Mon/Wed/Fri).</li>
-                <li>If you're not sure where to start, begin with the first few — they are ranked by importance.</li>
                 <li>Each exercise includes sets and reps to guide you — adjust based on your level. You can increase reps, add sets, or use bands/weights to make them more challenging.</li>
                 <li>Click "Recommend" if an exercise helped — it helps others too.</li>
                 <li className="font-semibold text-white">⚠️ Stop if you feel pain. Consult a medical professional if symptoms worsen.</li>

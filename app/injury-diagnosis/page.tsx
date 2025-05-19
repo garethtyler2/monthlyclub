@@ -79,9 +79,8 @@ export default function InjuryDiagnosisSearchPage() {
         method: "POST",
         body: JSON.stringify(aiPayload),
       });
-  
+
       const ai = await res.json();
-      console.log("AI response:", ai);
       if (!ai?.rankedInjuryCodes?.length) {
         throw new Error("AI did not return any ranked injury codes.");
       }
@@ -100,7 +99,6 @@ export default function InjuryDiagnosisSearchPage() {
         .single();
 
       if (error) throw error;
-      console.log("Inserted complaint:", complaint);
   
       // Step 3: Save the user's initial symptom ratings (pain, strength, mobility)
       await supabase.from("complaint_progress_logs").insert({
@@ -119,7 +117,6 @@ export default function InjuryDiagnosisSearchPage() {
         .select()
         .single();
 
-      console.log("Updated complaint:", updatedComplaint);
       if (updateError) console.error("Update error:", updateError);
   
       router.push(`/injury-results?complaintId=${complaint.id}`);
