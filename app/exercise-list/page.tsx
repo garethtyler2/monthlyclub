@@ -45,6 +45,8 @@ useEffect(() => {
   const injuryName = params.get("injury");
   const complaintId = params.get("complaintId");
 
+  // Start with no info tab selected
+  const [infoTab, setInfoTab] = useState<"how" | "why" | null>(null);
 
   const fetchUserRecommendations = async (injuryName: string, exerciseIdsFromLinks: number[]) => {
     const { data: userData } = await supabase.auth.getUser();
@@ -315,12 +317,52 @@ useEffect(() => {
         </p>
       </div>
 
-      <details className="text-sm text-end text-muted-foreground mb-4">
-        <summary className="cursor-pointer font-medium">🤝 Why recommend exercises?</summary>
-        <p className="mt-2">
-          Exercises are ordered based on community experience. When you recommend one that helped you, it helps others recover more effectively.
-        </p>
-      </details>
+      <div className="mb-4">
+        <div className="flex flex-wrap justify-center gap-4 mb-4">
+          <button
+            onClick={() => setInfoTab("how")}
+            className={`px-4 py-2 rounded-lg text-base font-semibold transition shadow-sm border border-transparent
+              ${infoTab === "how"
+                ? "bg-brand-blue text-white"
+                : "bg-muted text-muted-foreground hover:text-white hover:bg-brand-blue/80"}
+            `}
+          >
+            🧠 How to use this list
+          </button>
+          <button
+            onClick={() => setInfoTab("why")}
+            className={`px-4 py-2 rounded-lg text-base font-semibold transition shadow-sm border border-transparent
+              ${infoTab === "why"
+                ? "bg-brand-blue text-white"
+                : "bg-muted text-muted-foreground hover:text-white hover:bg-brand-blue/80"}
+            `}
+          >
+            🤝 Why recommend exercises?
+          </button>
+        </div>
+        {/* Only show content if infoTab is not null */}
+        {infoTab && (
+          <div className="text-sm text-muted-foreground border p-4 rounded-md bg-muted space-y-4 text-left">
+            {infoTab === "how" && (
+              <ul className="list-disc pl-5 space-y-2">
+                <li>This list shows the most effective rehab exercises for your selected injury, ranked by usefulness and community recommendations.</li>
+                <li>Try performing 3–5 of these exercises on alternate days (e.g., Mon/Wed/Fri).</li>
+                <li>If you're not sure where to start, begin with the first few — they are ranked by importance.</li>
+                <li>Each exercise includes sets and reps to guide you — adjust based on your level. You can increase reps, add sets, or use bands/weights to make them more challenging.</li>
+                <li>Click "Recommend" if an exercise helped — it helps others too.</li>
+                <li className="font-semibold text-white">⚠️ Stop if you feel pain. Consult a medical professional if symptoms worsen.</li>
+              </ul>
+            )}
+            {infoTab === "why" && (
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Recommendations improve the list for everyone — more votes mean smarter ordering.</li>
+                <li>Rehab is personal, and your feedback makes the system more human and adaptive.</li>
+                <li>The more accurate the recommendations, the faster others recover too.</li>
+              </ul>
+            )}
+          </div>
+        )}
+      </div>
 
       <Card className="p-2 space-y-4 mt-4">
         <div className="flex items-center gap-2 text-xl font-semibold">

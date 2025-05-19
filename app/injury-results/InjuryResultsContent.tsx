@@ -17,6 +17,7 @@ type Injury = {
 
 export default function InjuryResultsPage() {
   const [injuries, setInjuries] = useState<Injury[]>([])
+  const [summary, setSummary] = useState<string | null>(null);
   const searchParams = useSearchParams()
   const router = useRouter()
   const [loading, setLoading] = useState(true)
@@ -33,7 +34,7 @@ useEffect(() => {
 
     const { data: complaint, error } = await supabase
       .from("complaints")
-      .select("rankedInjuryCodes")
+      .select("rankedInjuryCodes, summary_label")
       .eq("id", complaintId)
       .single();
 
@@ -42,6 +43,8 @@ useEffect(() => {
       setLoading(false);
       return;
     }
+
+    setSummary(complaint.summary_label || null);
 
     if (error) {
       console.error("Failed to load complaint", error)
@@ -88,6 +91,12 @@ const handleSelectInjury = (injury: string) => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">
       <h1 className="text-center font-bold">Possible Injuries</h1>
+      {summary && (
+        <div className="text-center text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto bg-muted border border-border rounded-xl p-2 shadow-md">
+          <p className="font-bold text-lg sm:text-xl text-white mb-2">💡 AI Summary</p>
+          <p className="text-muted-foreground">{summary}</p>
+        </div>
+      )}
 
       {injuries.length === 0 && <p className="text-muted-foreground">No injuries found.</p>}
 
