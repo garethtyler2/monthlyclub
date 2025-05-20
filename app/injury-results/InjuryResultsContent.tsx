@@ -86,7 +86,9 @@ const handleSelectInjury = (injury: string) => {
   );
 }
 
-  if (loading) return <LoadingOverlay show message="Loading injury results..." />
+  if (loading || !injuries.length) {
+    return <LoadingOverlay show message="Loading injury results..." />;
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 space-y-8">

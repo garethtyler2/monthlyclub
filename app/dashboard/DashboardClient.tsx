@@ -117,7 +117,9 @@ export default function DashboardPage() {
     if (error) console.error("Failed to remove injury:", error);
   };
 
-  if (loading) return <LoadingOverlay show message="Loading your dashboard..." />;
+  if (loading || !user) {
+    return <LoadingOverlay show message="Loading your dashboard..." />;
+  }
   const transformed = userComplaints.map(complaint => {
     const savedInjuries = injuriesByComplaint[complaint.id] || [];
     const topInjuryTitle = savedInjuries.length > 0 ? savedInjuries[0].title : undefined;
