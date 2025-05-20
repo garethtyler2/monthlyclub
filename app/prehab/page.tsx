@@ -1,22 +1,89 @@
 "use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import SearchBarTemplate from "@/components/shared/SearchBarTemplate";
 import SEOContent from "@/components/shared/SEOContent";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { LoadingOverlay } from "@/components/ui/loading-overlay";
+import { supabase } from "@/lib/supabase/client";
 
 export default function PrehabSearchPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const handleSearch = (query: string) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const handleSearch = async (query: string) => {
     toast({
-      title: "Searching for prehab",
-      description: `You entered: "${query}"`,
+      title: "Generating prehab plan…",
+      description: `Working on: "${query}"`,
     });
-    console.log("Searching for:", query);
-    // You can also add routing logic here later
+    setIsLoading(true);
+  
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      window.location.href = `/login?redirect=/prehab`;
+      return;
+    }
+  
+    try {
+      const res = await fetch("/api/ai/prehab-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ search: query }),
+      });
+  
+      if (!res.ok) {
+        const errorText = await res.text(); // Try to read the raw response body
+        console.error("❌ Server returned non-OK status:", res.status);
+        console.error("❌ Response body:", errorText);
+        throw new Error(`Server error: ${res.status}`);
+      }
+  
+      let ai;
+      try {
+        ai = await res.json();
+      } catch (jsonError) {
+        const text = await res.text();
+        console.error("❌ Could not parse JSON response. Raw body:", text);
+        throw new Error("Response was not valid JSON.");
+      }
+  
+      const { summary, exercises } = ai.data || {};
+      if (!summary || !exercises) {
+        console.error("❌ AI response is missing summary or exercises:", ai);
+        throw new Error("AI returned incomplete data.");
+      }
+  
+      const { data: plan, error: insertError } = await supabase
+        .from("prehab_plans")
+        .insert({
+          user_id: user.id,
+          search_term: query,
+          summary,
+          exercises,
+        })
+        .select()
+        .single();
+  
+      if (insertError) throw insertError;
+  
+      router.push(`/prehab-plan?planId=${plan.id}`);
+    } catch (err: any) {
+      console.error("Prehab search error:", err);
+      toast({
+        title: "Something went wrong",
+        description: err?.message || "Unable to generate prehab plan.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
   };
+  
 
   return (
     <>
+      <LoadingOverlay show={isLoading} message="Building your plan…" />
       <SearchBarTemplate
         titleStart="Prehab"
         titleHighlight="Build Resilience, Prevent Injuries, and Optimize Recovery"
@@ -33,8 +100,6 @@ export default function PrehabSearchPage() {
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
       />
-
-
 
       <SEOContent
         titleStart="What Is Prehab?"

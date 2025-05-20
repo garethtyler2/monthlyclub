@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import SearchDashboard from "@/components/dashboard/SearchDashboard";
+import PrehabDashboard from "@/components/dashboard/PrehabDashboardCard";
 import { useRehabParams } from '@/hooks/useRehabParams';
 
 export default function DashboardPage() {
@@ -14,6 +15,8 @@ export default function DashboardPage() {
   const [userComplaints, setUserComplaints] = useState<any[]>([]);
   const [injuriesByComplaint, setInjuriesByComplaint] = useState<Record<string, any[]>>({});
   const [showChartMap, setShowChartMap] = useState<Record<string, boolean>>({});
+  const [selectedTab, setSelectedTab] = useState("Rehab");
+  const [prehabPlans, setPrehabPlans] = useState<any[]>([]);
   const router = useRouter();
   const { injury, complaintId, isValid } = useRehabParams();
   const toggleChart = (complaintId: string) => {
@@ -48,6 +51,17 @@ export default function DashboardPage() {
       }
 
       setUserComplaints(complaints);
+
+      const { data: prehabData, error: prehabError } = await supabase
+        .from("prehab_plans")
+        .select("id, search_term, summary, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (prehabError) {
+        console.error("❌ Failed to fetch prehab plans:", prehabError);
+      }
+      setPrehabPlans(prehabData || []);
 
       // Step 3: Fetch viewed injuries via complaint_injuries join
       const complaintIds = complaints.map(c => c.id);
@@ -144,7 +158,13 @@ export default function DashboardPage() {
       injuryName: complaint.id === complaintId ? injury : topInjuryTitle,
     };
   });
-  
+
+  const transformedPrehab = prehabPlans.map(plan => ({
+    id: plan.id,
+    title: plan.search_term,
+    subtitle: plan.summary,
+    url: `/prehab-plan?planId=${plan.id}`,
+  }));
   
 
   return (
@@ -163,8 +183,9 @@ export default function DashboardPage() {
       {["Rehab", "Prehab", "Personal Training"].map((tab) => (
         <button
           key={tab}
+          onClick={() => setSelectedTab(tab)}
           className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-            tab === "Rehab"
+            tab === selectedTab
               ? "bg-background text-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground"
           }`}
@@ -175,16 +196,23 @@ export default function DashboardPage() {
     </div>
   </div>
 
-  <SearchDashboard
-    searches={transformed.map(search => ({
-      ...search,
-      urlComplaintId: complaintId,
-    }))}
-    onRemoveInjury={handleRemoveInjury}
-    onRemoveComplaint={handleRemoveComplaint}
-    showChartMap={showChartMap}
-    onToggleChart={toggleChart}
-  />
+  {selectedTab === "Rehab" && (
+    <SearchDashboard
+      searches={transformed.map(search => ({
+        ...search,
+        urlComplaintId: complaintId,
+      }))}
+      onRemoveInjury={handleRemoveInjury}
+      onRemoveComplaint={handleRemoveComplaint}
+      showChartMap={showChartMap}
+      onToggleChart={toggleChart}
+    />
+  )}
+
+  {selectedTab === "Prehab" && (
+    <PrehabDashboard plans={transformedPrehab} />
+  )}
+
   {userComplaints.length === 0 && (
     <div className="text-center mb-10 animate-fade-in">
       <h2 className="text-2xl font-semibold mb-4">No activity yet</h2>
