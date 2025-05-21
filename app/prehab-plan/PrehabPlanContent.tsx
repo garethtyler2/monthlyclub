@@ -78,7 +78,7 @@ export default function PrehabPlanContent() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div className="max-w-3xl mx-auto p-3">
       <h1 className="text-3xl text-center font-bold mb-2">
         {plan.title || "Your Prehab Plan"}
       </h1>
@@ -97,17 +97,18 @@ export default function PrehabPlanContent() {
 
       <div className="space-y-6">
         {Array.isArray(plan.exercises) ? plan.exercises.map((exercise, index) => (
-          <Card key={index}>
-            <CardContent className="p-4 space-y-2">
-              <h3 className="text-xl font-semibold">{exercise.name}</h3>
-              <p><strong>Sets:</strong> {exercise.sets}</p>
-              <p><strong>Reps:</strong> {exercise.reps}</p>
-              <p><strong>Instructions:</strong> {exercise.instructions}</p>
-              <p className="text-sm text-muted-foreground italic">
-                {exercise.note}
-              </p>
-            </CardContent>
-          </Card>
+          <div
+            key={index}
+            className="border rounded-xl overflow-hidden border-brand-indigo/20 bg-gradient-to-b from-brand-indigo/10 to-transparent p-4 flex flex-col min-w-[200px] relative space-y-2"
+          >
+            <h3 className="text-xl font-semibold">{exercise.name}</h3>
+            <p><strong>Sets:</strong> {exercise.sets}</p>
+            <p><strong>Reps:</strong> {exercise.reps}</p>
+            <p><strong>Instructions:</strong> {exercise.instructions}</p>
+            <p className="text-sm text-muted-foreground italic">
+              {exercise.note}
+            </p>
+          </div>
         )) : (
           <p className="text-sm text-destructive">No exercises found for this plan.</p>
         )}

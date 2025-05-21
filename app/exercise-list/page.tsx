@@ -372,7 +372,10 @@ useEffect(() => {
           {exercises.map((ex: any, i: number) => {
             const isRecommended = userRecommended.includes(ex.id);
             return (
-              <div key={i} className="border rounded-xl p-2 bg-muted text-sm space-y-2">
+              <div
+                key={i}
+                className="border rounded-xl overflow-hidden border-brand-indigo/20 bg-gradient-to-b from-brand-indigo/10 to-transparent p-4 flex flex-col min-w-[200px] relative space-y-2 text-sm"
+              >
                 <div className="flex justify-between items-start">
                   <h4 className="text-lg font-semibold">{ex.name}</h4>
                   <span className="text-xs text-muted-foreground">🏅 {ex.recommendations || 0} votes</span>
