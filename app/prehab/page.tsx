@@ -49,7 +49,7 @@ export default function PrehabSearchPage() {
         throw new Error("Response was not valid JSON.");
       }
   
-      const { summary, exercises } = ai.data || {};
+      const { title, summary, exercises } = ai.data || {};
       if (!summary || !exercises) {
         console.error("❌ AI response is missing summary or exercises:", ai);
         throw new Error("AI returned incomplete data.");
@@ -60,6 +60,7 @@ export default function PrehabSearchPage() {
         .insert({
           user_id: user.id,
           search_term: query,
+          title,
           summary,
           exercises,
         })

@@ -28,6 +28,7 @@ export async function POST(req: Request) {
 
 Return the response in JSON format like this:
 {
+  "title": "Short, clear title of the plan",
   "summary": "Short summary of focus and goals",
   "exercises": [
     {
@@ -49,6 +50,7 @@ Return the response in JSON format like this:
             type: "object",
             additionalProperties: false,
             properties: {
+              title: { type: "string" },
               summary: { type: "string" },
               exercises: {
                 type: "array",
@@ -66,7 +68,7 @@ Return the response in JSON format like this:
                 },
               },
             },
-            required: ["summary", "exercises"],
+            required: ["title", "summary", "exercises"],
           },
         },
       },

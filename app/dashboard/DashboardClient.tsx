@@ -54,7 +54,7 @@ export default function DashboardPage() {
 
       const { data: prehabData, error: prehabError } = await supabase
         .from("prehab_plans")
-        .select("id, search_term, summary, created_at")
+        .select("id, search_term, summary, title, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
@@ -161,7 +161,7 @@ export default function DashboardPage() {
 
   const transformedPrehab = prehabPlans.map(plan => ({
     id: plan.id,
-    title: plan.search_term,
+    title: plan.title,
     subtitle: plan.summary,
     url: `/prehab-plan?planId=${plan.id}`,
   }));
