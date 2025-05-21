@@ -1,5 +1,8 @@
+// Import dependencies
 "use client";
 import React, { useState } from 'react';
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { 
   Dumbbell, 
@@ -25,24 +28,98 @@ import { RadioCard } from "@/components/ui/radio-card";
 
 
   
-
+  
 const PersonalTraining = () => {
+  const router = useRouter();
   const [showDetails, setShowDetails] = useState(false);
   const [hasInjury, setHasInjury] = useState<string | null>(null);
   const [trainingGoal, setTrainingGoal] = useState("");
   const [loading, setLoading] = useState(false);
-  
-  const handleSubmit = (e: React.FormEvent) => {
+  // Added state for all user form inputs
+  const [timeframe, setTimeframe] = useState("");
+  const [location, setLocation] = useState("");
+  const [focusArea, setFocusArea] = useState("");
+  const [trainingStyle, setTrainingStyle] = useState("");
+  const [fitnessLevel, setFitnessLevel] = useState("");
+  const [activityLevel, setActivityLevel] = useState("");
+  const [equipment, setEquipment] = useState<string[]>([]);
+  const [workoutDuration, setWorkoutDuration] = useState("");
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    console.log("✅ handleSubmit fired");
     e.preventDefault();
     setLoading(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      toast.success("Your training plan request has been submitted!");
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      window.location.href = `/login?redirect=/personal-training`;
+      return;
+    }
+
+    try {
+      const requestBody = {
+        trainingGoal,
+        hasInjury,
+        timeframe,
+        location,
+        focusArea,
+        trainingStyle,
+        fitnessLevel,
+        activityLevel,
+        equipment,
+        workoutDuration,
+      };
+      console.log("Submitting training plan request:", requestBody);
+      const res = await fetch("/api/ai/personal-training", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("❌ Server returned non-OK status:", res.status);
+        console.error("❌ Response body:", errorText);
+        throw new Error(`Server error: ${res.status}`);
+      }
+
+      let ai;
+      try {
+        ai = await res.json();
+      } catch (jsonError) {
+        const text = await res.text();
+        console.error("❌ Could not parse JSON response. Raw body:", text);
+        throw new Error("Response was not valid JSON.");
+      }
+
+      const { title, summary, exercises } = ai.data || {};
+      if (!summary || !exercises) {
+        console.error("❌ AI response is missing summary or exercises:", ai);
+        throw new Error("AI returned incomplete data.");
+      }
+
+      const { data: plan, error: insertError } = await supabase
+        .from("personal_training_plans")
+        .insert({
+          user_id: user.id,
+          title,
+          summary,
+          exercises,
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      router.push(`/personal-training-plan?planId=${plan.id}`);
+    } catch (err: any) {
+      console.error("Personal Training plan generation error:", err);
+      toast.error(err?.message || "Unable to generate training plan.");
       setLoading(false);
-    }, 1500);
+    }
   };
-  
+
   const toggleDetails = () => {
     setShowDetails(!showDetails);
   };
@@ -79,10 +156,10 @@ const PersonalTraining = () => {
                 <Clock className="h-5 w-5" /> 
                 How long would you like the workout programme for?
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-zinc-900">
-                <RadioCard id="timeframe_1_day" name="timeframe" value="1-day" label="Day" />
-                <RadioCard id="timeframe_1_week" name="timeframe" value="1-week" label="Week" />
-                <RadioCard id="timeframe_1_month" name="timeframe" value="1-month" label="Month" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-zinc-900">
+                <RadioCard id="timeframe_1_day" name="timeframe" value="1-day" label="Day" checked={timeframe === "1-day"} onChange={() => setTimeframe("1-day")} />
+                <RadioCard id="timeframe_1_week" name="timeframe" value="1-week" label="Week" checked={timeframe === "1-week"} onChange={() => setTimeframe("1-week")} />
+                <RadioCard id="timeframe_1_month" name="timeframe" value="1-month" label="Month" checked={timeframe === "1-month"} onChange={() => setTimeframe("1-month")} />
               </div>
             </div>
             
@@ -92,13 +169,15 @@ const PersonalTraining = () => {
                 <HomeIcon className="h-5 w-5  " /> 
                 Where will you be working out?
               </h3>
-              <div className="grid grid-cols-2 gap-3 text-zinc-900">
+            <div className="grid grid-cols-2 gap-3 text-zinc-900">
                 <RadioCard 
                   id="location_home" 
                   name="location" 
                   value="home" 
                   label="At Home" 
                   icon={<HomeIcon className="mr-2 h-4 w-4" />}
+                  checked={location === "home"}
+                  onChange={() => setLocation("home")}
                 />
                 <RadioCard 
                   id="location_gym" 
@@ -106,6 +185,8 @@ const PersonalTraining = () => {
                   value="gym" 
                   label="At The Gym" 
                   icon={<Building2 className="mr-2 h-4 w-4" />}
+                  checked={location === "gym"}
+                  onChange={() => setLocation("gym")}
                 />
               </div>
             </div>
@@ -115,9 +196,11 @@ const PersonalTraining = () => {
               <h3 className="text-xl font-semibold">
                 What is the focus of your training?
               </h3>
-              <Input 
+            <Input 
                 id="focus_area" 
                 name="focus_area" 
+                value={focusArea}
+                onChange={(e) => setFocusArea(e.target.value)}
                 className="border-slate-300 focus-visible:ring-fitness-primary" 
                 placeholder={focusPlaceholder}
               />
@@ -273,7 +356,7 @@ const PersonalTraining = () => {
                   <h3 className="text-xl font-semibold  800">
                     What is your preferred training style?
                   </h3>
-                  <Select>
+                  <Select value={trainingStyle} onValueChange={setTrainingStyle}>
                     <SelectTrigger className="border-slate-300 focus:ring-fitness-primary">
                       <SelectValue placeholder="Select your style" />
                     </SelectTrigger>
@@ -293,9 +376,9 @@ const PersonalTraining = () => {
                     What is your current fitness level?
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-zinc-900">
-                    <RadioCard id="fitness_beginner" name="fitness_level" value="beginner" label="Beginner" />
-                    <RadioCard id="fitness_intermediate" name="fitness_level" value="intermediate" label="Intermediate" />
-                    <RadioCard id="fitness_advanced" name="fitness_level" value="advanced" label="Advanced" />
+                    <RadioCard id="fitness_beginner" name="fitness_level" value="beginner" label="Beginner" checked={fitnessLevel === "beginner"} onChange={() => setFitnessLevel("beginner")} />
+                    <RadioCard id="fitness_intermediate" name="fitness_level" value="intermediate" label="Intermediate" checked={fitnessLevel === "intermediate"} onChange={() => setFitnessLevel("intermediate")} />
+                    <RadioCard id="fitness_advanced" name="fitness_level" value="advanced" label="Advanced" checked={fitnessLevel === "advanced"} onChange={() => setFitnessLevel("advanced")} />
                   </div>
                 </div>
                 
@@ -305,10 +388,10 @@ const PersonalTraining = () => {
                     How active are you currently?
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-zinc-900">
-                    <RadioCard id="activity_sedentary" name="activity_level" value="sedentary" label="Sedentary" />
-                    <RadioCard id="activity_light" name="activity_level" value="light" label="Light (1-2 times/week)" />
-                    <RadioCard id="activity_moderate" name="activity_level" value="moderate" label="Moderate (3-4 times/week)" />
-                    <RadioCard id="activity_high" name="activity_level" value="high" label="High (5+ times/week)" />
+                    <RadioCard id="activity_sedentary" name="activity_level" value="sedentary" label="Sedentary" checked={activityLevel === "sedentary"} onChange={() => setActivityLevel("sedentary")} />
+                    <RadioCard id="activity_light" name="activity_level" value="light" label="Light (1-2 times/week)" checked={activityLevel === "light"} onChange={() => setActivityLevel("light")} />
+                    <RadioCard id="activity_moderate" name="activity_level" value="moderate" label="Moderate (3-4 times/week)" checked={activityLevel === "moderate"} onChange={() => setActivityLevel("moderate")} />
+                    <RadioCard id="activity_high" name="activity_level" value="high" label="High (5+ times/week)" checked={activityLevel === "high"} onChange={() => setActivityLevel("high")} />
                   </div>
                 </div>
                 
@@ -318,9 +401,36 @@ const PersonalTraining = () => {
                     What equipment do you have access to?
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-zinc-900">
-                    <CheckboxCard id="equipment_dumbbells" name="equipment" value="dumbbells" label="Dumbbells" />
-                    <CheckboxCard id="equipment_resistance_bands" name="equipment" value="resistance_bands" label="Resistance Bands" />
-                    <CheckboxCard id="equipment_none" name="equipment" value="none" label="No Equipment" />
+                    <CheckboxCard id="equipment_dumbbells" name="equipment" value="dumbbells" label="Dumbbells"
+                      checked={equipment.includes("dumbbells")}
+                      onChange={e => {
+                        if (e.target.checked) {
+                          setEquipment(prev => [...prev, "dumbbells"]);
+                        } else {
+                          setEquipment(prev => prev.filter(eq => eq !== "dumbbells"));
+                        }
+                      }}
+                    />
+                    <CheckboxCard id="equipment_resistance_bands" name="equipment" value="resistance_bands" label="Resistance Bands"
+                      checked={equipment.includes("resistance_bands")}
+                      onChange={e => {
+                        if (e.target.checked) {
+                          setEquipment(prev => [...prev, "resistance_bands"]);
+                        } else {
+                          setEquipment(prev => prev.filter(eq => eq !== "resistance_bands"));
+                        }
+                      }}
+                    />
+                    <CheckboxCard id="equipment_none" name="equipment" value="none" label="No Equipment"
+                      checked={equipment.includes("none")}
+                      onChange={e => {
+                        if (e.target.checked) {
+                          setEquipment(["none"]);
+                        } else {
+                          setEquipment(prev => prev.filter(eq => eq !== "none"));
+                        }
+                      }}
+                    />
                   </div>
                 </div>
                 
@@ -331,9 +441,9 @@ const PersonalTraining = () => {
                     How long would you like each workout session to be?
                   </h3>
                   <div className="grid grid-cols-3 gap-3 text-zinc-900">
-                    <RadioCard id="duration_15_min" name="workout_duration" value="15-min" label="15 Minutes" />
-                    <RadioCard id="duration_30_min" name="workout_duration" value="30-min" label="30 Minutes" />
-                    <RadioCard id="duration_60_min" name="workout_duration" value="60-min" label="1 Hour" />
+                    <RadioCard id="duration_15_min" name="workout_duration" value="15-min" label="15 Minutes" checked={workoutDuration === "15-min"} onChange={() => setWorkoutDuration("15-min")} />
+                    <RadioCard id="duration_30_min" name="workout_duration" value="30-min" label="30 Minutes" checked={workoutDuration === "30-min"} onChange={() => setWorkoutDuration("30-min")} />
+                    <RadioCard id="duration_60_min" name="workout_duration" value="60-min" label="1 Hour" checked={workoutDuration === "60-min"} onChange={() => setWorkoutDuration("60-min")} />
                   </div>
                 </div>
               </div>
@@ -365,22 +475,33 @@ const PersonalTraining = () => {
 };
 
 
-const CheckboxCard = ({ id, name, value, label }: { 
+const CheckboxCard = ({
+  id,
+  name,
+  value,
+  label,
+  checked,
+  onChange,
+}: {
   id: string;
   name: string;
   value: string;
   label: string;
+  checked?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => {
   return (
     <div className="relative">
-      <input 
+      <input
         id={id}
         name={name}
         value={value}
         type="checkbox"
         className="peer sr-only"
+        checked={checked}
+        onChange={onChange}
       />
-      <label 
+      <label
         htmlFor={id}
         className="flex h-full items-center justify-center gap-1 rounded-lg border border-slate-300 bg-white p-4 text-center text-sm transition-all   peer-checked:border-fitness-primary peer-checked:bg-fitness-light peer-checked:font-medium cursor-pointer"
       >
