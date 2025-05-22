@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import SearchDashboard from "@/components/dashboard/SearchDashboard";
 import PrehabDashboard from "@/components/dashboard/PrehabDashboardCard";
+import PersonalTrainingDashboardCard from "@/components/dashboard/PersonalTrainingDashboardCard";
 import { useRehabParams } from '@/hooks/useRehabParams';
 
 export default function DashboardPage() {
@@ -17,6 +18,7 @@ export default function DashboardPage() {
   const [showChartMap, setShowChartMap] = useState<Record<string, boolean>>({});
   const [selectedTab, setSelectedTab] = useState("Rehab");
   const [prehabPlans, setPrehabPlans] = useState<any[]>([]);
+  const [personalPlans, setPersonalPlans] = useState<any[]>([]);
   const router = useRouter();
   const { injury, complaintId, isValid } = useRehabParams();
   const toggleChart = (complaintId: string) => {
@@ -62,6 +64,17 @@ export default function DashboardPage() {
         console.error("❌ Failed to fetch prehab plans:", prehabError);
       }
       setPrehabPlans(prehabData || []);
+
+      const { data: personalData, error: personalError } = await supabase
+        .from("personal_training_plans")
+        .select("id, title, summary, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (personalError) {
+        console.error("❌ Failed to fetch personal training plans:", personalError);
+      }
+      setPersonalPlans(personalData || []);
 
       // Step 3: Fetch viewed injuries via complaint_injuries join
       const complaintIds = complaints.map(c => c.id);
@@ -165,6 +178,13 @@ export default function DashboardPage() {
     subtitle: plan.summary,
     url: `/prehab-plan?planId=${plan.id}`,
   }));
+
+  const transformedPersonal = personalPlans.map(plan => ({
+    id: plan.id,
+    title: plan.title,
+    subtitle: plan.summary,
+    url: `/personal-training-plan?planId=${plan.id}`,
+  }));
   
 
   return (
@@ -211,6 +231,10 @@ export default function DashboardPage() {
 
   {selectedTab === "Prehab" && (
     <PrehabDashboard plans={transformedPrehab} />
+  )}
+
+  {selectedTab === "Personal Training" && (
+    <PersonalTrainingDashboardCard plans={transformedPersonal} />
   )}
 
   {userComplaints.length === 0 && (

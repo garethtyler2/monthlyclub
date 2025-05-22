@@ -83,12 +83,10 @@ export default function PersonalTrainingPlan() {
         {plan.title || "Your Personal Training Plan"}
       </h1>
 
-      <p className="text-muted-foreground text-center mb-6">{plan.summary}</p>
-
       <Card className="mb-4">
         <CardContent>
           <p className="text-muted-foreground mt-4 text-sm text-center">
-            This plan is structured for your goals. Adjust intensity as needed and stay consistent. If discomfort arises, adapt or skip exercises as necessary.
+            {plan.summary}
           </p>
         </CardContent>
       </Card>

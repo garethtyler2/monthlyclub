@@ -36,7 +36,9 @@ export const RadioCard = ({
       >
         {icon && <span className="mr-2">{icon}</span>}
         {label}
+        
       </label>
+      <CheckCircle2 className="absolute top-2 right-2 h-4 w-4 text-fitness-primary opacity-0 transition-opacity peer-checked:opacity-100" />
     </div>
   );
 };

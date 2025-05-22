@@ -156,10 +156,9 @@ const PersonalTraining = () => {
                 <Clock className="h-5 w-5" /> 
                 How long would you like the workout programme for?
               </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-zinc-900">
+            <div className="grid grid-cols-2 sm:grid-cols-2  gap-3 text-zinc-900">
                 <RadioCard id="timeframe_1_day" name="timeframe" value="1-day" label="Day" checked={timeframe === "1-day"} onChange={() => setTimeframe("1-day")} />
                 <RadioCard id="timeframe_1_week" name="timeframe" value="1-week" label="Week" checked={timeframe === "1-week"} onChange={() => setTimeframe("1-week")} />
-                <RadioCard id="timeframe_1_month" name="timeframe" value="1-month" label="Month" checked={timeframe === "1-month"} onChange={() => setTimeframe("1-month")} />
               </div>
             </div>
             
@@ -174,7 +173,7 @@ const PersonalTraining = () => {
                   id="location_home" 
                   name="location" 
                   value="home" 
-                  label="At Home" 
+                  label="Home" 
                   icon={<HomeIcon className="mr-2 h-4 w-4" />}
                   checked={location === "home"}
                   onChange={() => setLocation("home")}
@@ -183,7 +182,7 @@ const PersonalTraining = () => {
                   id="location_gym" 
                   name="location" 
                   value="gym" 
-                  label="At The Gym" 
+                  label="Gym" 
                   icon={<Building2 className="mr-2 h-4 w-4" />}
                   checked={location === "gym"}
                   onChange={() => setLocation("gym")}
