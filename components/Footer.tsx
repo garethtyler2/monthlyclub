@@ -54,11 +54,7 @@ const Footer = () => {
             <div>
               <h3 className="text-sm font-medium mb-4">About</h3>
               <ul className="space-y-3 text-sm">
-                <li>
-                  <Link href="/feedback" className="text-muted-foreground hover:text-primary transition-colors">
-                    Feedback
-                  </Link>
-                </li>
+
                 <li>
                   <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">
                     Contact Us
