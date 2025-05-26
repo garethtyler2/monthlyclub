@@ -1,9 +1,8 @@
 "use client"
 import React, { useEffect } from 'react';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import TopicGrid from '@/components/TopicGrid';
-import { CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import InjuryLibrary from "@/components/InjuryLibrary";
 import { Search, Code, BarChart3, ArrowDown, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -86,6 +85,11 @@ const Index = () => {
                 Explore Topics <ArrowDown className="ml-2 h-4 w-4" />
               </Link>
             </Button>
+            <Button variant="secondary" asChild>
+              <Link href="#injury-library">
+                Browse Injuries
+              </Link>
+            </Button>
           </div>
               <ul role="list" className="mt-16 grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-3">
                 {features.map((feature) => (
@@ -111,6 +115,10 @@ const Index = () => {
             </p>
           </div>
           <TopicGrid />
+          {/* Injury Library Section */}
+          <div id="injury-library">
+            <InjuryLibrary />
+          </div>
         </section>
 
         {/* Featured Content Section */}
