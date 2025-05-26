@@ -23,6 +23,7 @@ interface Props {
   onToggleChart?: () => void;
   injuryName?: string;
   urlComplaintId?: string;
+  rankedInjuryCodes?: number[] | null;
 }
 
 const SearchCard: React.FC<Props> = ({
@@ -36,6 +37,7 @@ const SearchCard: React.FC<Props> = ({
   onToggleChart,
   injuryName,
   urlComplaintId,
+  rankedInjuryCodes,
 }) => {
   console.log("🧪 SearchCard props:", {
     complaintId,
@@ -139,13 +141,15 @@ const SearchCard: React.FC<Props> = ({
       );
     })()}
 
-    <Button
-      className="mb-6 mt-6 w-full hover:text-blue-400 sm:w-auto"
-      variant="secondary"
-      onClick={() => window.location.href = `/injury-results?complaintId=${complaintId}`}
-    >
-      See Other Injury Suggestions
-    </Button>
+    {rankedInjuryCodes && rankedInjuryCodes.length > 0 && (
+      <Button
+        className="mb-6 mt-6 w-full hover:text-blue-400 sm:w-auto"
+        variant="secondary"
+        onClick={() => window.location.href = `/injury-results?complaintId=${complaintId}`}
+      >
+        See Other Injury Suggestions
+      </Button>
+    )}
   </div>
   );
 }

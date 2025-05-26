@@ -118,7 +118,23 @@ export default function InjuryDiagnosisSearchPage() {
         .single();
 
       if (updateError) console.error("Update error:", updateError);
-  
+
+      // Step 5: Link all ranked injuries to the complaint
+      if (ai.rankedInjuryCodes?.length) {
+        const complaintInjuries = ai.rankedInjuryCodes.map((code: number) => ({
+          complaint_id: complaint.id,
+          injury_code: code,
+        }));
+
+        const { error: linkError } = await supabase
+          .from("complaint_injuries")
+          .insert(complaintInjuries);
+
+        if (linkError) {
+          console.error("❌ Failed to link injuries to complaint:", linkError);
+        }
+      }
+
       router.push(`/injury-results?complaintId=${complaint.id}`);
     } catch (err: any) {
       console.error("Submission error:", err?.message || err);

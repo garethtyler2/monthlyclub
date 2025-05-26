@@ -48,7 +48,7 @@ const Index = () => {
       
       <main className="flex-1">
         {/* Hero Section */}
-    <section className="relative md:pt-20 pb-16 md:pb-32 overflow-hidden">
+    <section className="relative md:pt-10 pb-16 md:pb-32 overflow-hidden">
       {/* Gradient background effects */}
       <div className="absolute top-1/4 -right-64 w-96 h-96 bg-brand-purple/30 rounded-full blur-[128px] -z-10" />
       <div className="absolute -bottom-24 -left-64 w-96 h-96 bg-brand-blue/20 rounded-full blur-[128px] -z-10" />

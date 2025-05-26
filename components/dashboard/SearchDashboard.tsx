@@ -18,6 +18,7 @@ interface Search {
   onToggleChart?: () => void;
   injuryName?: string;
   urlComplaintId?: string;
+  rankedInjuryCodes?: number[] | null;
 }
 
 interface Props {
@@ -50,6 +51,7 @@ const SearchDashboard: React.FC<Props> = ({
           onToggleChart={() => onToggleChart(search.id)}
           injuryName={search.injuryName}
           urlComplaintId={search.urlComplaintId}
+          rankedInjuryCodes={search.rankedInjuryCodes}
         />
       ))}
     </div>
