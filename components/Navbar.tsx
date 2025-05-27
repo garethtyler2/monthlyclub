@@ -55,7 +55,7 @@ const Navbar = () => {
             Personal Training
           </Link>
 
-          <Link href="/insights" className="text-sm font-medium hover:text-white transition-colors">
+          <Link href="/ai-rehab-insights" className="text-sm font-medium hover:text-white transition-colors">
             The Rehab Hub
           </Link>
           {user && (
@@ -126,7 +126,7 @@ const Navbar = () => {
               </Link>
 
               <Link
-                href="/insights"
+                href="/ai-rehab-insights"
                 className="text-sm font-medium hover:text-white transition-colors p-2"
                 onClick={() => setIsMenuOpen(false)}
               >

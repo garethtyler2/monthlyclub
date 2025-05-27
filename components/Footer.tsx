@@ -28,7 +28,7 @@ const Footer = () => {
               <h3 className="text-sm font-medium mb-4">Explore</h3>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <Link href="/insights" className="text-muted-foreground hover:text-primary transition-colors">
+                  <Link href="/ai-rehab-insights" className="text-muted-foreground hover:text-primary transition-colors">
                     AI Rehab Insights
                   </Link>
                 </li>

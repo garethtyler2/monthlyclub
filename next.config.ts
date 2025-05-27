@@ -22,6 +22,26 @@ const nextConfig: NextConfig = {
         destination: '/injury_diagnosis',
         permanent: true,
       },
+      {
+        source: '/ai-physiotherapy',
+        destination: '/ai-rehab-insights',
+        permanent: true,
+      },
+      {
+        source: '/ai-personal-training',
+        destination: '/ai-rehab-insights',
+        permanent: true,
+      },
+      {
+        source: '/ai-prehabilitation',
+        destination: '/ai-rehab-insights',
+        permanent: true,
+      },
+      {
+        source: '/ai-physical-rehabilitation',
+        destination: '/ai-rehab-insights',
+        permanent: true,
+      },
     ];
   },
 };

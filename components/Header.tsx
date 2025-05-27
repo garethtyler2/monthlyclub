@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from "@/lib/utils";
@@ -12,33 +14,33 @@ interface SearchItem {
 }
 
 const searchItems: SearchItem[] = [
-  { id: "rehab-1", title: "What is AI Physical Rehabilitation", category: "AI Physical Rehabilitation", url: "/insights/ai-physical-rehabilitation/what-is-ai-physical-rehabilitation" },
-  { id: "rehab-2", title: "AI Injury Identification", category: "AI Physical Rehabilitation", url: "/insights/ai-physical-rehabilitation/ai-injury-identification" },
-  { id: "rehab-3", title: "Personalized Rehab Plans", category: "AI Physical Rehabilitation", url: "/insights/ai-physical-rehabilitation/personalized-rehab-plans" },
-  { id: "rehab-4", title: "Benefits of AI Physical Therapy", category: "AI Physical Rehabilitation", url: "/insights/ai-physical-rehabilitation/benefits-ai-physical-therapy" },
-  { id: "rehab-5", title: "Limitations of AI Rehabilitation", category: "AI Physical Rehabilitation", url: "/insights/ai-physical-rehabilitation/limitations-ai-rehabilitation" },
-  { id: "rehab-6", title: "Success Stories from AI Rehabilitation", category: "AI Physical Rehabilitation", url: "/insights/ai-physical-rehabilitation/success-stories-ai-rehabilitation" },
-  { id: "prehab-1", title: "What is AI Powered Prehabilitation", category: "AI Prehabilitation", url: "/insights/ai-prehabilitation/what-is-ai-powered-prehabilitation" },
-  { id: "prehab-2", title: "How Can AI Help Prevent Injuries", category: "AI Prehabilitation", url: "/insights/ai-prehabilitation/how-can-ai-help-prevent-injuries" },
-  { id: "prehab-3", title: "Prehab Exercises Tailored by AI", category: "AI Prehabilitation", url: "/insights/ai-prehabilitation/prehab-exercises-tailored-by-ai" },
-  { id: "prehab-4", title: "Is AI Prehabilitation Effective for Surgery Prep", category: "AI Prehabilitation", url: "/insights/ai-prehabilitation/is-ai-prehabilitation-effective-for-surgery-prep" },
-  { id: "prehab-5", title: "How Does AI Analyze Your Prehab Needs", category: "AI Prehabilitation", url: "/insights/ai-prehabilitation/how-does-ai-analyze-your-prehab-needs" },
-  { id: "train-1", title: "What is AI Powered Personal Training", category: "AI Personal Training", url: "/insights/ai-personal-training/what-is-ai-powered-personal-training" },
-  { id: "train-2", title: "How Can AI Help Optimize Training Results", category: "AI Personal Training", url: "/insights/ai-personal-training/how-can-ai-help-optimize-training-results" },
-  { id: "train-3", title: "Examples of AI Personalized Workouts", category: "AI Personal Training", url: "/insights/ai-personal-training/examples-of-ai-personalized-workouts" },
-  { id: "train-4", title: "Is AI Effective for Specific Fitness Goals", category: "AI Personal Training", url: "/insights/ai-personal-training/is-ai-effective-for-specific-fitness-goals" },
-  { id: "train-5", title: "How Does AI Track Progress in Training", category: "AI Personal Training", url: "/insights/ai-personal-training/how-does-ai-track-progress-in-training" },
-  { id: "physio-1", title: "How AI Transforms Physiotherapy", category: "AI Physiotherapy", url: "/insights/ai-physiotherapy/how-ai-transforms-physiotherapy" },
-  { id: "physio-2", title: "AI in Injury Identification", category: "AI Physiotherapy", url: "/insights/ai-physiotherapy/ai-in-injury-identification" },
-  { id: "physio-3", title: "AI for Rehabilitation Exercises", category: "AI Physiotherapy", url: "/insights/ai-physiotherapy/ai-for-rehabilitation-exercises" },
-  { id: "physio-4", title: "AI in Prehab and Injury Prevention", category: "AI Physiotherapy", url: "/insights/ai-physiotherapy/ai-in-prehab-and-injury-prevention" },
-  { id: "physio-5", title: "Personalized AI Training for Recovery and Fitness", category: "AI Physiotherapy", url: "/insights/ai-physiotherapy/personalized-ai-training-for-recovery-and-fitness" },
-  { id: "physio-6", title: "Online Physiotherapy", category: "AI Physiotherapy", url: "/insights/ai-physiotherapy/online-physiotherapy" },
-  { id: "physio-7", title: "Virtual vs Traditional Physio", category: "AI Physiotherapy", url: "/insights/ai-physiotherapy/virtual-vs-traditional-physio" },
-  { id: "physio-8", title: "AI Physiotherapist", category: "AI Physiotherapy", url: "/insights/ai-physiotherapy/ai-physiotherapist" },
-  { id: "physio-9", title: "Home Physio Guide", category: "AI Physiotherapy", url: "/insights/ai-physiotherapy/home-physio-guide" },
-  { id: "physio-10", title: "The Future of AI in Physiotherapy and Fitness", category: "AI Physiotherapy", url: "/insights/ai-physiotherapy/the-future-of-ai-in-physiotherapy-and-fitness" },
-  { id: "physio-11", title: "Virtual Physio FAQ", category: "AI Physiotherapy", url: "/insights/ai-physiotherapy/virtual-physio-faq" }
+  { id: "rehab-1", title: "What is AI Physical Rehabilitation", category: "AI Physical Rehabilitation", url: "/ai-rehab-insights/ai-physical-rehabilitation/what-is-ai-physical-rehabilitation" },
+  { id: "rehab-2", title: "AI Injury Identification", category: "AI Physical Rehabilitation", url: "/ai-rehab-insights/ai-physical-rehabilitation/ai-injury-identification" },
+  { id: "rehab-3", title: "Personalized Rehab Plans", category: "AI Physical Rehabilitation", url: "/ai-rehab-insights/ai-physical-rehabilitation/personalized-rehab-plans" },
+  { id: "rehab-4", title: "Benefits of AI Physical Therapy", category: "AI Physical Rehabilitation", url: "/ai-rehab-insights/ai-physical-rehabilitation/benefits-ai-physical-therapy" },
+  { id: "rehab-5", title: "Limitations of AI Rehabilitation", category: "AI Physical Rehabilitation", url: "/ai-rehab-insights/ai-physical-rehabilitation/limitations-ai-rehabilitation" },
+  { id: "rehab-6", title: "Success Stories from AI Rehabilitation", category: "AI Physical Rehabilitation", url: "/ai-rehab-insights/ai-physical-rehabilitation/success-stories-ai-rehabilitation" },
+  { id: "prehab-1", title: "What is AI Powered Prehabilitation", category: "AI Prehabilitation", url: "/ai-rehab-insights/ai-prehabilitation/what-is-ai-powered-prehabilitation" },
+  { id: "prehab-2", title: "How Can AI Help Prevent Injuries", category: "AI Prehabilitation", url: "/ai-rehab-insights/ai-prehabilitation/how-can-ai-help-prevent-injuries" },
+  { id: "prehab-3", title: "Prehab Exercises Tailored by AI", category: "AI Prehabilitation", url: "/ai-rehab-insights/ai-prehabilitation/prehab-exercises-tailored-by-ai" },
+  { id: "prehab-4", title: "Is AI Prehabilitation Effective for Surgery Prep", category: "AI Prehabilitation", url: "/ai-rehab-insights/ai-prehabilitation/is-ai-prehabilitation-effective-for-surgery-prep" },
+  { id: "prehab-5", title: "How Does AI Analyze Your Prehab Needs", category: "AI Prehabilitation", url: "/ai-rehab-insights/ai-prehabilitation/how-does-ai-analyze-your-prehab-needs" },
+  { id: "train-1", title: "What is AI Powered Personal Training", category: "AI Personal Training", url: "/ai-rehab-insights/ai-personal-training/what-is-ai-powered-personal-training" },
+  { id: "train-2", title: "How Can AI Help Optimize Training Results", category: "AI Personal Training", url: "/ai-rehab-insights/ai-personal-training/how-can-ai-help-optimize-training-results" },
+  { id: "train-3", title: "Examples of AI Personalized Workouts", category: "AI Personal Training", url: "/ai-rehab-insights/ai-personal-training/examples-of-ai-personalized-workouts" },
+  { id: "train-4", title: "Is AI Effective for Specific Fitness Goals", category: "AI Personal Training", url: "/ai-rehab-insights/ai-personal-training/is-ai-effective-for-specific-fitness-goals" },
+  { id: "train-5", title: "How Does AI Track Progress in Training", category: "AI Personal Training", url: "/ai-rehab-insights/ai-personal-training/how-does-ai-track-progress-in-training" },
+  { id: "physio-1", title: "How AI Transforms Physiotherapy", category: "AI Physiotherapy", url: "/ai-rehab-insights/ai-physiotherapy/how-ai-transforms-physiotherapy" },
+  { id: "physio-2", title: "AI in Injury Identification", category: "AI Physiotherapy", url: "/ai-rehab-insights/ai-physiotherapy/ai-in-injury-identification" },
+  { id: "physio-3", title: "AI for Rehabilitation Exercises", category: "AI Physiotherapy", url: "/ai-rehab-insights/ai-physiotherapy/ai-for-rehabilitation-exercises" },
+  { id: "physio-4", title: "AI in Prehab and Injury Prevention", category: "AI Physiotherapy", url: "/ai-rehab-insights/ai-physiotherapy/ai-in-prehab-and-injury-prevention" },
+  { id: "physio-5", title: "Personalized AI Training for Recovery and Fitness", category: "AI Physiotherapy", url: "/ai-rehab-insights/ai-physiotherapy/personalized-ai-training-for-recovery-and-fitness" },
+  { id: "physio-6", title: "Online Physiotherapy", category: "AI Physiotherapy", url: "/ai-rehab-insights/ai-physiotherapy/online-physiotherapy" },
+  { id: "physio-7", title: "Virtual vs Traditional Physio", category: "AI Physiotherapy", url: "/ai-rehab-insights/ai-physiotherapy/virtual-vs-traditional-physio" },
+  { id: "physio-8", title: "AI Physiotherapist", category: "AI Physiotherapy", url: "/ai-rehab-insights/ai-physiotherapy/ai-physiotherapist" },
+  { id: "physio-9", title: "Home Physio Guide", category: "AI Physiotherapy", url: "/ai-rehab-insights/ai-physiotherapy/home-physio-guide" },
+  { id: "physio-10", title: "The Future of AI in Physiotherapy and Fitness", category: "AI Physiotherapy", url: "/ai-rehab-insights/ai-physiotherapy/the-future-of-ai-in-physiotherapy-and-fitness" },
+  { id: "physio-11", title: "Virtual Physio FAQ", category: "AI Physiotherapy", url: "/ai-rehab-insights/ai-physiotherapy/virtual-physio-faq" }
 ];
 
 const Header = () => {

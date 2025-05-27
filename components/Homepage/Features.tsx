@@ -20,7 +20,7 @@ const featureItems = [
     description: "Receive personalized rehab exercises based on your level and symptoms.",
     className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
     delay: 100,
-    link: "/direct-rehab"
+    link: "/injury-diagnosis"
   },
   {
     icon: BarChart,
@@ -52,7 +52,7 @@ const featureItems = [
     description: "Stay informed with curated content on physiotherapy, injury science, and how AI is reshaping recovery.",    
     className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
     delay: 500,
-    link: "/insights"
+    link: "/ai-rehab-insights"
   },
 ];
 

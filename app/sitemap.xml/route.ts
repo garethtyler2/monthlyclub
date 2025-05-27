@@ -1,10 +1,13 @@
-
-
 import { NextResponse } from "next/server"
 import { supabase } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/server"
 
 export async function GET() {
+  const supabase = await createClient()
   const baseUrl = "https://ai-rehab.co.uk"
+
+  const formatDate = (date: string | Date) =>
+    new Date(date).toISOString().split("T")[0]
 
   // Static routes
   const staticPaths = [
@@ -14,26 +17,22 @@ export async function GET() {
     "personal-training",
     "contact",
     "ai-rehab-insights",
-    "ai-physical-rehabilitation",
     "ai-physical-rehabilitation/what-is-ai-physical-rehabilitation",
     "ai-physical-rehabilitation/personalized-rehab-plans",
     "ai-physical-rehabilitation/benefits-ai-physical-therapy",
     "ai-physical-rehabilitation/limitations-ai-rehabilitation",
     "ai-physical-rehabilitation/success-stories-ai-rehabilitation",
     "ai-physical-rehabilitation/ai-injury-identification",
-    "ai-prehabilitation",
     "ai-prehabilitation/what-is-ai-powered-prehabilitation",
     "ai-prehabilitation/how-can-ai-help-prevent-injuries",
     "ai-prehabilitation/prehab-exercises-tailored-by-ai",
     "ai-prehabilitation/is-ai-prehabilitation-effective-for-surgery-prep",
     "ai-prehabilitation/how-does-ai-analyze-your-prehab-needs",
-    "ai-personal-training",
     "ai-personal-training/what-is-ai-powered-personal-training",
     "ai-personal-training/how-can-ai-help-optimize-training-results",
     "ai-personal-training/examples-of-ai-personalized-workouts",
     "ai-personal-training/is-ai-effective-for-specific-fitness-goals",
     "ai-personal-training/how-does-ai-track-progress-in-training",
-    "ai-physiotherapy",
     "ai-physiotherapy/how-ai-transforms-physiotherapy",
     "ai-physiotherapy/ai-in-injury-identification",
     "ai-physiotherapy/ai-for-rehabilitation-exercises",
@@ -62,6 +61,7 @@ export async function GET() {
       (path) => `
     <url>
       <loc>${baseUrl}/${path}</loc>
+      <lastmod>${formatDate(new Date())}</lastmod>
       <changefreq>weekly</changefreq>
       <priority>0.8</priority>
     </url>
