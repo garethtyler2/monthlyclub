@@ -19,6 +19,9 @@ const Footer = () => {
             <p className="text-muted-foreground text-sm max-w-xs">
               Your affordable and accessible alternative to traditional physiotherapy.
             </p>
+            <p className="text-xs text-muted-foreground mt-4">
+            AI-Rehab provides general information and guidance only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider with any questions about your condition.
+          </p>
           </div>
           
           {/* Navigation Links */}
