@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import SearchBarTemplate from "@/components/shared/SearchBarTemplate";
 import SEOContent from "@/components/shared/SEOContent";
@@ -13,6 +13,21 @@ export default function PrehabSearchPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    const tryResumePrehab = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const savedData = localStorage.getItem("pendingPrehabSearch");
+
+      if (user && savedData) {
+        const { query } = JSON.parse(savedData);
+        localStorage.removeItem("pendingPrehabSearch");
+        await handleSearch(query);
+      }
+    };
+
+    tryResumePrehab();
+  }, []);
+
   const handleSearch = async (query: string) => {
     toast({
       title: "Generating prehab plan…",
@@ -22,6 +37,7 @@ export default function PrehabSearchPage() {
   
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
+      localStorage.setItem("pendingPrehabSearch", JSON.stringify({ query }));
       window.location.href = `/login?redirect=/prehab`;
       return;
     }

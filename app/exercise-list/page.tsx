@@ -18,6 +18,55 @@ function ExerciseContent() {
   const [userRecommended, setUserRecommended] = useState<string[]>([]);
   const [recommendingId, setRecommendingId] = useState<string | null>(null);
 
+  // Effect to handle resuming exercise from pending injury context
+  useEffect(() => {
+    const resumeExerciseContext = async () => {
+      const saved = localStorage.getItem("pendingExerciseFromInjury");
+      if (!saved) return;
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { injuryTitle, injuryId } = JSON.parse(saved);
+      localStorage.removeItem("pendingExerciseFromInjury");
+
+      const { data: newComplaint, error: insertError } = await supabase
+        .from("complaints")
+        .insert({
+          user_id: user.id,
+          location: injuryTitle,
+        })
+        .select()
+        .single();
+
+      if (!newComplaint || insertError) return;
+
+      const complaintId = newComplaint.id;
+
+      const { error: linkError } = await supabase
+        .from("complaint_injuries")
+        .insert({
+          complaint_id: complaintId,
+          injury_id: injuryId,
+        });
+
+      if (!linkError) {
+        await supabase
+          .from("complaint_injuries")
+          .update({
+            viewed_by_user: true,
+            viewed_at: new Date().toISOString(),
+          })
+          .eq("complaint_id", complaintId)
+          .eq("injury_id", injuryId);
+      }
+
+      window.location.href = `/exercise-list?injury=${encodeURIComponent(injuryTitle)}&complaintId=${complaintId}`;
+    };
+
+    resumeExerciseContext();
+  }, []);
+
 useEffect(() => {
   const hasDismissed = localStorage.getItem("dismissRecommendPopup") === "true";
   if (!hasDismissed) {

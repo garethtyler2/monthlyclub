@@ -45,6 +45,7 @@ export default function InjuryPage() {
     fetchInjury()
   }, [slug, router])
 
+
   const handleClick = useCallback(async () => {
     const {
       data: { user },
@@ -52,7 +53,8 @@ export default function InjuryPage() {
     } = await supabase.auth.getUser()
 
     if (!user) {
-      router.push("/login")
+      localStorage.setItem("pendingExerciseFromInjury", JSON.stringify({ injuryTitle: detail?.title, injuryId: detail?.id }));
+      router.push(`/login?redirect=/exercise-list`);
       return
     }
 
@@ -94,7 +96,7 @@ export default function InjuryPage() {
     }
 
     router.push(`/exercise-list?injury=${encodeURIComponent(detail.title)}&complaintId=${complaintId}`)
-  }, [detail, router])
+  }, [detail, router, slug])
 
   if (isLoading) return <LoadingOverlay show message="Loading injury details..." />
   if (!detail) return <p className="text-center mt-10 text-muted-foreground">No data available.</p>

@@ -1,6 +1,7 @@
 // Import dependencies
+// Import dependencies
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
@@ -27,8 +28,6 @@ import { useTypingPlaceholder } from "@/hooks/useTypingPlaceholder";
 import { RadioCard } from "@/components/ui/radio-card";
 
 
-  
-  
 const PersonalTraining = () => {
   const router = useRouter();
   const [showDetails, setShowDetails] = useState(false);
@@ -45,59 +44,44 @@ const PersonalTraining = () => {
   const [equipment, setEquipment] = useState<string[]>([]);
   const [workoutDuration, setWorkoutDuration] = useState("");
 
+  // Resume pending personal training plan if present after login
+  useEffect(() => {
+    const tryResumePersonalTraining = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const savedData = localStorage.getItem("pendingPersonalTraining");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    console.log("✅ handleSubmit fired");
-    e.preventDefault();
+      if (user && savedData) {
+        const parsed = JSON.parse(savedData);
+        localStorage.removeItem("pendingPersonalTraining");
+        await submitPersonalTraining(parsed);
+      }
+    };
+
+    tryResumePersonalTraining();
+  }, []);
+
+  // Submission logic for personal training plan
+  const submitPersonalTraining = async (formData: any) => {
     setLoading(true);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      window.location.href = `/login?redirect=/personal-training`;
-      return;
-    }
-
     try {
-      const requestBody = {
-        trainingGoal,
-        hasInjury,
-        timeframe,
-        location,
-        focusArea,
-        trainingStyle,
-        fitnessLevel,
-        activityLevel,
-        equipment,
-        workoutDuration,
-      };
-      console.log("Submitting training plan request:", requestBody);
       const res = await fetch("/api/ai/personal-training", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify(formData),
       });
 
       if (!res.ok) {
         const errorText = await res.text();
-        console.error("❌ Server returned non-OK status:", res.status);
-        console.error("❌ Response body:", errorText);
         throw new Error(`Server error: ${res.status}`);
       }
 
-      let ai;
-      try {
-        ai = await res.json();
-      } catch (jsonError) {
-        const text = await res.text();
-        console.error("❌ Could not parse JSON response. Raw body:", text);
-        throw new Error("Response was not valid JSON.");
-      }
-
+      const ai = await res.json();
       const { title, summary, exercises } = ai.data || {};
-      if (!summary || !exercises) {
-        console.error("❌ AI response is missing summary or exercises:", ai);
-        throw new Error("AI returned incomplete data.");
-      }
+      if (!summary || !exercises) throw new Error("AI returned incomplete data.");
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
 
       const { data: plan, error: insertError } = await supabase
         .from("personal_training_plans")
@@ -117,6 +101,38 @@ const PersonalTraining = () => {
       console.error("Personal Training plan generation error:", err);
       toast.error(err?.message || "Unable to generate training plan.");
       setLoading(false);
+    }
+  };
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    console.log("✅ handleSubmit fired");
+    e.preventDefault();
+    setLoading(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    const requestBody = {
+      trainingGoal,
+      hasInjury,
+      timeframe,
+      location,
+      focusArea,
+      trainingStyle,
+      fitnessLevel,
+      activityLevel,
+      equipment,
+      workoutDuration,
+    };
+    if (!user) {
+      localStorage.setItem("pendingPersonalTraining", JSON.stringify(requestBody));
+      window.location.href = `/login?redirect=/personal-training`;
+      return;
+    }
+
+    try {
+      await submitPersonalTraining(requestBody);
+    } catch (err: any) {
+      // Error handling is done in submitPersonalTraining
     }
   };
 

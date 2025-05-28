@@ -2,7 +2,7 @@
 // The AI then diagnoses likely injuries and creates related database records.
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import SearchBarTemplate from "@/components/shared/SearchBarTemplate"
 import { Button } from "@/components/ui/button"
@@ -23,6 +23,88 @@ export default function InjuryDiagnosisSearchPage() {
   const [bodyRegion, setBodyRegion] = useState<"upper" | "lower" | "">("");
   const [location, setLocation] = useState("");
   const router = useRouter()
+
+  useEffect(() => {
+    const tryResubmit = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      const savedData = localStorage.getItem("pendingInjurySubmission");
+
+      if (user && savedData) {
+        const parsed = JSON.parse(savedData);
+        localStorage.removeItem("pendingInjurySubmission");
+        await submitInjuryData(parsed);
+      }
+    };
+
+    tryResubmit();
+  }, []);
+
+  const submitInjuryData = async (payload: any) => {
+    setIsLoading(true);
+
+    try {
+      const { data: areaInjuries, error: fetchError } = await supabase
+        .from("injuries")
+        .select("injury_code, title, description")
+        .eq("area", payload.location);
+
+      if (fetchError) throw fetchError;
+
+      const aiPayload = { ...payload, injuries: areaInjuries };
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const res = await fetch("/api/ai/injury-diagnosis", {
+        method: "POST",
+        body: JSON.stringify(aiPayload),
+      });
+
+      const ai = await res.json();
+      if (!ai?.rankedInjuryCodes?.length) {
+        throw new Error("AI did not return any ranked injury codes.");
+      }
+
+      const { data: complaint, error } = await supabase
+        .from("complaints")
+        .insert({
+          user_id: user.id,
+          location: payload.location,
+          onset_type: payload.onsetType,
+          cause: payload.cause,
+          summary_label: ai.summaryLabel,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      await supabase.from("complaint_progress_logs").insert({
+        user_id: user.id,
+        complaint_id: complaint.id,
+        pain_level: payload.painLevel,
+        strength_level: payload.strengthLevel,
+        mobility_level: payload.mobilityLevel,
+      });
+
+      await supabase
+        .from("complaints")
+        .update({ rankedInjuryCodes: ai.rankedInjuryCodes })
+        .eq("id", complaint.id);
+
+      const complaintInjuries = ai.rankedInjuryCodes.map((code: number) => ({
+        complaint_id: complaint.id,
+        injury_code: code,
+      }));
+
+      await supabase.from("complaint_injuries").insert(complaintInjuries);
+
+      router.push(`/injury-results?complaintId=${complaint.id}`);
+    } catch (err: any) {
+      console.error("Resubmission error:", err?.message || err);
+      setIsLoading(false);
+    }
+  };
 
   // handleSubmit processes the injury diagnosis form:
   // 1. Calls AI to get injury suggestions
@@ -47,100 +129,14 @@ export default function InjuryDiagnosisSearchPage() {
       mobilityLevel: mobility,
     };
 
-    // Step 0: Fetch injuries for the selected location from Supabase
-    const { data: areaInjuries, error: fetchError } = await supabase
-      .from("injuries")
-      .select("injury_code, title, description")
-      .eq("area", location);
-
-    if (fetchError) throw fetchError;
-
-    const aiPayload = {
-      location,
-      onsetType,
-      cause,
-      painLevel: pain,
-      strengthLevel: strength,
-      mobilityLevel: mobility,
-      injuries: areaInjuries,
-    };
-  
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
+      localStorage.setItem("pendingInjurySubmission", JSON.stringify(payload));
       window.location.href = "/login?redirect=/injury-diagnosis";
       return;
     }
-  
-    setIsLoading(true);
-  
-    try {
-      // Step 1: Call the AI service to get a list of probable injuries
-      const res = await fetch("/api/ai/injury-diagnosis", {
-        method: "POST",
-        body: JSON.stringify(aiPayload),
-      });
 
-      const ai = await res.json();
-      if (!ai?.rankedInjuryCodes?.length) {
-        throw new Error("AI did not return any ranked injury codes.");
-      }
-  
-      // Step 2: Save the user's complaint (their main concern) into the database
-      const { data: complaint, error } = await supabase
-        .from("complaints")
-        .insert({
-          user_id: user.id,
-          location,
-          onset_type: onsetType,
-          cause,
-          summary_label: ai.summaryLabel,
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-  
-      // Step 3: Save the user's initial symptom ratings (pain, strength, mobility)
-      await supabase.from("complaint_progress_logs").insert({
-        user_id: user.id,
-        complaint_id: complaint.id,
-        pain_level: pain,
-        strength_level: strength,
-        mobility_level: mobility,
-      });
-  
-      // Step 4: Store the rankedInjuryCodes directly on the complaint
-      const { data: updatedComplaint, error: updateError } = await supabase
-        .from("complaints")
-        .update({ rankedInjuryCodes: ai.rankedInjuryCodes })
-        .eq("id", complaint.id)
-        .select()
-        .single();
-
-      if (updateError) console.error("Update error:", updateError);
-
-      // Step 5: Link all ranked injuries to the complaint
-      if (ai.rankedInjuryCodes?.length) {
-        const complaintInjuries = ai.rankedInjuryCodes.map((code: number) => ({
-          complaint_id: complaint.id,
-          injury_code: code,
-        }));
-
-        const { error: linkError } = await supabase
-          .from("complaint_injuries")
-          .insert(complaintInjuries);
-
-        if (linkError) {
-          console.error("❌ Failed to link injuries to complaint:", linkError);
-        }
-      }
-
-      router.push(`/injury-results?complaintId=${complaint.id}`);
-    } catch (err: any) {
-      console.error("Submission error:", err?.message || err);
-      console.dir(err, { depth: null });
-      setIsLoading(false);
-    }
+    await submitInjuryData(payload);
   };
   
 
