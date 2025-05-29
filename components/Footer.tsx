@@ -70,7 +70,7 @@ const Footer = () => {
         
         <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground mb-4 md:mb-0">
-            © 2023 AI-Rehab. All rights reserved.
+            © 2025 AI-Rehab. All rights reserved.
           </p>
           <div className="flex space-x-6 text-sm">
             <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
