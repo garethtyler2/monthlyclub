@@ -5,6 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 
 const Navbar = () => {
@@ -59,21 +66,37 @@ const Navbar = () => {
             The Rehab Hub
           </Link>
           {user && (
-            <Button className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90">
-                <Link href="/dashboard" className="text-white">Dashboard</Link>
-            </Button>
-            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center space-x-2 focus:outline-none cursor-pointer">
+                <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue">
+                  {user.user_metadata?.avatar_url ? (
+                    <img
+                      src={user.user_metadata.avatar_url}
+                      alt={user.user_metadata.full_name || "User"}
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <AvatarFallback>
+                      {user.user_metadata?.full_name
+                        ? user.user_metadata.full_name.charAt(0).toUpperCase()
+                        : "U"}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="mt-2">
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
 
-          {user ? (
-            <Button
-              variant="ghost"
-              className="text-sm font-medium hover:text-white transition-colors"
-              onClick={handleLogout}
-            >
-              Logout
-            </Button>
-          ) : (
+          {!user && (
             <>
 
               <Button className="ml-2 bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90">
@@ -133,39 +156,52 @@ const Navbar = () => {
                 The Rehab Hub
               </Link>
 
-              {user && (
-                <Button
-                  className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90 p-2 "
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Link href="/dashboard" className="text-white w-full ">
+              {user ? (
+                <div className="flex flex-col pt-4 border-t border-white/10 space-y-2 px-2">
+                  <div className="flex items-center space-x-3">
+                    <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue">
+                      {user.user_metadata?.avatar_url ? (
+                        <img
+                          src={user.user_metadata.avatar_url}
+                          alt={user.user_metadata.full_name || "User"}
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      ) : (
+                        <AvatarFallback>
+                          {user.user_metadata?.full_name
+                            ? user.user_metadata.full_name.charAt(0).toUpperCase()
+                            : "U"}
+                        </AvatarFallback>
+                      )}
+                    </Avatar>
+                    <span className="text-sm font-medium text-white">
+                      {user.user_metadata?.full_name || "User"}
+                    </span>
+                  </div>
+                  <Link
+                    href="/dashboard"
+                    className="text-sm pt-2 font-medium text-white hover:underline"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     Dashboard
                   </Link>
-                </Button>
-              )}
-
-              {/* Auth links for mobile */}
-              <div className="flex flex-col pt-2 border-t border-white/10 space-y-2">
-                {user ? (
-                  <Button
-                    className="w-full justify-start px-2"
-                    variant="ghost"
+                  <button
                     onClick={handleLogout}
+                    className="text-sm pt-2 text-white hover:underline text-left"
                   >
                     Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col pt-2 border-t border-white/10 space-y-2">
+                  <Button
+                    className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90 w-full"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Link href="/login" className="text-white">Access AI-Rehab</Link>
                   </Button>
-                ) : (
-                  <>
-
-                    <Button
-                      className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90 w-full"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Link href="/login" className="text-white">Access AI-Rehab</Link>
-                    </Button>
-                  </>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

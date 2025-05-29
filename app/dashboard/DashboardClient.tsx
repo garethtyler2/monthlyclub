@@ -39,6 +39,9 @@ export default function DashboardPage() {
       }
 
       setUser(user);
+      const fullName = user.user_metadata?.full_name || "";
+      const firstName = fullName.split(" ")[0];
+      setUser({ ...user, firstName });
 
       // Step 2: Fetch all complaints tied to the user, including rankedInjuryCodes
       const { data: complaints, error: complaintsError } = await supabase
@@ -193,7 +196,9 @@ export default function DashboardPage() {
     <h1 className="animate-fade-in text-4xl sm:text-5xl font-bold leading-tight">
       <span className="block">Welcome</span>
       <span className="block text-lg sm:text-2xl text-muted-foreground mt-2">
-        <span className="gradient-text">{user.email}</span>
+        <span className="gradient-text">
+          {user.firstName ? `${user.firstName}` : user.email}
+        </span>
       </span>
     </h1>
   </div>
