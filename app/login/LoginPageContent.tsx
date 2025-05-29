@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
@@ -9,6 +9,9 @@ export default function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || "/dashboard";
+
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+  const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -50,7 +53,7 @@ export default function LoginPageContent() {
           </h1>
         </div>
 
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-4">
           <button
             onClick={handleLogin}
             className="flex items-center justify-center gap-3 bg-white text-gray-700 border border-gray-300 rounded-md px-4 py-2 text-sm font-medium shadow-sm hover:bg-gray-50 transition-colors"
@@ -66,10 +69,24 @@ export default function LoginPageContent() {
         </div>
 
 
-        <p className="mt-6 text-xs text-gray-500">
+        <p className=" text-xs text-gray-500">
+          Supabase ID: <strong className="text-gray-600">zottypnnrmziobqxehxk</strong>
+        </p>
+        <p className="text-xs text-gray-500">
+          <button className="underline text-xs" onClick={toggleAccordion}>
+            What's that?
+          </button>
+        </p>
+        {isAccordionOpen && (
+          <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded border border-gray-200">
+            To help build trust, we show our App ID here so you can confirm it matches the one shown in Google's login screen. This ensures you're signing in securely through our app.
+          </div>
+        )}
+
+        <p className="mt-12 text-xs text-gray-500">
           By signing in, you agree to our{" "}
           <a href="#" className="underline hover:text-gray-700">Terms</a> and{" "}
-          <a href="#" className="underline hover:text-gray-700">Privacy Policy</a>
+          <a href="#" className="underline hover:text-gray-700">Privacy Policy</a>.
         </p>
       </div>
     </div>
