@@ -307,32 +307,6 @@ const PersonalTraining = () => {
                 </div>
                 
                 {/* Dynamic Fields for Training Goal */}
-                {trainingGoal === "strength" && (
-                  <div className="space-y-3 animate-fade-in">
-                    <h3 className="text-lg font-medium  800">
-                      Enter your 1 Rep Max (optional):
-                    </h3>
-                    <div className="flex gap-2 items-center">
-                      <Input 
-                        id="one_rep_max" 
-                        name="one_rep_max" 
-                        type="number" 
-                        className="border-slate-300 focus-visible:ring-fitness-primary" 
-                        placeholder="e.g., 100kg"
-                      />
-                      <span className=" 500">kg</span>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="unknown_rep_max" />
-                      <label
-                        htmlFor="unknown_rep_max"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        I don't know
-                      </label>
-                    </div>
-                  </div>
-                )}
                 
                 {trainingGoal === "endurance" && (
                   <div className="space-y-3 animate-fade-in">
@@ -411,43 +385,45 @@ const PersonalTraining = () => {
                 </div>
                 
                 {/* Equipment Selection */}
-                <div className="space-y-3">
-                  <h3 className="text-xl font-semibold  800">
-                    What equipment do you have access to?
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-zinc-900">
-                    <CheckboxCard id="equipment_dumbbells" name="equipment" value="dumbbells" label="Dumbbells"
-                      checked={equipment.includes("dumbbells")}
-                      onChange={e => {
-                        if (e.target.checked) {
-                          setEquipment(prev => [...prev, "dumbbells"]);
-                        } else {
-                          setEquipment(prev => prev.filter(eq => eq !== "dumbbells"));
-                        }
-                      }}
-                    />
-                    <CheckboxCard id="equipment_resistance_bands" name="equipment" value="resistance_bands" label="Resistance Bands"
-                      checked={equipment.includes("resistance_bands")}
-                      onChange={e => {
-                        if (e.target.checked) {
-                          setEquipment(prev => [...prev, "resistance_bands"]);
-                        } else {
-                          setEquipment(prev => prev.filter(eq => eq !== "resistance_bands"));
-                        }
-                      }}
-                    />
-                    <CheckboxCard id="equipment_none" name="equipment" value="none" label="No Equipment"
-                      checked={equipment.includes("none")}
-                      onChange={e => {
-                        if (e.target.checked) {
-                          setEquipment(["none"]);
-                        } else {
-                          setEquipment(prev => prev.filter(eq => eq !== "none"));
-                        }
-                      }}
-                    />
+                {location === "home" && (
+                  <div className="space-y-3">
+                    <h3 className="text-xl font-semibold  800">
+                      What equipment do you have access to?
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-zinc-900">
+                      <CheckboxCard id="equipment_dumbbells" name="equipment" value="dumbbells" label="Dumbbells"
+                        checked={equipment.includes("dumbbells")}
+                        onChange={e => {
+                          if (e.target.checked) {
+                            setEquipment(prev => [...prev, "dumbbells"]);
+                          } else {
+                            setEquipment(prev => prev.filter(eq => eq !== "dumbbells"));
+                          }
+                        }}
+                      />
+                      <CheckboxCard id="equipment_resistance_bands" name="equipment" value="resistance_bands" label="Resistance Bands"
+                        checked={equipment.includes("resistance_bands")}
+                        onChange={e => {
+                          if (e.target.checked) {
+                            setEquipment(prev => [...prev, "resistance_bands"]);
+                          } else {
+                            setEquipment(prev => prev.filter(eq => eq !== "resistance_bands"));
+                          }
+                        }}
+                      />
+                      <CheckboxCard id="equipment_none" name="equipment" value="none" label="No Equipment"
+                        checked={equipment.includes("none")}
+                        onChange={e => {
+                          if (e.target.checked) {
+                            setEquipment(["none"]);
+                          } else {
+                            setEquipment(prev => prev.filter(eq => eq !== "none"));
+                          }
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
                 
                 {/* Workout Duration */}
                 <div className="space-y-3">
