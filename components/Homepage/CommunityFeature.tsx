@@ -41,7 +41,7 @@ const CommunityFeature = () => {
             <a href="/ai-rehab-insights#injury-library">Explore Top-Rated Exercises</a>
           </Button>
           <Button asChild variant="outline">
-            <a href="/ai-rehab-insights/ai-physical-rehabilitation/community-driven-rehab">Find Out More</a>
+            <a href="/ai-physical-rehabilitation/community-driven-rehab">Find Out More</a>
           </Button>
         </div>
       </div>

@@ -18,6 +18,7 @@ export async function GET() {
     "contact",
     "ai-rehab-insights",
     "ai-physical-rehabilitation/what-is-ai-physical-rehabilitation",
+    "ai-physical-rehabilitation/community-driven-rehab",
     "ai-physical-rehabilitation/personalized-rehab-plans",
     "ai-physical-rehabilitation/benefits-ai-physical-therapy",
     "ai-physical-rehabilitation/limitations-ai-rehabilitation",

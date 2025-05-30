@@ -139,7 +139,7 @@ const Index = () => {
                 <div className="p-6">
                   <h3 className="font-semibold text-xl mb-2">What is AI Physical Rehabilitation?</h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">Discover how AI can personalize your rehabilitation journey from the very start.</p>
-                  <a href="/ai-rehab-insights/ai-physical-rehabilitation/what-is-ai-physical-rehabilitation" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">Read Guide →</a>
+                  <a href="/ai-physical-rehabilitation/what-is-ai-physical-rehabilitation" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">Read Guide →</a>
                 </div>
               </div>
               
@@ -150,7 +150,7 @@ const Index = () => {
                 <div className="p-6">
                   <h3 className="font-semibold text-xl mb-2">How Can AI Help Prevent Injuries?</h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">Explore AI-driven strategies to stay injury-free before they even happen.</p>
-                  <a href="/ai-rehab-insights/ai-prehabilitation/how-can-ai-help-prevent-injuries" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">Read Guide →</a>
+                  <a href="/ai-prehabilitation/how-can-ai-help-prevent-injuries" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">Read Guide →</a>
                 </div>
               </div>
               
@@ -161,7 +161,7 @@ const Index = () => {
                 <div className="p-6">
                   <h3 className="font-semibold text-xl mb-2">Track Your Recovery Progress</h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">Learn how AI tools help you monitor improvements and adjust plans dynamically.</p>
-                  <a href="/ai-rehab-insights/ai-personal-training/how-does-ai-track-progress-in-training" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">Read Guide →</a>
+                  <a href="/ai-personal-training/how-does-ai-track-progress-in-training" className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium">Read Guide →</a>
                 </div>
               </div>
             </div>
