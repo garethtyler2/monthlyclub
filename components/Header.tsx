@@ -15,6 +15,7 @@ interface SearchItem {
 
 const searchItems: SearchItem[] = [
   { id: "rehab-1", title: "What is AI Physical Rehabilitation", category: "AI Physical Rehabilitation", url: "/ai-rehab-insights/ai-physical-rehabilitation/what-is-ai-physical-rehabilitation" },
+  { id: "rehab-7", title: "How the AI-Rehab Community Ranks Exercises", category: "AI Physical Rehabilitation", url: "/ai-rehab-insights/community-driven-rehab" },
   { id: "rehab-2", title: "AI Injury Identification", category: "AI Physical Rehabilitation", url: "/ai-rehab-insights/ai-physical-rehabilitation/ai-injury-identification" },
   { id: "rehab-3", title: "Personalized Rehab Plans", category: "AI Physical Rehabilitation", url: "/ai-rehab-insights/ai-physical-rehabilitation/personalized-rehab-plans" },
   { id: "rehab-4", title: "Benefits of AI Physical Therapy", category: "AI Physical Rehabilitation", url: "/ai-rehab-insights/ai-physical-rehabilitation/benefits-ai-physical-therapy" },

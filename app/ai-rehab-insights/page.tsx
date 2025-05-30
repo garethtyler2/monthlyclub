@@ -82,7 +82,7 @@ const Index = () => {
           >
             <Button className="hero-button-primary" asChild>
               <Link href="#topic-grid">
-                Explore Topics <ArrowDown className="ml-2 h-4 w-4" />
+                Explore Topics 
               </Link>
             </Button>
             <Button variant="secondary" asChild>

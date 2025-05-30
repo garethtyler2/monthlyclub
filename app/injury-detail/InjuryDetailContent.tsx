@@ -228,7 +228,11 @@ const handleClick = () => {
             {detail.detailedDescription}
           </p>
         </div>
-
+        <div className="pt-4">
+          <Button onClick={handleClick} className="w-full hero-button-primary">
+          Exercises
+          </Button>
+        </div>
         <Card className="p-5 space-y-4">
           <div className="flex items-center gap-2 text-xl font-semibold">
             <AlertTriangle size={20} /> Symptoms

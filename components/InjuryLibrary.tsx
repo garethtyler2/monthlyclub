@@ -41,6 +41,14 @@ export default function InjuryLibrary() {
 
   return (
     <section className="py-16 container mx-auto px-4">
+      <div className="mb-8 max-w-3xl mx-auto text-center bg-brand-purple/10 rounded-lg px-6 py-5">
+        <h3 className="text-xl font-semibold text-brand-purple mb-2">📣 Community-Powered Recovery</h3>
+        <p className="text-sm text-muted-foreground">
+          Every exercise in AI-Rehab is ranked by users based on real-world effectiveness.
+          Recommend the ones that worked for you and help others find what really works.
+          Together, we're building the largest community-driven injury rehab resource online.
+        </p>
+      </div>
       <div className="mb-12 text-center max-w-2xl mx-auto">
         <h2 className="text-3xl font-bold mb-4">Injury Knowledge Library</h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">

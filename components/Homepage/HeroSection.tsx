@@ -52,15 +52,23 @@ const Hero = () => {
           </div>
 
           <div
-            className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl animate-fade-in"
+            className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl animate-fade-in"
             style={{ animationDelay: "1000ms" }}
           >
-            {features.map((feature, index) => (
-              <div key={index} className="flex items-center">
-                <CheckCircle className="h-5 w-5 text-brand-purple mr-2" />
-                <span className="text-sm font-medium">{feature}</span>
-              </div>
-            ))}
+            {features.map((feature, index) => {
+              const isLast = index === features.length - 1;
+              const shouldCenter = features.length % 3 !== 0 && isLast;
+
+              return (
+                <div
+                  key={index}
+                  className={`flex items-center ${shouldCenter ? "sm:col-span-3 sm:justify-center" : ""}`}
+                >
+                  <CheckCircle className="h-5 w-5 text-brand-purple mr-2" />
+                  <span className="text-sm font-medium">{feature}</span>
+                </div>
+              );
+            })}
           </div>
 
           <p
@@ -78,6 +86,6 @@ const Hero = () => {
   );
 };
 
-const features = ["Fast & Accurate", "Personalized Plans", "Progress Tracking"];
+const features = ["Fast & Accurate", "Personalized Plans", "Progress Tracking", "Community-Driven"];
 
 export default Hero;

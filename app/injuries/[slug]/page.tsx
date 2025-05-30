@@ -110,7 +110,11 @@ export default function InjuryPage() {
             {detail.detailedDescription}
           </p>
         </div>
-
+        <div className="pt-4">
+          <Button className="w-full hero-button-primary" onClick={handleClick}>
+            Exercises
+          </Button>
+        </div>
         <Card className="p-5 space-y-4">
           <div className="flex items-center gap-2 text-xl font-semibold">
             <AlertTriangle size={20} /> Symptoms

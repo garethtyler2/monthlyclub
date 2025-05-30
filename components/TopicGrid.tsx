@@ -3,12 +3,13 @@ import TopicCard from '@/components/TopicCard';
 import { Activity, ShieldCheck, Dumbbell, Stethoscope } from 'lucide-react';
 
 const aiPhysicalRehabSubtopics = [
+  { id: "community-driven-rehab", title: "How the AI-Rehab Community Ranks Exercises", description: "How real user recommendations shape smarter rehab outcomes." },
   { id: "what-is-ai-physical-rehabilitation", title: "What is AI Physical Rehabilitation", description: "Overview of how AI is transforming physical rehabilitation." },
   { id: "ai-injury-identification", title: "AI Injury Identification", description: "Using AI to identify injuries accurately and efficiently." },
   { id: "personalized-rehab-plans", title: "Personalized Rehab Plans", description: "Tailored rehabilitation programs powered by AI." },
   { id: "benefits-ai-physical-therapy", title: "Benefits of AI Physical Therapy", description: "Explore the benefits of integrating AI into physical therapy." },
   { id: "limitations-ai-rehabilitation", title: "Limitations of AI Rehabilitation", description: "Understand the current limitations of AI in rehab." },
-  { id: "success-stories-ai-rehabilitation", title: "Success Stories from AI Rehabilitation", description: "Real-life success stories involving AI-based rehab." }
+  { id: "success-stories-ai-rehabilitation", title: "Success Stories from AI Rehabilitation", description: "Real-life success stories involving AI-based rehab." },
 ];
 
 const aiPrehabilitationSubtopics = [
