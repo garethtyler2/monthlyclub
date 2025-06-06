@@ -53,7 +53,7 @@ export default function LoginPageContent() {
           </h1>
         </div>
 
-        <div className="flex justify-center mb-4">
+        <div className="flex justify-center mb-3">
           <button
             onClick={handleLogin}
             className="flex items-center justify-center gap-3 bg-white text-gray-700 border border-gray-300 rounded-md px-4 py-2 text-sm font-medium shadow-sm hover:bg-gray-50 transition-colors"
