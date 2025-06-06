@@ -70,7 +70,7 @@ export default function LoginPageContent() {
 
 
         <p className=" text-xs text-gray-500">
-          Supabase ID: <strong className="text-gray-600">zottypnnrmziobqxehxk</strong>
+          Supabase ID: <strong className="text-gray-600">qnecyousolguftvceaao</strong>
         </p>
         <p className="text-xs text-gray-500">
           <button className="underline text-xs" onClick={toggleAccordion}>

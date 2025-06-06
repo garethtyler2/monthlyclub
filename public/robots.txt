@@ -3,4 +3,4 @@ Disallow: /login
 Disallow: /dashboard
 Disallow: /feedback
 
-Sitemap: https://ai-rehab.co.uk/sitemap.xml
+Sitemap: https://monthlyclubhq.com/sitemap.xml

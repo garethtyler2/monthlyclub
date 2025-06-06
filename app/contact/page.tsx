@@ -9,10 +9,10 @@ export default function ContactPage() {
           We’d love to hear from you. Reach out to us any time.
         </p>
         <a
-          href="mailto:hello@ai-rehab.co.uk"
+          href="mailto:hello@monthlyclubhq.com"
           className="text-xl font-semibold text-brand-purple hover:underline"
         >
-          hello@ai-rehab.co.uk
+          hello@monthlyclubhq.com
         </a>
       </div>
     </div>

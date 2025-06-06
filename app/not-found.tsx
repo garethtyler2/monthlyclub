@@ -13,10 +13,10 @@ export default function NotFound() {
       <p className="text-base md:text-lg text-muted-foreground mb-6 max-w-md">
         Sorry about this. Try again or contact us if it keeps happening:{" "}
         <a
-          href="mailto:hello@ai-rehab.co.uk"
+          href="mailto:hello@monthlyclubhq.com"
           className="text-brand-blue underline hover:text-brand-blue/80"
         >
-          hello@ai-rehab.co.uk
+          hello@monthlyclubhq.com
         </a>
       </p>
       <Link

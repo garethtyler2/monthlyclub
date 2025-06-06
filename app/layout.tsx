@@ -22,11 +22,11 @@ export const metadata: Metadata = {
     template: "%s | AI Rehab",
   },
   description: "AI Rehab is your AI-powered physiotherapy assistant. Explore exercises, injury insights, and recovery plans tailored to your needs.",
-  metadataBase: new URL("https://ai-rehab.co.uk"),
+  metadataBase: new URL("https://monthlyclubhq.com"),
   openGraph: {
     title: "AI Rehab",
     description: "AI-powered physiotherapy guidance for injury recovery and rehabilitation.",
-    url: "https://ai-rehab.co.uk",
+    url: "https://monthlyclubhq.com",
     siteName: "AI Rehab",
     locale: "en_GB",
     type: "website",
