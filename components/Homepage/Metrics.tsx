@@ -29,7 +29,7 @@ const metrics = [
     symbol: "%",
     delay: 100,
     icon: Activity,
-    description: "Businesses using Monthly Club retain over 95% of subscribers month-to-month."
+    description: "Businesses using Monthly Club retain over 90% of subscribers month-to-month."
   },
   {
     value: "40%",

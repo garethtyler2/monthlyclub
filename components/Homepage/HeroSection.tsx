@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import BetaSignupForm from "@/components/BetaSignupForm";
 
 const Hero = () => {
   return (
@@ -13,14 +14,14 @@ const Hero = () => {
 
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-          <div
-            className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium mb-6 animate-fade-in"
-            style={{ animationDelay: "200ms" }}
-          >
-            <span className="text-brand-purple">✨ Monthly Club</span>
-            <span className="mx-2">—</span>
-            <span>Subscriptions made simple</span>
-          </div>
+<div
+  className="flex flex-col sm:flex-row items-center justify-center text-center text-sm font-medium rounded-full border border-white/10 bg-white/5 px-4 py-2 mb-6 animate-fade-in space-y-1 sm:space-y-0 sm:space-x-2 w-full max-w-xs mx-auto"
+  style={{ animationDelay: "200ms" }}
+>
+  <span className="text-brand-purple text-center w-full sm:w-auto">✨ Monthly Club</span>
+  <span className="hidden sm:inline">—</span>
+  <span className="text-center w-full sm:w-auto">Subscriptions made simple</span>
+</div>
 
           <h1 className="animate-fade-in" style={{ animationDelay: "400ms" }}>
             <span className="block">Simple Subscriptions</span>
@@ -40,12 +41,7 @@ const Hero = () => {
             className="flex flex-col sm:flex-row gap-4 mt-10 animate-fade-in"
             style={{ animationDelay: "800ms" }}
           >
-            <Button className="hero-button-primary" asChild>
-              <Link href="/get-started">
-                Create Your Subscription Plan
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+          <BetaSignupForm />
 
           </div>
 

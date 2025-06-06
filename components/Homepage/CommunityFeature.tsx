@@ -31,13 +31,10 @@ const CommunityFeature = () => {
           className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in"
           style={{ animationDelay: "800ms" }}
         >
-          <Button asChild className="hero-button-primary">
-            <a href="/how-it-works">See How It Works</a>
-          </Button>
-          <Button asChild variant="outline">
-            <a href="/community">Join the Community</a>
-          </Button>
         </div>
+          <Button asChild className="w-1/2 hero-button-primary">
+            <a href="#">Join the Beta!</a>
+          </Button>
       </div>
     </section>
   );
