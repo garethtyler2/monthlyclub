@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle } from "lucide-react";
 import Link from "next/link";
-import BetaSignupForm from "@/components/BetaSignupForm";
+import BetaSignupForm from "@/components/Homepage/BetaSignupForm";
 
 const Hero = () => {
   return (
