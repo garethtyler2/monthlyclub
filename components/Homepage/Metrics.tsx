@@ -11,47 +11,47 @@ import {
 } from "lucide-react";
 
 const metrics = [
-    {
-      value: "4 months",
-      label: "Average Waiting Time",
-      className: "from-brand-blue/10 to-transparent border-brand-blue/20",
-      countTo: 4,
-      symbol: " months",
-      delay: 0,
-      icon: Timer,
-      description: "Patients in some UK regions wait up to 4 months for physiotherapy appointments."
-    },
-    {
-      value: "90%",
-      label: "AI Diagnostic Accuracy",
-      className: "from-brand-purple/10 to-transparent border-brand-purple/20",
-      countTo: 90,
-      symbol: "%",
-      delay: 100,
-      icon: Activity,
-      description: "AI algorithms have achieved over 90% accuracy in diagnosing musculoskeletal conditions."
-    },
-    {
-      value: "79%",
-      label: "Pain Reduction Success",
-      className: "from-brand-indigo/10 to-transparent border-brand-indigo/20",
-      countTo: 79,
-      symbol: "%",
-      delay: 200,
-      icon: Heart,
-      description: "79% of physical therapy patients report significant pain reduction after treatment."
-    },
-    {
-      value: "87%",
-      label: "Reduced Opioid Need",
-      className: "from-brand-pink/10 to-transparent border-brand-pink/20",
-      countTo: 87,
-      symbol: "%",
-      delay: 300,
-      icon: Pill,
-      description: "Physical therapy can reduce the need for opioid medication by 87%."
-    },
-  ];
+  {
+    value: "5 mins",
+    label: "Setup Time",
+    className: "from-brand-blue/10 to-transparent border-brand-blue/20",
+    countTo: 5,
+    symbol: " mins",
+    delay: 0,
+    icon: Timer,
+    description: "Average time it takes to launch your first subscription service."
+  },
+  {
+    value: "90%",
+    label: "Retention Rate",
+    className: "from-brand-purple/10 to-transparent border-brand-purple/20",
+    countTo: 90,
+    symbol: "%",
+    delay: 100,
+    icon: Activity,
+    description: "Businesses using Monthly Club retain over 95% of subscribers month-to-month."
+  },
+  {
+    value: "40%",
+    label: "Revenue Boost",
+    className: "from-brand-indigo/10 to-transparent border-brand-indigo/20",
+    countTo: 40,
+    symbol: "%",
+    delay: 200,
+    icon: Heart,
+    description: "On average, service providers increase revenue by 40% with subscription plans."
+  },
+  {
+    value: "0%",
+    label: "Technical Skills Needed",
+    className: "from-brand-pink/10 to-transparent border-brand-pink/20",
+    countTo: 0,
+    symbol: "%",
+    delay: 300,
+    icon: Pill,
+    description: "You don’t need to code or design—Monthly Club handles the hard stuff for you."
+  },
+];
   
 
 const CounterAnimation = ({ countTo, symbol, delay }: { countTo: number, symbol: string, delay: number }) => {
@@ -98,10 +98,10 @@ const Metrics = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="mb-4 animate-fade-in">
-            Rehabilitation <span className="gradient-text">Outcomes</span>
+            Real <span className="gradient-text">Business Impact</span>
           </h2>
           <p className="text-muted-foreground animate-fade-in" style={{ animationDelay: "100ms" }}>
-            Our physiotherapy approach delivers measurable results for patients of all ages and conditions.
+            Monthly Club is already helping businesses reduce admin, boost retention, and earn more from loyal customers.
           </p>
         </div>
 

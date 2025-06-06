@@ -5,44 +5,44 @@ import { Quote } from "lucide-react";
 const testimonials = [
   {
     content:
-      "Great tool! I popped in some of my long-term knee pain symptoms and found the cause right away. More help than any doctor’s appointment I’ve had!",
-    author: "Ethan",
-    role: "Improving knee pain and strength",
+      "Monthly Club made it so easy to turn my cleaning services into subscriptions. I just set up my plans, shared the link, and got my first customer the next day!",
+    author: "Amira",
+    role: "Domestic Cleaner",
     delay: 0,
   },
   {
     content:
-      "My elbow was annoying me, but not enough to bother the NHS. AI-Rehab spotted my tennis elbow in 2 minutes and I’ve been rehabbing since.",
-    author: "Lucy",
-    role: "Rehabilitating a long-term issue",
+      "Game changer for my dog grooming business. I used to track bookings manually—now it’s all automated and predictable.",
+    author: "Leo",
+    role: "Mobile Dog Groomer",
     delay: 100,
   },
   {
     content:
-      "Not only figured out I had sciatica and a herniated disc, but I also got exercises to fix and manage it. So impressed!",
-    author: "Daniel",
-    role: "Dealing with chronic back pain",
+      "I’ve been able to offer my massage clients weekly plans and cut down on no-shows. It’s like I finally have a real system!",
+    author: "Nina",
+    role: "Massage Therapist",
     delay: 200,
   },
   {
     content:
-      "The progress tracking tools were a game-changer. I could see my improvements every week, which kept me motivated.",
-    author: "John",
-    role: "Managing chronic back pain",
+      "Simple, beautiful, and it just works. My clients love the ease of signing up and managing their plans.",
+    author: "James",
+    role: "Personal Trainer",
     delay: 300,
   },
   {
     content:
-      "AI Rehab transformed my recovery process. The tailored exercises helped me get back to my daily routine faster than I thought possible.",
-    author: "Sarah",
-    role: "Recovering from ACL surgery",
+      "Monthly Club helped me grow my lash extension business without hiring staff or chasing invoices.",
+    author: "Tasha",
+    role: "Beauty Specialist",
     delay: 400,
   },
   {
     content:
-      "AI-Rehab’s personal training plans helped me lose 10 pounds in just a month. I’ve never felt stronger or more confident!",
-    author: "Jane",
-    role: "Achieving weight loss goals",
+      "I was up and running in 10 minutes. The service page looks amazing and the recurring payments work like a charm.",
+    author: "Raj",
+    role: "Gardener",
     delay: 500,
   },
 ];
@@ -56,14 +56,13 @@ const Testimonials = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="mb-4 animate-fade-in">
-            What <span className="gradient-text">Our Users</span> Are Saying
+            What <span className="gradient-text">Our Businesses</span> Are Saying
           </h2>
           <p
             className="text-muted-foreground animate-fade-in"
             style={{ animationDelay: "100ms" }}
           >
-            Real feedback from people using AI-Rehab to recover, prevent injuries, and
-            achieve their health goals.
+            Real feedback from service providers growing their income and customer base with Monthly Club.
           </p>
         </div>
 

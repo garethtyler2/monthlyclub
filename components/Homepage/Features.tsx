@@ -7,52 +7,52 @@ import Link from "next/link";
 
 const featureItems = [
   {
-    icon: Activity,
-    title: "Accurate Identification",
-    description: "Accurately identify your injury or issue using our advanced AI diagnosis system.",
+    icon: Clipboard,
+    title: "Create Service Plans",
+    description: "Easily build subscription plans for any service—from beauty to gardening—in minutes.",
     className: "border-brand-purple/20 bg-gradient-to-b from-brand-purple/10 to-transparent",
     delay: 0,
-    link: "/injury-diagnosis"
-  },
-  {
-    icon: Clipboard,
-    title: "Personalized Rehab",
-    description: "Receive personalized rehab exercises based on your level and symptoms.",
-    className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
-    delay: 100,
-    link: "/injury-diagnosis"
-  },
-  {
-    icon: BarChart,
-    title: "Progress Tracking",
-    description: "Interactive tools to track progress in pain, mobility, and strength.",
-    className: "border-brand-indigo/20 bg-gradient-to-b from-brand-indigo/10 to-transparent",
-    delay: 200,
-    link: "/dashboard"
+    link: "/"
   },
   {
     icon: Shield,
-    title: "Comprehensive Prehab",
-    description: "Strengthen your body with exercises designed to prevent injuries before they happen.",
-    className: "border-brand-pink/20 bg-gradient-to-b from-brand-pink/10 to-transparent",
-    delay: 300,
-    link: "/prehab-search"
+    title: "Automated Payments",
+    description: "Connect Stripe and let customers subscribe with automated recurring payments.",
+    className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
+    delay: 100,
+    link: "/"
+  },
+  {
+    icon: BarChart,
+    title: "Customer Insights",
+    description: "Track your active subscribers, earnings, and plan performance in your dashboard.",
+    className: "border-brand-indigo/20 bg-gradient-to-b from-brand-indigo/10 to-transparent",
+    delay: 200,
+    link: "/"
   },
   {
     icon: Target,
-    title: "Tailored Training",
-    description: "Personalized training plans for weight loss, muscle gain, and more.",
+    title: "Public Service Page",
+    description: "Each business gets a clean, branded page to showcase and sell their services.",
+    className: "border-brand-pink/20 bg-gradient-to-b from-brand-pink/10 to-transparent",
+    delay: 300,
+    link: "/"
+  },
+  {
+    icon: Activity,
+    title: "No Tech Skills Needed",
+    description: "We’ve built everything so you don’t have to. Just sign up and go live in minutes.",
     className: "border-brand-purple/20 bg-gradient-to-b from-brand-purple/10 to-transparent",
     delay: 400,
-    link: "/personal-training"
+    link: "/"
   },
   {
     icon: Brain,
-    title: "AI-Rehab Insights",
-    description: "Stay informed with curated content on physiotherapy, injury science, and how AI is reshaping recovery.",    
+    title: "Built for Service Businesses",
+    description: "Perfect for cleaners, groomers, beauty pros, and anyone who works on repeat bookings.",
     className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
     delay: 500,
-    link: "/ai-rehab-insights"
+    link: "/"
   },
 ];
 
@@ -62,10 +62,10 @@ const Features = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="mb-4 animate-fade-in">
-            The AI <span className="gradient-text">Advantage</span>
+            Why <span className="gradient-text">Monthly Club</span>
           </h2>
           <p className="text-muted-foreground animate-fade-in" style={{ animationDelay: "100ms" }}>
-            AI-Rehab combines the expertise of physiotherapy with cutting-edge AI, empowering you to recover faster and optimize your physical performance—all in one place.
+            We make it easy for small service businesses to launch, sell, and manage subscriptions online—without the tech headaches.
           </p>
         </div>
 

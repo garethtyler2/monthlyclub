@@ -52,7 +52,7 @@ export default function RootLayout({
     <html lang="en">
       <head /> 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased pt-20 bg-background text-foreground min-h-screen`}>
-        <Navbar />
+        {/* <Navbar /> */}
         <main className="">{children}</main>
         <Analytics />
         <Footer />

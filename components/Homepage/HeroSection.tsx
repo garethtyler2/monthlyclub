@@ -17,15 +17,15 @@ const Hero = () => {
             className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium mb-6 animate-fade-in"
             style={{ animationDelay: "200ms" }}
           >
-            <span className="text-brand-purple">✨ Smarter Rehab</span>
+            <span className="text-brand-purple">✨ Monthly Club</span>
             <span className="mx-2">—</span>
-            <span>Starts here</span>
+            <span>Subscriptions made simple</span>
           </div>
 
           <h1 className="animate-fade-in" style={{ animationDelay: "400ms" }}>
-            <span className="block">Your AI-Powered</span>
+            <span className="block">Simple Subscriptions</span>
             <span className="gradient-text">
-            Virtual Physiotherapist
+              for Local Service Businesses
             </span>
           </h1>
 
@@ -33,9 +33,7 @@ const Hero = () => {
             className="mt-6 text-lg text-muted-foreground max-w-2xl animate-fade-in"
             style={{ animationDelay: "600ms" }}
           >
-            AI-Rehab is your affordable and accessible alternative to traditional
-            physiotherapy. Identify injuries, design recovery plans, and achieve peak
-            physical performance.
+            Monthly Club helps local service providers—from cleaners to hairdressers—offer subscription-based services online. Create your plans, share your link, and start earning recurring revenue.
           </p>
 
           <div
@@ -43,8 +41,8 @@ const Hero = () => {
             style={{ animationDelay: "800ms" }}
           >
             <Button className="hero-button-primary" asChild>
-              <Link href="/injury-diagnosis">
-                Start Your Virtual Physio Session
+              <Link href="/get-started">
+                Create Your Subscription Plan
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -75,10 +73,7 @@ const Hero = () => {
             className="mt-10 text-sm text-muted-foreground max-w-2xl animate-fade-in"
             style={{ animationDelay: "1200ms" }}
           >
-            Whether you're looking for online physiotherapy, a virtual physio session from
-            home, or an AI physiotherapist, our platform delivers personalized care at your
-            fingertips. Save time, save money, and get the expert support you need—no matter
-            where you are.
+            Whether you're a gardener, a cleaner, or a mobile beauty pro—Monthly Club gives you the tools to grow with subscriptions. Easy setup, automated payments, and a storefront you can share anywhere.
           </p>
         </div>
       </div>
@@ -86,6 +81,6 @@ const Hero = () => {
   );
 };
 
-const features = ["Fast & Accurate", "Personalized Plans", "Progress Tracking", "Community-Driven"];
+const features = ["No Tech Skills Needed", "Recurring Payments", "Branded Service Page", "Easy Customer Management"];
 
 export default Hero;

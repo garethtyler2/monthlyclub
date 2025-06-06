@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -13,45 +12,21 @@ const Footer = () => {
             <div className="flex items-center mb-2">
               {/* Replace with your actual logo or use text */}
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-purple to-brand-blue mr-2">
-                AI-Rehab
+                Monthly Club
               </span>
             </div>
             <p className="text-muted-foreground text-sm max-w-xs">
-              Your affordable and accessible alternative to traditional physiotherapy.
+              Helping small service businesses grow with simple subscription tools.
             </p>
             <p className="text-xs text-muted-foreground mt-4">
-            AI-Rehab provides general information and guidance only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider with any questions about your condition.
+            Monthly Club is a platform for businesses to manage recurring services. We don’t handle service delivery—only the tools to streamline and grow your business.
           </p>
           </div>
           
           {/* Navigation Links */}
           <div className="grid grid-cols-2 gap-8">
             {/* Explore Links */}
-            <div>
-              <h3 className="text-sm font-medium mb-4">Explore</h3>
-              <ul className="space-y-3 text-sm">
-                <li>
-                  <Link href="/ai-rehab-insights" className="text-muted-foreground hover:text-primary transition-colors">
-                    AI Rehab Insights
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/ai-physical-rehabilitation" className="text-muted-foreground hover:text-primary transition-colors">
-                    AI in Physical Rehabilitation
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/ai-prehabilitation" className="text-muted-foreground hover:text-primary transition-colors">
-                    AI in Prehabilitation
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/ai-personal-training" className="text-muted-foreground hover:text-primary transition-colors">
-                    AI-Powered Personal Training
-                  </Link>
-                </li>
-              </ul>
-            </div>
+
             
             {/* About Links */}
             <div>
@@ -70,7 +45,7 @@ const Footer = () => {
         
         <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground mb-4 md:mb-0">
-            © 2025 AI-Rehab. All rights reserved.
+            © 2025 Monthly Club. All rights reserved.
           </p>
           <div className="flex space-x-6 text-sm">
             <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">

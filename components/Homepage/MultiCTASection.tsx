@@ -7,33 +7,33 @@ import Link from "next/link";
 const CTAFeatures = [
   {
     icon: ShieldCheck,
-    title: "Prevent Injuries",
-    description: "Strengthen weak areas proactively"
+    title: "Launch Fast",
+    description: "Get your subscription service online in minutes—no devs needed."
   },
   {
     icon: Activity,
-    title: "Recover Faster",
-    description: "Prepare for surgery or recover faster"
+    title: "Earn Recurring Revenue",
+    description: "Stop chasing invoices. Customers subscribe once and pay automatically."
   },
   {
     icon: TrendingUp,
-    title: "Track Your Progress",
-    description: "Monitor improvements in real-time"
+    title: "Grow Your Business",
+    description: "Use your branded service page to attract and retain loyal clients."
   }
 ];
 
 const CTAButtons = [
   {
-    text: "Identify Your Injury",
-    link: "/injury-diagnosis"
+    text: "Create a Plan",
+    link: "/get-started"
   },
   {
-    text: "Explore Prehab",
-    link: "/prehab"
+    text: "See How It Works",
+    link: "/how-it-works"
   },
   {
-    text: "Start Personal Training",
-    link: "/personal-training"
+    text: "View Examples",
+    link: "/examples"
   }
 ];
 
@@ -47,11 +47,10 @@ const CTA = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="glass-card p-8 md:p-12 text-center max-w-4xl mx-auto animate-fade-in">
           <h2 className="mb-4">
-            Why Choose <span className="gradient-text">AI-Rehab</span>?
+            Why Choose <span className="gradient-text">Monthly Club</span>?
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
-            AI-Rehab is your go-to platform for injury recovery, fitness training, and optimization.
-            It's AI-powered, delivering tools for injury assessment, rehab, prehab, and training plans.
+            Monthly Club helps you turn one-off customers into reliable recurring income. No tech skills required—just set up your services, share your link, and start earning.
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -64,29 +63,21 @@ const CTA = () => {
             ))}
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            {CTAButtons.map((button, index) => (
-              <Button key={index} variant={index % 2 === 0 ? "default" : "outline"} className={index % 2 === 0 ? "hero-button-primary" : "hero-button-secondary"} asChild>
-                <Link href={button.link}>
-                  {button.text} <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            ))}
-          </div>
+
           
           <div className="mt-10">
-            <h3 className="text-xl font-medium mb-4">The Power of Prehab</h3>
+            <h3 className="text-xl font-medium mb-4">Made for Service Providers</h3>
             <p className="text-muted-foreground mb-6">
-              Prehab is about strengthening and conditioning before injuries or surgeries. With AI, you can improve recovery times, prevent injuries, and perform better.
+              Whether you're cleaning homes or cutting hair, Monthly Club gives you modern tools to scale your service—without adding complexity.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="border border-white/10 bg-white/5 rounded-xl p-6">
-                <h4 className="font-medium mb-2">Before Surgery</h4>
-                <p className="text-sm text-muted-foreground">Prepare with targeted exercises for smoother recovery.</p>
+                <h4 className="font-medium mb-2">Any Service</h4>
+                <p className="text-sm text-muted-foreground">From mobile groomers to personal trainers—if it's repeatable, it's billable.</p>
               </div>
               <div className="border border-white/10 bg-white/5 rounded-xl p-6">
-                <h4 className="font-medium mb-2">Preventative Strength</h4>
-                <p className="text-sm text-muted-foreground">Find and address weak spots early.</p>
+                <h4 className="font-medium mb-2">Zero Overhead</h4>
+                <p className="text-sm text-muted-foreground">We handle the subscriptions. You just deliver your service.</p>
               </div>
             </div>
           </div>

@@ -42,14 +42,14 @@ export default function LoginPageContent() {
       <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center">
         <div className="mb-6">
           <Image
-            src="/AI-RehabLogo.png"
-            alt="AI-Rehab logo"
-            width={120}
-            height={40}
+            src="/Monthly Club logo.png"
+            alt="Monthly Club logo"
+            width={200}
+            height={20}
             className="mx-auto mb-6"
           />
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-purple to-brand-blue">
-            AI-Rehab
+            Monthly Club
           </h1>
         </div>
 

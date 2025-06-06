@@ -1,5 +1,3 @@
-// components/Homepage/CommunityFeature.tsx
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 
@@ -14,34 +12,30 @@ const CommunityFeature = () => {
           className="text-3xl font-bold text-gray-500 mb-4 animate-fade-in"
           style={{ animationDelay: "200ms" }}
         >
-            <span className="gradient-text">Community-Powered, </span>
-           Evidence-Based Rehab
+            <span className="gradient-text">Built for Community, </span>
+           Designed for Growth
         </h2>
         <p
           className="text-lg text-muted-foreground mb-6 animate-fade-in"
           style={{ animationDelay: "400ms" }}
         >
-          Discover the most effective injury recovery exercises, ranked by
-          people just like you. Every recommendation helps us build the world’s
-          largest community-driven rehab knowledge base.
+          Monthly Club brings small businesses together—sharing tools, knowledge, and real-world tips to grow recurring revenue with ease.
         </p>
         <p
           className="text-md text-muted-foreground mb-6 animate-fade-in"
           style={{ animationDelay: "600ms" }}
         >
-          With AI-Rehab, you’re not just recovering—you’re contributing to
-          crowdsourced, real-world research on injury rehabilitation. Your
-          recommendations help others heal smarter and faster.
+          Whether you're a solo cleaner or a growing grooming business, you're part of a bigger movement toward predictable income and digital simplicity.
         </p>
         <div
           className="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in"
           style={{ animationDelay: "800ms" }}
         >
           <Button asChild className="hero-button-primary">
-            <a href="/ai-rehab-insights#injury-library">Explore Top-Rated Exercises</a>
+            <a href="/how-it-works">See How It Works</a>
           </Button>
           <Button asChild variant="outline">
-            <a href="/ai-physical-rehabilitation/community-driven-rehab">Find Out More</a>
+            <a href="/community">Join the Community</a>
           </Button>
         </div>
       </div>
