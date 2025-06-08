@@ -119,30 +119,34 @@ export default function LoginPageContent() {
             </button>
           </div>
 
-          <div className="mt-6 flex justify-center space-x-4">
-            <button
-              onClick={() => handleOAuthSignIn("google")}
-              className=" hover:bg-red-500 text-black px-4 py-2 rounded flex items-center space-x-2"
-              type="button"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 48 48">
-                <path fill="#EA4335" d="M24 9.5c3.3 0 6.2 1.1 8.5 3.2l6.3-6.3C34.8 2.4 29.8 0 24 0 14.8 0 7.1 5.8 3.7 13.8l7.3 5.6C12.3 13.6 17.7 9.5 24 9.5z"/>
-                <path fill="#34A853" d="M46.1 24.5c0-1.6-.1-2.8-.4-4.1H24v7.8h12.5c-.5 3.1-2.2 5.7-4.6 7.4l7.2 5.6c4.2-3.9 6.7-9.6 6.7-16.7z"/>
-                <path fill="#4A90E2" d="M10.8 28.5c-.6-1.7-1-3.4-1-5.3s.4-3.6 1-5.3l-7.3-5.6C2.1 16.5 1 20.1 1 24s1.1 7.5 2.5 11l7.3-5.5z"/>
-                <path fill="#FBBC05" d="M24 48c6.5 0 12-2.1 16-5.7l-7.2-5.6c-2 1.3-4.5 2-8.8 2-6.3 0-11.7-4.1-13.7-9.6l-7.3 5.6C7.1 42.2 14.8 48 24 48z"/>
-              </svg>
-              <span>Google</span>
-            </button>
-            <button
-              onClick={() => handleOAuthSignIn("facebook")}
-              className=" hover:bg-blue-500 text-black px-4 py-2 rounded flex items-center space-x-2"
-              type="button"
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path fill="#1877F2" d="M22.675 0H1.325C.593 0 0 .593 0 1.326v21.348C0 23.408.593 24 1.325 24h11.495v-9.294H9.691v-3.622h3.129V8.413c0-3.1 1.894-4.788 4.659-4.788 1.325 0 2.464.099 2.797.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.324-.592 1.324-1.326V1.326C24 .593 23.408 0 22.675 0z" />
-              </svg>
-              <span>Facebook</span>
-            </button>
+          <div className="mt-6 flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+            <div className="flex-1">
+              <button
+                onClick={() => handleOAuthSignIn("google")}
+                className="w-full border border-gray-300 hover:bg-red-500 text-black px-4 py-2 rounded flex items-center justify-center space-x-2"
+                type="button"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 48 48">
+                  <path fill="#EA4335" d="M24 9.5c3.3 0 6.2 1.1 8.5 3.2l6.3-6.3C34.8 2.4 29.8 0 24 0 14.8 0 7.1 5.8 3.7 13.8l7.3 5.6C12.3 13.6 17.7 9.5 24 9.5z"/>
+                  <path fill="#34A853" d="M46.1 24.5c0-1.6-.1-2.8-.4-4.1H24v7.8h12.5c-.5 3.1-2.2 5.7-4.6 7.4l7.2 5.6c4.2-3.9 6.7-9.6 6.7-16.7z"/>
+                  <path fill="#4A90E2" d="M10.8 28.5c-.6-1.7-1-3.4-1-5.3s.4-3.6 1-5.3l-7.3-5.6C2.1 16.5 1 20.1 1 24s1.1 7.5 2.5 11l7.3-5.5z"/>
+                  <path fill="#FBBC05" d="M24 48c6.5 0 12-2.1 16-5.7l-7.2-5.6c-2 1.3-4.5 2-8.8 2-6.3 0-11.7-4.1-13.7-9.6l-7.3 5.6C7.1 42.2 14.8 48 24 48z"/>
+                </svg>
+                <span>Google</span>
+              </button>
+            </div>
+            <div className="flex-1">
+              <button
+                onClick={() => handleOAuthSignIn("facebook")}
+                className="w-full border border-gray-300 hover:bg-blue-500 text-black px-4 py-2 rounded flex items-center justify-center space-x-2"
+                type="button"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path fill="#1877F2" d="M22.675 0H1.325C.593 0 0 .593 0 1.326v21.348C0 23.408.593 24 1.325 24h11.495v-9.294H9.691v-3.622h3.129V8.413c0-3.1 1.894-4.788 4.659-4.788 1.325 0 2.464.099 2.797.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.324-.592 1.324-1.326V1.326C24 .593 23.408 0 22.675 0z" />
+                </svg>
+                <span>Facebook</span>
+              </button>
+            </div>
           </div>
 
           {!showEmailForm ? (
@@ -150,14 +154,14 @@ export default function LoginPageContent() {
               onClick={() => setShowEmailForm(true)}
               className="hero-button-primary w-full text-sm text-white bg-brand-purple py-2 mt-6 rounded hover:bg-brand-purple/90 transition"
             >
-              Or use email and password
+              Sign in with Email
             </button>
           ) : (
             <>
 
 
               {authMode === "sign-in" && (
-                <form onSubmit={handleLogin} className="space-y-4 text-left">
+                <form onSubmit={handleLogin} className="space-y-4 mt-4 text-left">
                   <label className="block text-sm font-medium text-gray-700">Email</label>
                   <input
                     type="email"
