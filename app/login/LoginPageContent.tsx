@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -85,8 +86,8 @@ export default function LoginPageContent() {
 
         <p className="mt-12 text-xs text-gray-500">
           By signing in, you agree to our{" "}
-          <a href="#" className="underline hover:text-gray-700">Terms</a> and{" "}
-          <a href="#" className="underline hover:text-gray-700">Privacy Policy</a>.
+          <Link href="#" className="underline hover:text-gray-700">Terms</Link> and{" "}
+          <Link href="#" className="underline hover:text-gray-700">Privacy Policy</Link>.
         </p>
       </div>
     </div>

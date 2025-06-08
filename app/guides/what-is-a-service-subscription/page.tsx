@@ -1,7 +1,6 @@
 
-
-
 import { Metadata } from "next";
+import Link from "next/link";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -26,9 +25,9 @@ export default function WhatIsAServiceSubscriptionPage() {
 
           <div className="relative container mx-auto px-6 max-w-3xl text-center">
             <div className="mb-6">
-              <a href="/" className="text-brand-purple hover:underline text-sm font-medium">
+              <Link href="/" className="text-brand-purple hover:underline text-sm font-medium">
                 ← Back to Monthly Club
-              </a>
+              </Link>
             </div>
 
             <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-gray-900 dark:text-white">
@@ -77,7 +76,7 @@ export default function WhatIsAServiceSubscriptionPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <a href="/">Join the Beta for Free</a>
+                <Link href="/">Join the Beta for Free</Link>
               </Button>
             </div>
           </div>

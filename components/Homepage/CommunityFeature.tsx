@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const CommunityFeature = () => {
   return (
@@ -33,7 +34,7 @@ const CommunityFeature = () => {
         >
         </div>
           <Button asChild className="w-1/2 hero-button-primary">
-            <a href="#">Join the Beta!</a>
+            <Link href="#">Join the Beta!</Link>
           </Button>
       </div>
     </section>

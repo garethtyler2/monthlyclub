@@ -82,7 +82,7 @@ const CTA = () => {
             </div>
           </div>
           <Button asChild className="mt-6 w-1/2 hero-button-primary">
-            <a href="#">Join the Beta!</a>
+            <Link href="#">Join the Beta!</Link>
           </Button>
         </div>
       </div>

@@ -1,10 +1,9 @@
-"use client";
-
+import { Metadata } from "next";
+import Link from "next/link";
 import React from "react";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import TopicGrid from "@/components/TopicGrid";
-import Link from "next/link";
 import { CheckCircle } from "lucide-react";
 
 export default function GuidesHomePage() {
@@ -102,3 +101,7 @@ export default function GuidesHomePage() {
     </div>
   );
 }
+export const metadata: Metadata = {
+  title: "Guides Hub | Monthly Club",
+  description: "Explore step-by-step guides and practical advice on how to launch, price, and grow your subscription-based service business with Monthly Club.",
+};
