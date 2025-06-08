@@ -94,7 +94,7 @@ export default function TermsAndConditions() {
 
       <h2>12. Contact</h2>
       <p>
-        If you have any questions or concerns about these Terms, please contact us at support@monthlyclub.co.uk.
+        If you have any questions or concerns about these Terms, please contact us at support@monthlyclubhq.com.
       </p>
     </>
   );

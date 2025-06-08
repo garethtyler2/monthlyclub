@@ -18,16 +18,16 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "AI Rehab",
-    template: "%s | AI Rehab",
+    default: "Monthly Club",
+    template: "%s | Monthly Club",
   },
-  description: "AI Rehab is your AI-powered physiotherapy assistant. Explore exercises, injury insights, and recovery plans tailored to your needs.",
+  description: "Monthly Club helps local service businesses offer subscriptions online. Create, sell, and manage recurring service plans with ease.",
   metadataBase: new URL("https://monthlyclubhq.com"),
   openGraph: {
-    title: "AI Rehab",
-    description: "AI-powered physiotherapy guidance for injury recovery and rehabilitation.",
+    title: "Monthly Club",
+    description: "Subscription tools for local service businesses. Empowering recurring revenue through modern online service plans.",
     url: "https://monthlyclubhq.com",
-    siteName: "AI Rehab",
+    siteName: "Monthly Club",
     locale: "en_GB",
     type: "website",
   },
@@ -52,7 +52,7 @@ export default function RootLayout({
     <html lang="en">
       <head /> 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased pt-20 bg-background text-foreground min-h-screen`}>
-        {/* <Navbar /> */}
+        <Navbar />
         <main className="">{children}</main>
         <Analytics />
         <Footer />

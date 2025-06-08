@@ -9,8 +9,21 @@ export async function GET() {
   const formatDate = (date: string | Date) =>
     new Date(date).toISOString().split("T")[0]
 
-  // Only include the homepage for sitemap
-  const staticPaths = [""]
+  // Only include the homepage and all guides for sitemap
+  const staticPaths = [
+    "",
+    "guides/automate-payments-stripe",
+    "guides/cleaning-subscription-model",
+    "guides/create-subscription-plan",
+    "guides/hairdresser-subscriptions",
+    "guides/how-monthly-club-helps",
+    "guides/marketing-subscription-services",
+    "guides/recurring-revenue-benefits",
+    "guides/service-subscription-examples",
+    "guides/subscription-billing-tools",
+    "guides/subscription-ideas-for-service-businesses",
+    "guides/what-is-a-service-subscription",
+  ]
 
   const urls = [
     ...staticPaths.map(

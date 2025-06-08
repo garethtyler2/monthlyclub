@@ -45,65 +45,17 @@ const Navbar = () => {
         <div className="flex items-center">
           <Link href="/" className="flex items-center">
             <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-purple to-brand-blue">
-              AI-Rehab
+              Monthly Club
             </span>
           </Link>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4">
-          <Link href="/injury-diagnosis" className="text-sm font-medium hover:text-white transition-colors">
-            Rehab
-          </Link>
-          <Link href="/prehab" className="text-sm font-medium hover:text-white transition-colors">
-            Prehab
-          </Link>
-          <Link href="/personal-training" className="text-sm font-medium hover:text-white transition-colors">
-            Personal Training
-          </Link>
 
-          <Link href="/ai-rehab-insights" className="text-sm font-medium hover:text-white transition-colors">
-            The Rehab Hub
+          <Link href="/guides" className="text-sm font-medium hover:text-white transition-colors">
+            Guides
           </Link>
-          {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center space-x-2 focus:outline-none cursor-pointer">
-                <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue">
-                  {user.user_metadata?.avatar_url ? (
-                    <img
-                      src={user.user_metadata.avatar_url}
-                      alt={user.user_metadata.full_name || "User"}
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  ) : (
-                    <AvatarFallback>
-                      {user.user_metadata?.full_name
-                        ? user.user_metadata.full_name.charAt(0).toUpperCase()
-                        : "U"}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="mt-2">
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard">Dashboard</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleLogout}>
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-
-          {!user && (
-            <>
-
-              <Button className="ml-2 bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90">
-                <Link href="/login" className="text-white">Access AI-Rehab</Link>
-              </Button>
-            </>
-          )}
         </nav>
 
         {/* Mobile Navigation Toggle */}
@@ -125,83 +77,14 @@ const Navbar = () => {
           />
           <div className="md:hidden border-t border-white/10 animate-fade-in relative z-50">
             <div className="container mx-auto px-4 py-4 flex flex-col space-y-3">
-              <Link
-                href="/injury-diagnosis"
-                className="text-sm font-medium hover:text-white transition-colors p-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Rehab
-              </Link>
-              <Link
-                href="/prehab"
-                className="text-sm font-medium hover:text-white transition-colors p-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Prehab
-              </Link>
 
               <Link
-                href="/personal-training"
+                href="/guides"
                 className="text-sm font-medium hover:text-white transition-colors p-2"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Personal Training
+                Guides
               </Link>
-
-              <Link
-                href="/ai-rehab-insights"
-                className="text-sm font-medium hover:text-white transition-colors p-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                The Rehab Hub
-              </Link>
-
-              {user ? (
-                <div className="flex flex-col pt-4 border-t border-white/10 space-y-2 px-2">
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue">
-                      {user.user_metadata?.avatar_url ? (
-                        <img
-                          src={user.user_metadata.avatar_url}
-                          alt={user.user_metadata.full_name || "User"}
-                          className="w-full h-full rounded-full object-cover"
-                        />
-                      ) : (
-                        <AvatarFallback>
-                          {user.user_metadata?.full_name
-                            ? user.user_metadata.full_name.charAt(0).toUpperCase()
-                            : "U"}
-                        </AvatarFallback>
-                      )}
-                    </Avatar>
-                    <span className="text-sm font-medium text-white">
-                      {user.user_metadata?.full_name || "User"}
-                    </span>
-                  </div>
-                  <Link
-                    href="/dashboard"
-                    className="text-sm pt-2 font-medium text-white hover:underline"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="text-sm pt-2 text-white hover:underline text-left"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <div className="flex flex-col pt-2 border-t border-white/10 space-y-2">
-                  <Button
-                    className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90 w-full"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    <Link href="/login" className="text-white">Access AI-Rehab</Link>
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
         </div>

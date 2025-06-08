@@ -14,12 +14,11 @@ const Hero = () => {
 
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
-<div
-  className="flex flex-col sm:flex-row items-center justify-center text-center text-sm font-medium rounded-full border border-white/10 bg-white/5 px-4 py-2 mb-6 animate-fade-in space-y-1 sm:space-y-0 sm:space-x-2 w-full max-w-xs mx-auto"
+        <div
+  className="flex flex-col items-center justify-center text-center text-sm font-medium rounded-full border border-white/10 bg-white/5 px-4 py-2 mb-6 animate-fade-in space-y-1 w-full max-w-xs mx-auto"
   style={{ animationDelay: "200ms" }}
 >
   <span className="text-brand-purple text-center w-full sm:w-auto">✨ Monthly Club</span>
-  <span className="hidden sm:inline">—</span>
   <span className="text-center w-full sm:w-auto">Subscriptions made simple</span>
 </div>
 
@@ -46,23 +45,18 @@ const Hero = () => {
           </div>
 
           <div
-            className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl animate-fade-in"
+            className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-2xl animate-fade-in"
             style={{ animationDelay: "1000ms" }}
           >
-            {features.map((feature, index) => {
-              const isLast = index === features.length - 1;
-              const shouldCenter = features.length % 3 !== 0 && isLast;
-
-              return (
-                <div
-                  key={index}
-                  className={`flex items-center ${shouldCenter ? "sm:col-span-3 sm:justify-center" : ""}`}
-                >
-                  <CheckCircle className="h-5 w-5 text-brand-purple mr-2" />
-                  <span className="text-sm font-medium">{feature}</span>
-                </div>
-              );
-            })}
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="flex items-center"
+              >
+                <CheckCircle className="h-5 w-5 text-brand-purple mr-2" />
+                <span className="text-sm font-medium">{feature}</span>
+              </div>
+            ))}
           </div>
 
           <p
@@ -77,6 +71,6 @@ const Hero = () => {
   );
 };
 
-const features = ["No Tech Skills Needed", "Recurring Payments", "Branded Service Page", "Easy Customer Management"];
+const features = ["No Tech Skills Needed", "Recurring Payments", "Branded Service Page"];
 
 export default Hero;
