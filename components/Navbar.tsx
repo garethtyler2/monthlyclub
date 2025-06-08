@@ -52,10 +52,14 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-4">
-
           <Link href="/guides" className="text-sm font-medium hover:text-white transition-colors">
             Guides
           </Link>
+          {!loading && user && (
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              Log out
+            </Button>
+          )}
         </nav>
 
         {/* Mobile Navigation Toggle */}
@@ -77,7 +81,6 @@ const Navbar = () => {
           />
           <div className="md:hidden border-t border-white/10 animate-fade-in relative z-50">
             <div className="container mx-auto px-4 py-4 flex flex-col space-y-3">
-
               <Link
                 href="/guides"
                 className="text-sm font-medium hover:text-white transition-colors p-2"
@@ -85,6 +88,11 @@ const Navbar = () => {
               >
                 Guides
               </Link>
+              {!loading && user && (
+                <Button variant="outline" size="sm" onClick={handleLogout}>
+                  Log out
+                </Button>
+              )}
             </div>
           </div>
         </div>
