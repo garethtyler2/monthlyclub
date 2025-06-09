@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
 
 
@@ -9,10 +9,39 @@ export default function BetaSignupForm() {
   const [businessType, setBusinessType] = useState("");
   const [customBusinessType, setCustomBusinessType] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [serviceTypes, setServiceTypes] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchServiceTypes = async () => {
+      const { data, error } = await supabase
+        .from("service_types")
+        .select("label")
+        .order("label", { ascending: true });
+
+      if (!error && data) {
+        setServiceTypes(data.map((item) => item.label));
+      } else {
+        console.error("Failed to load service types:", error);
+      }
+    };
+
+    fetchServiceTypes();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
+
+    if (businessType === "Other" && customBusinessType) {
+      const user = (await supabase.auth.getUser()).data.user;
+      await supabase.from("service_types").insert([
+        {
+          label: customBusinessType,
+          is_custom: true,
+          created_by_user_id: user?.id ?? null
+        }
+      ]);
+    }
 
     const finalBusinessType = businessType === "Other" ? customBusinessType : businessType;
 
@@ -50,29 +79,9 @@ export default function BetaSignupForm() {
         className="w-full px-4 py-2 border border-gray-300 rounded"
       >
         <option value="" disabled>Select your business type</option>
-        <option value="Hairdresser">Hairdresser</option>
-        <option value="Barber">Barber</option>
-        <option value="Beautician">Beautician</option>
-        <option value="Massage Therapist">Massage Therapist</option>
-        <option value="Cleaner">Cleaner</option>
-        <option value="Gardener">Gardener</option>
-        <option value="Dog Walker">Dog Walker</option>
-        <option value="Dog Groomer">Dog Groomer</option>
-        <option value="Window Cleaner">Window Cleaner</option>
-        <option value="Mobile Car Washer">Mobile Car Washer</option>
-        <option value="Plumber">Plumber</option>
-        <option value="Electrician">Electrician</option>
-        <option value="Handyman">Handyman</option>
-        <option value="Personal Trainer">Personal Trainer</option>
-        <option value="Tutor">Tutor</option>
-        <option value="Lawn Care">Lawn Care</option>
-        <option value="Home Organizer">Home Organizer</option>
-        <option value="Pest Control">Pest Control</option>
-        <option value="Pool Cleaner">Pool Cleaner</option>
-        <option value="Mobile Mechanic">Mobile Mechanic</option>
-        <option value="Laundry/Ironing Service">Laundry/Ironing Service</option>
-        <option value="Mobile Nail Technician">Mobile Nail Technician</option>
-        <option value="Pet Sitting">Pet Sitting</option>
+        {serviceTypes.map((type) => (
+          <option key={type} value={type}>{type}</option>
+        ))}
         <option value="Other">Other</option>
       </select>
       {businessType === "Other" && (

@@ -4,11 +4,15 @@
 import { useState, useEffect } from 'react';
 import { HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { supabase } from "@/lib/supabase/client";
 
 export default function CreateBusinessPage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState<File | null>(null);
+  const [businessType, setBusinessType] = useState("");
+  const [customBusinessType, setCustomBusinessType] = useState("");
+  const [serviceTypes, setServiceTypes] = useState<string[]>([]);
 
   const phrases = ['the service you offer', 'products and prices'];
   const [typing, setTyping] = useState('');
@@ -43,23 +47,131 @@ export default function CreateBusinessPage() {
     return () => clearInterval(interval);
   }, [typing, isDeleting, index]);
 
+  useEffect(() => {
+    const fetchServiceTypes = async () => {
+      const { data, error } = await supabase
+        .from("service_types")
+        .select("label")
+        .order("label", { ascending: true });
+
+      if (!error && data) {
+        setServiceTypes(data.map((item) => item.label));
+      } else {
+        console.error("Failed to load service types:", error);
+      }
+    };
+
+    fetchServiceTypes();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ name, description, image });
+
+    const user = (await supabase.auth.getUser()).data.user;
+    if (!user) return alert("You must be logged in.");
+
+    let finalBusinessType = businessType;
+    if (businessType === "Other" && customBusinessType) {
+      const { data: insertedType } = await supabase.from("service_types").insert([
+        {
+          label: customBusinessType,
+          is_custom: true,
+          created_by_user_id: user.id
+        }
+      ]).select().single();
+      finalBusinessType = insertedType?.label ?? customBusinessType;
+    }
+
+    let imageUrl = "";
+
+    if (image) {
+      const fileExt = image.name.split('.').pop();
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("business-profile-images")
+        .upload(filePath, image, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error("Image upload error:", uploadError?.message || uploadError);
+        alert("Image upload failed. Please try a smaller image or check your connection.");
+      } else {
+        const { data: publicUrl } = supabase
+          .storage
+          .from("business-profile-images")
+          .getPublicUrl(filePath);
+        imageUrl = publicUrl.publicUrl;
+      }
+    }
+
+    const { data: business, error: businessError } = await supabase
+      .from("businesses")
+      .insert([
+        {
+          user_id: user.id,
+          name,
+          description,
+          image_url: imageUrl,
+          service_type: finalBusinessType
+        }
+      ])
+      .select()
+      .single();
+
+    if (businessError || !business) {
+      console.error("Business insert error:", businessError);
+      return;
+    }
+
+    const aiRes = await fetch("/api/ai/generate-business-summary", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ businessName: name, paragraph: description })
+    });
+
+    const aiData = await aiRes.json();
+    if (!aiRes.ok || !aiData?.data) {
+      console.error("AI error:", aiData);
+      return;
+    }
+
+    const { summary, products } = aiData.data;
+
+    await supabase
+      .from("businesses")
+      .update({ description: summary })
+      .eq("id", business.id);
+
+    const productInserts = products.map((product: any) => ({
+      business_id: business.id,
+      name: product.name,
+      description: product.description,
+      price: product.price
+    }));
+
+    await supabase.from("products").insert(productInserts);
+
+    window.location.href = `/create-a-business/step-two?id=${business.id}`;
   };
 
   return (
     <section className="py-10 md:py-24 relative overflow-hidden">
+      <div className="container mx-auto px-4 md:px-6">
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-brand-purple/20 rounded-full blur-[128px] -z-10" />
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-brand-blue/20 rounded-full blur-[128px] -z-10" />
 
-      <div className="container mx-auto px-4 md:px-6">
         {/* Progress bar at the top */}
         <p className="text-base font-medium text-gray-100 text-center mb-2">
           Step 1: Describe your business
         </p>
+        <div className="max-w-3xl mx-auto mb-8">
         <div className="w-full h-2 mb-8 bg-gray-700/50 rounded-full overflow-hidden">
           <div className="h-full bg-gradient-to-r from-brand-purple to-brand-blue w-1/3 animate-pulse" />
+        </div>
         </div>
         <div className="glass-card p-4 md:p-12 max-w-3xl mx-auto animate-fade-in border border-gray-200 shadow-md rounded-lg bg-white/5">
         <h1 className="mb-4 animate-fade-in text-center mx-auto">
@@ -98,6 +210,9 @@ export default function CreateBusinessPage() {
                 Add your image <span className="text-xs">(optional)</span>
               </p>
             </div>
+            {name && (
+              <h2 className="text-xl font-semibold text-white mt-4 text-center">{name}</h2>
+            )}
             <div>
               <label className="block text-base font-semibold mb-1 text-gray-100">Business Name</label>
               <input
@@ -108,6 +223,35 @@ export default function CreateBusinessPage() {
                 required
                 placeholder="Business Name"
               />
+            </div>
+            <div>
+              <label className="block text-base font-semibold mb-1 text-gray-100">Service Type</label>
+              <select
+                required
+                value={businessType}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setBusinessType(value);
+                  if (value !== "Other") setCustomBusinessType("");
+                }}
+                className="w-full px-4 py-2 border border-gray-300 rounded"
+              >
+                <option value="" disabled>Select your business type</option>
+                {serviceTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+                <option value="Other">Other</option>
+              </select>
+              {businessType === "Other" && (
+                <input
+                  type="text"
+                  required
+                  placeholder="Please specify your business type"
+                  value={customBusinessType}
+                  onChange={(e) => setCustomBusinessType(e.target.value)}
+                  className="w-full mt-2 px-4 py-2 border border-gray-300 rounded"
+                />
+              )}
             </div>
             <div>
               <label className="block text-base font-semibold mb-1 flex items-center gap-1 text-gray-100">
@@ -143,6 +287,7 @@ export default function CreateBusinessPage() {
           </form>
         </div>
       </div>
+      
     </section>
   );
 }
