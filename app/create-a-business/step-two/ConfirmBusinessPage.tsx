@@ -12,6 +12,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { Trash } from "lucide-react";
 
 const gradientStyles = [
   "from-brand-blue/10 to-transparent border-brand-blue/20",
@@ -81,7 +82,7 @@ export default function ConfirmBusinessPage() {
   if (loading) return <div className="p-6">Loading...</div>;
 
   return (
-    <div className=" py-10">
+    <div className=" py-10 overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">
     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 md:w-96 md:h-96 bg-brand-purple/20 rounded-full blur-[128px] -z-10" />
     <div className="absolute bottom-0 right-1/2 translate-x-1/2 w-80 h-80 md:w-96 md:h-96 bg-brand-blue/20 rounded-full blur-[128px] -z-10" />
@@ -126,6 +127,16 @@ export default function ConfirmBusinessPage() {
                 <div className="space-y-4">
                   {products.map((product, index) => (
                     <div key={product.id} className="bg-white/5 p-4 rounded-md border border-white/10 space-y-3">
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setProducts((prev) => prev.filter((_, i) => i !== index))}
+                          className="text-red-500 hover:text-red-700 transition"
+                          aria-label="Delete product"
+                        >
+                          <Trash className="w-4 h-4" />
+                        </button>
+                      </div>
                       <div>
                         <label className="text-sm font-semibold text-white">Product Name</label>
                         <Input
@@ -194,6 +205,7 @@ export default function ConfirmBusinessPage() {
               {business?.description && (
                 <p className="text-center text-muted-foreground mb-6">{business.description}</p>
               )}
+              <label className="block font-medium mb-2 text-white">Products</label>
               <div className="space-y-4">
                 {products.map((product, index) => (
                   <Card
@@ -219,12 +231,13 @@ export default function ConfirmBusinessPage() {
                       >
                         Subscribe
                       </Button>
-                    </motion.div>
-                    {clickedProductId === product.id && (
+                      {clickedProductId === product.id && (
                       <p className="mt-2 text-sm text-green-400 text-center animate-bounce">
                         🎉 Ooooh NICE!
                       </p>
                     )}
+                    </motion.div>
+                    
                     </CardContent>
                   </Card>
                 ))}
