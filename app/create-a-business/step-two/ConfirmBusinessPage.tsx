@@ -28,6 +28,7 @@ export default function ConfirmBusinessPage() {
   const [business, setBusiness] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [clickedProductId, setClickedProductId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -63,20 +64,46 @@ export default function ConfirmBusinessPage() {
   const handleSave = async () => {
     if (!businessId) return;
 
-    await supabase.from("businesses").update({ description: business.description }).eq("id", businessId);
+    setSaving(true);
 
-    for (const product of products) {
-      await supabase
+    try {
+      // Update business description
+      const { error: businessError } = await supabase
+        .from("businesses")
+        .update({ description: business.description })
+        .eq("id", businessId);
+
+      if (businessError) throw new Error("Failed to update business");
+
+      // Delete existing products
+      const { error: deleteError } = await supabase
         .from("products")
-        .update({
-          name: product.name,
-          description: product.description,
-          price: product.price,
-        })
-        .eq("id", product.id);
-    }
+        .delete()
+        .eq("business_id", businessId);
 
-    window.location.href = `/create-a-business/step-three?id=${businessId}`;
+      if (deleteError) throw new Error("Failed to delete existing products");
+
+      // Insert updated products
+      const cleanedProducts = products.map((product) => ({
+        business_id: businessId,
+        name: product.name,
+        description: product.description,
+        price: product.price,
+      }));
+
+      const { error: insertError } = await supabase
+        .from("products")
+        .insert(cleanedProducts);
+
+      if (insertError) throw new Error("Failed to insert updated products");
+
+      window.location.href = `/create-a-business/step-three?id=${businessId}`;
+    } catch (err) {
+      console.error("Save error:", err);
+      alert("There was a problem saving your business details. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) return <div className="p-6">Loading...</div>;
@@ -183,8 +210,12 @@ export default function ConfirmBusinessPage() {
                   </Button>
                 </div>
               </div>
-              <Button className="mt-4 w-full hero-button-primary" onClick={handleSave}>
-                Continue to Stripe Setup
+              <Button
+                className="mt-4 w-full hero-button-primary"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? "Saving..." : "Continue to Stripe Setup"}
               </Button>
             </div>
           </TabsContent>
