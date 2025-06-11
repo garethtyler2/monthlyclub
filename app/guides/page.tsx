@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import React from "react";
+import Head from "next/head";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import TopicGrid from "@/components/TopicGrid";
@@ -30,6 +31,29 @@ export default function GuidesHomePage() {
       <Header />
 
       <main className="flex-1">
+        <Head>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "CollectionPage",
+                "name": "Guides Hub | Monthly Club",
+                "description": "Explore step-by-step guides and practical advice on how to launch, price, and grow your subscription-based service business with Monthly Club.",
+                "url": "https://www.monthlyclubhq.com/guides",
+                "publisher": {
+                  "@type": "Organization",
+                  "name": "Monthly Club",
+                  "url": "https://www.monthlyclubhq.com",
+                  "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                  }
+                }
+              })
+            }}
+          />
+        </Head>
         {/* Hero Section */}
         <section className="relative md:pt-10 pb-16 md:pb-32 overflow-hidden">
           <div className="absolute top-1/4 -right-64 w-96 h-96 bg-brand-purple/30 rounded-full blur-[128px] -z-10" />

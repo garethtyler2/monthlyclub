@@ -17,6 +17,36 @@ export default function MarketingSubscriptionServicesPage() {
         <title>Marketing Your Subscription Services Online | Monthly Club</title>
         <meta name="description" content="Grow your local service business with proven subscription marketing tips. Leverage social media, referrals, and real-world examples to gain subscribers." />
         <link rel="canonical" href="https://www.monthlyclubhq.com/guides/marketing-subscription-services" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://www.monthlyclubhq.com/guides/marketing-subscription-services"
+              },
+              "headline": "Marketing Your Subscription Services Online",
+              "description": "Grow your local service business with proven subscription marketing tips. Leverage social media, referrals, and real-world examples to gain subscribers.",
+              "author": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "url": "https://www.monthlyclubhq.com"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                }
+              },
+              "datePublished": "2024-06-01",
+              "dateModified": "2025-06-10"
+            })
+          }}
+        />
       </Head>
       <Header />
 

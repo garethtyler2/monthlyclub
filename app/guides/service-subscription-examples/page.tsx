@@ -17,6 +17,36 @@ export default function ServiceSubscriptionExamplesPage() {
         <title>Examples of Service-Based Subscription Pages | Monthly Club</title>
         <meta name="description" content="Real-world subscription examples from local businesses using Monthly Club. See how cleaners, barbers, and dog groomers build reliable income online." />
         <link rel="canonical" href="https://www.monthlyclubhq.com/guides/service-subscription-examples" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://www.monthlyclubhq.com/guides/service-subscription-examples"
+              },
+              "headline": "Examples of Service-Based Subscription Pages",
+              "description": "Real-world subscription examples from local businesses using Monthly Club. See how cleaners, barbers, and dog groomers build reliable income online.",
+              "author": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "url": "https://www.monthlyclubhq.com"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                }
+              },
+              "datePublished": "2024-06-01",
+              "dateModified": "2025-06-10"
+            })
+          }}
+        />
       </Head>
       <Header />
 

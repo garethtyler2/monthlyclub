@@ -17,6 +17,36 @@ export default function AutomatePaymentsStripePage() {
         <title>Automating Payments with Stripe | Monthly Club</title>
         <meta name="description" content="Automate payments for your subscription service using Stripe. Discover how Monthly Club makes recurring income easy for local businesses." />
         <link rel="canonical" href="https://www.monthlyclubhq.com/guides/automate-payments-stripe" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://www.monthlyclubhq.com/guides/automate-payments-stripe"
+              },
+              "headline": "Automating Payments with Stripe",
+              "description": "Automate payments for your subscription service using Stripe. Discover how Monthly Club makes recurring income easy for local businesses.",
+              "author": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "url": "https://www.monthlyclubhq.com"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                }
+              },
+              "datePublished": "2024-06-01",
+              "dateModified": "2025-06-10"
+            })
+          }}
+        />
       </Head>
       <Header />
 

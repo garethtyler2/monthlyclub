@@ -18,6 +18,36 @@ export default function WhatIsAServiceSubscriptionPage() {
         <title>What is a Service Subscription? | Monthly Club</title>
         <meta name="description" content="Learn what service subscriptions are and how they help local service businesses build recurring income. Monthly Club makes it simple." />
         <link rel="canonical" href="https://www.monthlyclubhq.com/guides/what-is-a-service-subscription" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://www.monthlyclubhq.com/guides/what-is-a-service-subscription"
+              },
+              "headline": "What is a Service Subscription?",
+              "description": "Learn what service subscriptions are and how they help local service businesses build recurring income. Monthly Club makes it simple.",
+              "author": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "url": "https://www.monthlyclubhq.com"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                }
+              },
+              "datePublished": "2024-06-01",
+              "dateModified": "2025-06-10"
+            })
+          }}
+        />
       </Head>
       <Header />
 

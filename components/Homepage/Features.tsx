@@ -12,7 +12,7 @@ const featureItems = [
     description: "Easily build subscription plans for any service—from beauty to gardening—in minutes.",
     className: "border-brand-purple/20 bg-gradient-to-b from-brand-purple/10 to-transparent",
     delay: 0,
-    link: "/"
+    link: "/guides/create-subscription-plan"
   },
   {
     icon: Shield,
@@ -20,7 +20,7 @@ const featureItems = [
     description: "Connect Stripe and let customers subscribe with automated recurring payments.",
     className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
     delay: 100,
-    link: "/"
+    link: "/guides/automate-payments-stripe"
   },
   {
     icon: BarChart,
@@ -52,7 +52,7 @@ const featureItems = [
     description: "Perfect for cleaners, groomers, beauty pros, and anyone who works on repeat bookings.",
     className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
     delay: 500,
-    link: "/"
+    link: "/guides/service-subscription-examples"
   },
 ];
 

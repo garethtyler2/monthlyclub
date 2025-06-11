@@ -19,6 +19,36 @@ export default function HowMonthlyClubHelpsPage() {
         <title>How Monthly Club Helps Service Businesses | Monthly Club</title>
         <meta name="description" content="Monthly Club helps local service providers grow recurring income with easy-to-use tools: subscriptions, payment automation, and public service pages." />
         <link rel="canonical" href="https://www.monthlyclubhq.com/guides/how-monthly-club-helps" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://www.monthlyclubhq.com/guides/how-monthly-club-helps"
+              },
+              "headline": "How Monthly Club Helps Service Providers Grow",
+              "description": "Monthly Club helps local service providers grow recurring income with easy-to-use tools: subscriptions, payment automation, and public service pages.",
+              "author": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "url": "https://www.monthlyclubhq.com"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                }
+              },
+              "datePublished": "2024-06-01",
+              "dateModified": "2025-06-10"
+            })
+          }}
+        />
       </Head>
       <Header />
 

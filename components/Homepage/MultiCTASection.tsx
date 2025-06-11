@@ -78,11 +78,14 @@ const CTA = () => {
               <div className="border border-white/10 bg-white/5 rounded-xl p-6">
                 <h4 className="font-medium mb-2">Zero Overhead</h4>
                 <p className="text-sm text-muted-foreground">We handle the subscriptions. You just deliver your service.</p>
+                <p className="mt-2 text-xs text-brand-purple">
+                  <Link href="/guides/automate-payments-stripe" className="hover:underline">How automated payments work →</Link>
+                </p>
               </div>
             </div>
           </div>
           <Button asChild className="mt-6 w-1/2 hero-button-primary">
-            <Link href="#">Join the Beta!</Link>
+            <Link href="/guides">Explore the Guides</Link>
           </Button>
         </div>
       </div>

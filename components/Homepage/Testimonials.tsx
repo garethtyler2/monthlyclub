@@ -64,6 +64,14 @@ const Testimonials = () => {
           >
             Real feedback from service providers growing their income and customer base with Monthly Club.
           </p>
+          <div className="mt-4 animate-fade-in" style={{ animationDelay: "200ms" }}>
+            <a
+              href="/guides/hairdresser-subscriptions"
+              className="text-sm text-brand-purple underline underline-offset-2 hover:text-brand-purple/80"
+            >
+              See how hairdressers, cleaners, and pros use subscriptions →
+            </a>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -1,14 +1,37 @@
+import Head from "next/head";
 import Features from "@/components/Homepage/Features";
 import Hero from "@/components/Homepage/HeroSection";
 import Testimonials from "@/components/Homepage/Testimonials";
 import Metrics from "@/components/Homepage/Metrics"; 
 import MultiCTASection from "@/components/Homepage/MultiCTASection";
-import CommunityFeature from "@/components/Homepage/CommunityFeature";
+import CommunityFeature from "@/components/Homepage/Learn&Grow";
 import ExampleUseCase from "@/components/Homepage/ExampleUseCase";
 
 export default function HomePage() {
   return (
     <>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "Monthly Club",
+              "url": "https://www.monthlyclubhq.com",
+              "publisher": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "url": "https://www.monthlyclubhq.com",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                }
+              }
+            })
+          }}
+        />
+      </Head>
       <Hero />
       <Features />
       <CommunityFeature />

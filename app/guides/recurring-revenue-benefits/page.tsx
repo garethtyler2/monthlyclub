@@ -17,6 +17,36 @@ export default function RecurringRevenueBenefitsPage() {
         <title>Benefits of Recurring Revenue for Local Businesses | Monthly Club</title>
         <meta name="description" content="Explore how recurring revenue helps local service businesses stabilize income, reduce admin, and build long-term client loyalty through subscriptions." />
         <link rel="canonical" href="https://www.monthlyclubhq.com/guides/recurring-revenue-benefits" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://www.monthlyclubhq.com/guides/recurring-revenue-benefits"
+              },
+              "headline": "Benefits of Recurring Revenue for Local Businesses",
+              "description": "Explore how recurring revenue helps local service businesses stabilize income, reduce admin, and build long-term client loyalty through subscriptions.",
+              "author": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "url": "https://www.monthlyclubhq.com"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                }
+              },
+              "datePublished": "2024-06-01",
+              "dateModified": "2025-06-10"
+            })
+          }}
+        />
       </Head>
       <Header />
 

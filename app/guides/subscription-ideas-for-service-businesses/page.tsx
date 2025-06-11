@@ -17,6 +17,36 @@ export default function SubscriptionIdeasPage() {
         <title>Subscription Ideas for Local Services | Monthly Club</title>
         <meta name="description" content="Discover real-world subscription ideas for dog walkers, gardeners, valets, tutors, and wellness pros. Build recurring income with smart, simple plans." />
         <link rel="canonical" href="https://www.monthlyclubhq.com/guides/subscription-ideas-for-service-businesses" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://www.monthlyclubhq.com/guides/subscription-ideas-for-service-businesses"
+              },
+              "headline": "Subscription Ideas for Service Businesses",
+              "description": "Discover real-world subscription ideas for dog walkers, gardeners, valets, tutors, and wellness pros. Build recurring income with smart, simple plans.",
+              "author": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "url": "https://www.monthlyclubhq.com"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                }
+              },
+              "datePublished": "2024-06-01",
+              "dateModified": "2025-06-10"
+            })
+          }}
+        />
       </Head>
       <Header />
 

@@ -36,6 +36,13 @@ const Hero = () => {
             Monthly Club helps local service providers—from cleaners to hairdressers—offer subscription-based services online. Create your plans, share your link, and start earning recurring revenue.
           </p>
 
+          <p
+            className="mt-8 text-sm text-muted-foreground max-w-2xl animate-fade-in"
+            style={{ animationDelay: "700ms" }}
+          >
+            New to subscriptions? Explore our <Link href="/guides" className="text-brand-purple underline underline-offset-2 hover:text-brand-purple/80">Guides</Link> for step-by-step help and real examples.
+          </p>
+
           <div
             className="flex flex-col sm:flex-row gap-4 mt-10 animate-fade-in"
             style={{ animationDelay: "800ms" }}
@@ -65,6 +72,18 @@ const Hero = () => {
           >
             Whether you're a gardener, a cleaner, or a mobile beauty pro—Monthly Club gives you the tools to grow with subscriptions. Easy setup, automated payments, and a storefront you can share anywhere.
           </p>
+
+          <div
+            className="mt-6 animate-fade-in"
+            style={{ animationDelay: "1300ms" }}
+          >
+            <Link
+              href="/guides/service-subscription-examples"
+              className="inline-flex items-center text-sm font-medium text-brand-purple hover:underline hover:underline-offset-2"
+            >
+              See real subscription examples →
+            </Link>
+          </div>
         </div>
       </div>
     </section>

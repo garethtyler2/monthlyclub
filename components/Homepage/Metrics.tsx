@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "../ui/button";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -95,7 +97,7 @@ const CounterAnimation = ({ countTo, symbol, delay }: { countTo: number, symbol:
 const Metrics = () => {
   return (
     <section id="metrics" className="py-16 md:py-24 bg-slate-50/5">
-      <div className="container mx-auto px-4 md:px-6">
+      <div className="container text-center mx-auto px-4 md:px-6">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="mb-4 animate-fade-in">
             Real <span className="gradient-text">Business Impact</span>
@@ -103,6 +105,14 @@ const Metrics = () => {
           <p className="text-muted-foreground animate-fade-in" style={{ animationDelay: "100ms" }}>
             Monthly Club is already helping businesses reduce admin, boost retention, and earn more from loyal customers.
           </p>
+          <div className="mt-4 animate-fade-in" style={{ animationDelay: "200ms" }}>
+            <a
+              href="/guides/recurring-revenue-benefits"
+              className="text-sm text-brand-purple underline underline-offset-2 hover:text-brand-purple/80"
+            >
+              Learn why recurring revenue works →
+            </a>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -128,6 +138,9 @@ const Metrics = () => {
             </Card>
           ))}
         </div>
+            <Button asChild className="w-1/2 mt-10 hero-button-primary">
+            <Link href="#">Join the Beta!</Link>
+          </Button>
       </div>
     </section>
   );

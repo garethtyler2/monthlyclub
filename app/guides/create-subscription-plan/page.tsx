@@ -17,6 +17,36 @@ export default function CreateSubscriptionPlanPage() {
         <title>Create Your First Subscription Plan | Monthly Club</title>
         <meta name="description" content="Step-by-step guide for hairdressers and service pros to build and share a subscription plan with Monthly Club. Simple setup, no tech skills needed." />
         <link rel="canonical" href="https://www.monthlyclubhq.com/guides/create-subscription-plan" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://www.monthlyclubhq.com/guides/create-subscription-plan"
+              },
+              "headline": "How to Create a Subscription Plan with Monthly Club",
+              "description": "Follow this step-by-step guide to create and publish your first subscription plan using Monthly Club. No tech skills required.",
+              "author": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "url": "https://www.monthlyclubhq.com"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                }
+              },
+              "datePublished": "2024-06-01",
+              "dateModified": "2025-06-10"
+            })
+          }}
+        />
       </Head>
       <Header />
 

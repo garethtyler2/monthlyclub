@@ -17,6 +17,36 @@ export default function CleaningSubscriptionModelPage() {
         <title>Cleaning Subscription Models | Monthly Club</title>
         <meta name="description" content="Learn how cleaners can boost income with subscriptions. Explore weekly, bi-weekly, and deep-clean plans tailored for predictable revenue." />
         <link rel="canonical" href="https://www.monthlyclubhq.com/guides/cleaning-subscription-model" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Article",
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": "https://www.monthlyclubhq.com/guides/cleaning-subscription-model"
+              },
+              "headline": "Cleaning Subscription Models",
+              "description": "Learn how cleaners can boost income with subscriptions. Explore weekly, bi-weekly, and deep-clean plans tailored for predictable revenue.",
+              "author": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "url": "https://www.monthlyclubhq.com"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Monthly Club",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                }
+              },
+              "datePublished": "2024-06-01",
+              "dateModified": "2025-06-10"
+            })
+          }}
+        />
       </Head>
       <Header />
 
