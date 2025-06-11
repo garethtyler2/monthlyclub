@@ -1,5 +1,5 @@
-
 import { Metadata } from "next";
+import Head from "next/head";
 import Link from "next/link";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,11 @@ export const metadata: Metadata = {
 export default function WhatIsAServiceSubscriptionPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-background">
+      <Head>
+        <title>What is a Service Subscription? | Monthly Club</title>
+        <meta name="description" content="Learn what service subscriptions are and how they help local service businesses build recurring income. Monthly Club makes it simple." />
+        <link rel="canonical" href="https://www.monthlyclubhq.com/guides/what-is-a-service-subscription" />
+      </Head>
       <Header />
 
       <main className="flex-1">
@@ -72,11 +77,11 @@ export default function WhatIsAServiceSubscriptionPage() {
 
               <h2>Try Monthly Club (Beta)</h2>
               <p>
-                We’re currently in beta and inviting small businesses to join early. You’ll get full access to the platform — free during early access — and support from our team to help you set up.
+                We’re currently in beta and welcoming service businesses to join us. You’ll get full access to everything — free during early access — and hands-on support to help you launch your first subscription.
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Join the Beta for Free</Link>
+                <Link href="/">Start Your Free Early Access</Link>
               </Button>
             </div>
           </div>

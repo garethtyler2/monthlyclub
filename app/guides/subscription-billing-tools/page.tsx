@@ -2,6 +2,7 @@
 
 import { Metadata } from "next";
 import Link from "next/link";
+import Head from "next/head";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 
@@ -14,6 +15,11 @@ export const metadata: Metadata = {
 export default function SubscriptionBillingToolsPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-background">
+      <Head>
+        <title>Top Subscription Billing Tools for Local Businesses | Monthly Club</title>
+        <meta name="description" content="Simplify recurring payments with the best subscription billing tools. See how Stripe, GoCardless, and Monthly Club make billing stress-free for service pros." />
+        <link rel="canonical" href="https://www.monthlyclubhq.com/guides/subscription-billing-tools" />
+      </Head>
       <Header />
 
       <main className="flex-1">
@@ -71,7 +77,7 @@ export default function SubscriptionBillingToolsPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Join the Beta for Free</Link>
+                <Link href="/">Start Simplifying Your Billing Today</Link>
               </Button>
             </div>
           </div>

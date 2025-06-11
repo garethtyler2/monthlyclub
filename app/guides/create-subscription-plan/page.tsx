@@ -1,5 +1,5 @@
-
 import { Metadata } from "next";
+import Head from "next/head";
 import Link from "next/link";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 export default function CreateSubscriptionPlanPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-background">
+      <Head>
+        <title>Create Your First Subscription Plan | Monthly Club</title>
+        <meta name="description" content="Step-by-step guide for hairdressers and service pros to build and share a subscription plan with Monthly Club. Simple setup, no tech skills needed." />
+        <link rel="canonical" href="https://www.monthlyclubhq.com/guides/create-subscription-plan" />
+      </Head>
       <Header />
 
       <main className="flex-1">
@@ -55,9 +60,9 @@ export default function CreateSubscriptionPlanPage() {
 
               <h2>Step 3: Add the Plan Details</h2>
               <ul>
-                <li><strong>Plan name:</strong> e.g., “Weekly Cleaning” or “Monthly Haircut”</li>
-                <li><strong>Description:</strong> Let customers know exactly what’s included</li>
-                <li><strong>Price & frequency:</strong> Choose weekly, bi-weekly, monthly, etc.</li>
+                <li><strong>Plan name:</strong> For example, “Weekly Haircut Membership” or “Bi-Weekly Home Cleaning”</li>
+                <li><strong>Description:</strong> Explain what’s included, like the number of visits, any extras (e.g., deep clean or blow dry)</li>
+                <li><strong>Price & frequency:</strong> Set your monthly or weekly rate. Your customers will be billed automatically.</li>
               </ul>
 
               <h2>Step 4: Set Availability & Rules</h2>
@@ -70,8 +75,13 @@ export default function CreateSubscriptionPlanPage() {
                 Once your plan is saved, you'll get a public page you can send to your customers. They'll be able to sign up instantly and pay via Stripe.
               </p>
 
+              <h2>Example: Mia’s Hair Studio</h2>
+              <p>
+                Mia offers a “Two Blow Dries a Month” plan at £60. She created the plan in under 10 minutes using Monthly Club. Her regulars love the convenience, and Mia now has predictable monthly income.
+              </p>
+
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Create Your First Plan Now</Link>
+                <Link href="/">Build Your Plan and Start Earning</Link>
               </Button>
             </div>
           </div>

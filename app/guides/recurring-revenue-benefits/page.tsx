@@ -1,4 +1,4 @@
-
+import Head from "next/head";
 import { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 export default function RecurringRevenueBenefitsPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-background">
+      <Head>
+        <title>Benefits of Recurring Revenue for Local Businesses | Monthly Club</title>
+        <meta name="description" content="Explore how recurring revenue helps local service businesses stabilize income, reduce admin, and build long-term client loyalty through subscriptions." />
+        <link rel="canonical" href="https://www.monthlyclubhq.com/guides/recurring-revenue-benefits" />
+      </Head>
       <Header />
 
       <main className="flex-1">
@@ -58,7 +63,7 @@ export default function RecurringRevenueBenefitsPage() {
 
               <h2>Real-World Example</h2>
               <p>
-                A dog groomer offering a bi-monthly subscription gets paid on the 1st of each month. She no longer spends time chasing bookings and now fills her calendar weeks in advance.
+                Sarah runs a dog grooming service in Bristol. She created a £45/month plan for a bi-monthly grooming session. Her regular clients signed up quickly — now she gets paid on the 1st of each month, and her calendar stays full without last-minute gaps or no-shows.
               </p>
 
               <h2>How Monthly Club Helps</h2>
@@ -67,7 +72,7 @@ export default function RecurringRevenueBenefitsPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Join the Beta and Start Building Recurring Revenue</Link>
+                <Link href="/">Start Your Subscription Journey Today</Link>
               </Button>
             </div>
           </div>

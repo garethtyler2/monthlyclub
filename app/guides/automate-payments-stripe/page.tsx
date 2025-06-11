@@ -1,5 +1,5 @@
-
 import { Metadata } from "next";
+import Head from "next/head";
 import Link from "next/link";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 export default function AutomatePaymentsStripePage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-background">
+      <Head>
+        <title>Automating Payments with Stripe | Monthly Club</title>
+        <meta name="description" content="Automate payments for your subscription service using Stripe. Discover how Monthly Club makes recurring income easy for local businesses." />
+        <link rel="canonical" href="https://www.monthlyclubhq.com/guides/automate-payments-stripe" />
+      </Head>
       <Header />
 
       <main className="flex-1">
@@ -50,7 +55,10 @@ export default function AutomatePaymentsStripePage() {
 
               <h2>How Monthly Club Uses Stripe</h2>
               <p>
-                When a customer subscribes to your plan, Stripe automatically charges them based on your pricing and frequency (e.g. £40/month). Payments go straight to your connected account, minus Stripe’s small fee.
+                Let’s say you’re a hairdresser offering a “Monthly Blowdry Plan” at £40/month. When a customer signs up, Stripe handles everything — charging their card automatically every month, transferring funds to your account, and even retrying if a payment fails. You don’t need to chase anyone, send invoices, or track overdue payments.
+              </p>
+              <p>
+                Stripe is fully integrated with Monthly Club, so you never have to touch code or manage a separate Stripe dashboard. Your customers pay through a branded checkout, and Stripe does the rest behind the scenes.
               </p>
 
               <h2>Benefits of Automation</h2>
@@ -66,13 +74,16 @@ export default function AutomatePaymentsStripePage() {
                 Once you're set up with Monthly Club, you'll connect your payout details and Stripe handles the rest. You’ll get paid out automatically based on their schedule — typically daily or weekly.
               </p>
 
-              <h2>It's All Built In</h2>
+              <h2>Fully Integrated – No Tech Skills Needed</h2>
               <p>
-                You don’t need to touch code, set up Stripe manually, or learn a new platform. Just create your plan, share your page, and Stripe does the rest.
+                Monthly Club was built for people who are great at what they do — not developers. Stripe is baked right into the platform, so you don’t need to learn a new tool. Simply choose your plan pricing, publish your page, and Stripe begins collecting payments from your subscribers.
+              </p>
+              <p>
+                Want to offer weekly lawn cuts, monthly grooming packages, or quarterly home cleanings? You’re covered — and your customers never need to worry about paying manually.
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Join the Beta and Automate Your Income</Link>
+                <Link href="/">Get Started with Stripe & Monthly Club</Link>
               </Button>
             </div>
           </div>

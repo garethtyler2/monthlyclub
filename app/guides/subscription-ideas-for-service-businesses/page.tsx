@@ -1,8 +1,8 @@
-
 import { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
+import Head from "next/head";
 
 export const metadata: Metadata = {
   title: "Subscription Ideas for Service Businesses | Monthly Club",
@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 export default function SubscriptionIdeasPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-background">
+      <Head>
+        <title>Subscription Ideas for Local Services | Monthly Club</title>
+        <meta name="description" content="Discover real-world subscription ideas for dog walkers, gardeners, valets, tutors, and wellness pros. Build recurring income with smart, simple plans." />
+        <link rel="canonical" href="https://www.monthlyclubhq.com/guides/subscription-ideas-for-service-businesses" />
+      </Head>
       <Header />
 
       <main className="flex-1">
@@ -34,7 +39,7 @@ export default function SubscriptionIdeasPage() {
             </h1>
 
             <p className="text-lg md:text-xl leading-relaxed text-gray-700 dark:text-gray-300 font-medium">
-              Not sure how to turn your service into a subscription? Here are real-world ideas to help you launch — and grow — your recurring income.
+              Not sure how to turn your service into a subscription? Use these real-world examples to kickstart your plans and bring predictability to your business.
             </p>
           </div>
         </section>
@@ -111,7 +116,7 @@ export default function SubscriptionIdeasPage() {
 
               <div className="text-center pt-4">
                 <Button className="hero-button-primary mt-6">
-                  <Link href="/">Start Building Your Plan</Link>
+                  <Link href="/">Try These Ideas with Monthly Club</Link>
                 </Button>
               </div>
             </div>

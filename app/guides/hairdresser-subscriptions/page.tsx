@@ -1,4 +1,4 @@
-
+import Head from "next/head";
 import { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 export default function HairdresserSubscriptionsPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-background">
+      <Head>
+        <title>Hairdresser Subscription Plans | Monthly Club</title>
+        <meta name="description" content="Discover how hairdressers can offer smart subscription plans with Monthly Club. Boost loyalty and income with monthly or weekly appointment options." />
+        <link rel="canonical" href="https://www.monthlyclubhq.com/guides/hairdresser-subscriptions" />
+      </Head>
       <Header />
 
       <main className="flex-1">
@@ -45,7 +50,10 @@ export default function HairdresserSubscriptionsPage() {
             <div className="prose prose-lg max-w-none dark:prose-invert space-y-8">
               <h2>Why Subscriptions Work for Hairdressers</h2>
               <p>
-                Most clients return every few weeks — so why not offer them a fixed plan? Subscriptions give your regulars peace of mind (and a guaranteed slot), while you get predictable monthly income.
+                Hairdressing is built on repeat visits — most clients return every few weeks. A subscription plan gives them peace of mind and gives you the financial security of steady, predictable income.
+              </p>
+              <p>
+                With fewer cancellations and easier scheduling, subscriptions mean you can plan your calendar in advance and spend less time on admin.
               </p>
 
               <h2>Example Plans You Can Offer</h2>
@@ -68,8 +76,13 @@ export default function HairdresserSubscriptionsPage() {
                 Monthly Club gives you a public page to list your plans, take subscriptions, and get paid through Stripe. You can send your link via WhatsApp, Instagram, or email.
               </p>
 
+              <h2>Real Example: Lee the Barber</h2>
+              <p>
+                Lee runs a small barbershop in Manchester. He launched a “Monthly Trim Plan” with Monthly Club at £30/month. Within two weeks, 8 clients signed up. Now, his Fridays are fully booked in advance — and paid upfront.
+              </p>
+
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Join the Beta and Try it Free</Link>
+                <Link href="/">Launch Your Subscription Plan Today</Link>
               </Button>
             </div>
           </div>

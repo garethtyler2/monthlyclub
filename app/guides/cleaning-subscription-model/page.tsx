@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -12,6 +13,11 @@ export const metadata: Metadata = {
 export default function CleaningSubscriptionModelPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-background">
+      <Head>
+        <title>Cleaning Subscription Models | Monthly Club</title>
+        <meta name="description" content="Learn how cleaners can boost income with subscriptions. Explore weekly, bi-weekly, and deep-clean plans tailored for predictable revenue." />
+        <link rel="canonical" href="https://www.monthlyclubhq.com/guides/cleaning-subscription-model" />
+      </Head>
       <Header />
 
       <main className="flex-1">
@@ -44,7 +50,10 @@ export default function CleaningSubscriptionModelPage() {
             <div className="prose prose-lg max-w-none dark:prose-invert space-y-8">
               <h2>Why Subscriptions Work for Cleaners</h2>
               <p>
-                Cleaning is one of the best industries for recurring services. Most customers want a regular slot — whether that’s weekly, bi-weekly, or monthly. Subscription plans let them lock it in and pay automatically.
+                Cleaning is a service people need on a regular basis — and that makes it perfect for subscriptions. Whether it’s a weekly tidy-up or a monthly deep clean, giving clients the ability to “set it and forget it” means fewer gaps in your calendar and steadier income for your business.
+              </p>
+              <p>
+                Instead of quoting one job at a time, subscriptions let you build lasting client relationships and reduce admin stress.
               </p>
 
               <h2>Popular Cleaning Plan Ideas</h2>
@@ -68,8 +77,13 @@ export default function CleaningSubscriptionModelPage() {
                 Monthly Club gives you a clean, branded page where clients can view your services and subscribe in seconds. Payments are powered by Stripe, and everything is managed for you — no tech setup needed.
               </p>
 
+              <h2>Real Example: Jo’s Cleaning Service</h2>
+              <p>
+                Jo runs a small cleaning business in Leeds. After switching to Monthly Club, she set up a simple £160/month weekly clean subscription. Within the first month, five regulars signed up. Now she spends less time doing quotes and more time delivering great service — knowing her income is locked in ahead of time.
+              </p>
+
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Join the Beta and Set Up Your First Plan</Link>
+                <Link href="/">Start Earning Recurring Income Today</Link>
               </Button>
             </div>
           </div>

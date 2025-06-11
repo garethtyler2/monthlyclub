@@ -1,4 +1,4 @@
-
+import Head from "next/head";
 import { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 export default function MarketingSubscriptionServicesPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-background">
+      <Head>
+        <title>Marketing Your Subscription Services Online | Monthly Club</title>
+        <meta name="description" content="Grow your local service business with proven subscription marketing tips. Leverage social media, referrals, and real-world examples to gain subscribers." />
+        <link rel="canonical" href="https://www.monthlyclubhq.com/guides/marketing-subscription-services" />
+      </Head>
       <Header />
 
       <main className="flex-1">
@@ -65,7 +70,7 @@ export default function MarketingSubscriptionServicesPage() {
 
               <h2>Bonus: Offer an Incentive</h2>
               <p>
-                Consider giving a free add-on or discounted first month for new subscribers — especially when you're just starting out.
+                Encourage signups with a small bonus. For example: “Subscribe this week and get a free add-on service” or “Get 50% off your first month.” It helps nudge people who are on the fence.
               </p>
 
               <h2>Grow Steadily Over Time</h2>
@@ -73,8 +78,13 @@ export default function MarketingSubscriptionServicesPage() {
                 Building a subscriber base is a long-term game. The key is consistency: talk about it often, keep the experience simple, and remind people of the benefits.
               </p>
 
+              <h2>Real Example: Jasmine the Mobile Nail Tech</h2>
+              <p>
+                Jasmine started posting about her subscription plans twice a week on Instagram. She added a link to her Monthly Club page in her bio and started getting one or two signups a week. Within two months, she had over 20 subscribers and a steady monthly income.
+              </p>
+
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Join the Beta and Start Marketing Smarter</Link>
+                <Link href="/">Start Growing Your Subscribers Today</Link>
               </Button>
             </div>
           </div>

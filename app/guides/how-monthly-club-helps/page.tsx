@@ -1,4 +1,6 @@
 
+import Head from "next/head";
+
 import { Metadata } from "next";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -13,6 +15,11 @@ export const metadata: Metadata = {
 export default function HowMonthlyClubHelpsPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-background">
+      <Head>
+        <title>How Monthly Club Helps Service Businesses | Monthly Club</title>
+        <meta name="description" content="Monthly Club helps local service providers grow recurring income with easy-to-use tools: subscriptions, payment automation, and public service pages." />
+        <link rel="canonical" href="https://www.monthlyclubhq.com/guides/how-monthly-club-helps" />
+      </Head>
       <Header />
 
       <main className="flex-1">
@@ -45,7 +52,7 @@ export default function HowMonthlyClubHelpsPage() {
             <div className="prose prose-lg max-w-none dark:prose-invert space-y-8">
               <h2>Built for Local Pros</h2>
               <p>
-                Whether you’re a dog walker, gardener, beauty therapist, or mobile barber — Monthly Club gives you the tools to offer plans your customers can subscribe to with one click.
+                Whether you're a mobile hairdresser, a dog walker, or a local cleaner — Monthly Club helps you turn one-time jobs into steady, recurring income. You can build and sell subscription plans your customers can sign up to in seconds.
               </p>
 
               <h2>Everything You Need to Launch</h2>
@@ -66,8 +73,13 @@ export default function HowMonthlyClubHelpsPage() {
                 We designed Monthly Club for the non-techy business owner. Everything is streamlined, clean, and built to help you earn more with less friction.
               </p>
 
+              <h2>Real Example: Priya the Mobile Therapist</h2>
+              <p>
+                Priya used to spend hours a week chasing appointments. After setting up a “Monthly Massage Plan” with Monthly Club, she booked 12 clients who now pay automatically each month — and she no longer deals with late cancellations or gaps.
+              </p>
+
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Try Monthly Club Free</Link>
+                <Link href="/">Start Growing with Monthly Club</Link>
               </Button>
             </div>
           </div>

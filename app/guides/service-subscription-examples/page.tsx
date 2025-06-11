@@ -1,5 +1,5 @@
-
 import { Metadata } from "next";
+import Head from "next/head";
 import Link from "next/link";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,11 @@ export const metadata: Metadata = {
 export default function ServiceSubscriptionExamplesPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-background">
+      <Head>
+        <title>Examples of Service-Based Subscription Pages | Monthly Club</title>
+        <meta name="description" content="Real-world subscription examples from local businesses using Monthly Club. See how cleaners, barbers, and dog groomers build reliable income online." />
+        <link rel="canonical" href="https://www.monthlyclubhq.com/guides/service-subscription-examples" />
+      </Head>
       <Header />
 
       <main className="flex-1">
@@ -34,7 +39,7 @@ export default function ServiceSubscriptionExamplesPage() {
             </h1>
 
             <p className="text-lg md:text-xl leading-relaxed text-gray-700 dark:text-gray-300 font-medium">
-              See how real local businesses are turning services into stable, recurring income with Monthly Club.
+              See how real service pros — from mobile barbers to cleaners — are using subscriptions to build predictable, repeatable income online.
             </p>
           </div>
         </section>
@@ -65,11 +70,11 @@ export default function ServiceSubscriptionExamplesPage() {
 
               <h2>More Coming Soon</h2>
               <p>
-                As more providers join the platform, we’ll showcase live pages to inspire your own setup. Want to be featured? Just reach out!
+                As more service providers join Monthly Club, we'll keep sharing great examples from across the UK. If you’d like your business featured, just reach out!
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Join the Beta and Create Your Page</Link>
+                <Link href="/">Create Your Subscription Page Today</Link>
               </Button>
             </div>
           </div>
