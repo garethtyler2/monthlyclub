@@ -44,7 +44,7 @@ const TopicCard: React.FC<TopicCardProps> = ({ id, title, description, icon, sub
                 </div>
                 <div className="mt-2 flex justify-end">
                   <Link 
-                    href={`/${id}/${subtopic.id}`}
+                    href={`/guides/${subtopic.id}`}
                     className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                   >
                     Learn more 
