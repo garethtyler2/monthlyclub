@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/lib/supabase/client";
 
 export default function StepThree() {
   const searchParams = useSearchParams();
@@ -16,13 +17,45 @@ export default function StepThree() {
   const handleStripeSetup = async () => {
     setLoading(true);
 
-    // Placeholder logic - this is where you'd integrate with Stripe
-    console.log("Preparing Stripe setup with:", { name, email, businessId });
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    setTimeout(() => {
+    const userId = user?.id;
+
+    if (!userId) {
+      alert("User not logged in.");
       setLoading(false);
-      alert("Stripe onboarding not connected yet – this is a placeholder.");
-    }, 1500);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/stripe/create-onboarding-link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          businessId,
+          name,
+          email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data?.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Something went wrong creating the Stripe link.");
+      }
+    } catch (error) {
+      console.error("Stripe onboarding error:", error);
+      alert("Error initiating Stripe onboarding.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

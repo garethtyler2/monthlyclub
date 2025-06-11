@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Trash } from "lucide-react";
+import { LoadingOverlay } from "@/components/ui/loading-overlay"
 
 const gradientStyles = [
   "from-brand-blue/10 to-transparent border-brand-blue/20",
@@ -30,6 +31,7 @@ export default function ConfirmBusinessPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [clickedProductId, setClickedProductId] = useState<string | null>(null);
+  const [tab, setTab] = useState("edit");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,10 +69,10 @@ export default function ConfirmBusinessPage() {
     setSaving(true);
 
     try {
-      // Update business description
+      // Update business description and name
       const { error: businessError } = await supabase
         .from("businesses")
-        .update({ description: business.description })
+        .update({ description: business.description, name: business.name })
         .eq("id", businessId);
 
       if (businessError) throw new Error("Failed to update business");
@@ -106,7 +108,9 @@ export default function ConfirmBusinessPage() {
     }
   };
 
-  if (loading) return <div className="p-6">Loading...</div>;
+    if (loading ) {
+    return <LoadingOverlay show message="Generating your business page and products" />;
+  }
 
   return (
     <div className=" py-10 overflow-hidden">
@@ -121,16 +125,22 @@ export default function ConfirmBusinessPage() {
           <div className="h-full bg-gradient-to-r from-brand-purple to-brand-blue w-2/3 animate-pulse" />
         </div>
         </div>
-        <Tabs defaultValue="edit" className="max-w-3xl mx-auto">
+        <Tabs value={tab} onValueChange={setTab} className="max-w-3xl mx-auto">
           <TabsList className="mb-6 flex justify-center">
             <TabsTrigger value="edit">Edit Info</TabsTrigger>
             <TabsTrigger value="preview">Preview Page</TabsTrigger>
           </TabsList>
           <TabsContent value="edit">
             <div className="glass-card p-4 md:p-12 animate-fade-in border border-gray-200 shadow-md rounded-lg bg-white/5">
-              {business?.name && (
-                <h2 className="text-2xl font-semibold text-white text-center mb-4">{business.name}</h2>
-              )}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-white mb-1">Business Name</label>
+                <Input
+                  className="bg-gray-800 border border-white text-white placeholder-gray-400"
+                  value={business?.name || ""}
+                  onChange={(e) => setBusiness({ ...business, name: e.target.value })}
+                  placeholder="Business Name"
+                />
+              </div>
               {/* Show uploaded business image if present */}
               {business?.image_url && (
                 <div className="flex justify-center mb-6">
@@ -210,16 +220,25 @@ export default function ConfirmBusinessPage() {
                   </Button>
                 </div>
               </div>
-              <Button
-                className="mt-4 w-full hero-button-primary"
-                onClick={handleSave}
-                disabled={saving}
-              >
-                {saving ? "Saving..." : "Continue to Stripe Setup"}
-              </Button>
+              <div className="mt-4 w-full flex flex-col md:flex-row md:justify-between gap-3">
+                <Button
+                  variant="ghost"
+                  className="text-white border border-white hover:bg-white/10 w-full md:w-auto"
+                  onClick={() => setTab("preview")}
+                >
+                  Preview My Business Page
+                </Button>
+                <Button
+                  className="hero-button-primary w-full md:w-auto"
+                  onClick={handleSave}
+                  disabled={saving}
+                >
+                  {saving ? "Saving..." : "Continue to Stripe Setup"}
+                </Button>
+              </div>
             </div>
           </TabsContent>
-          <TabsContent value="preview">
+          <TabsContent id="preview" value="preview">
             <div className="glass-card p-4 border border-white/10 bg-white/5 rounded-lg shadow animate-fade-in text-white">
               {business?.name && (
                 <h2 className="text-2xl font-semibold text-center mb-4">{business.name}</h2>
@@ -252,26 +271,35 @@ export default function ConfirmBusinessPage() {
                       <p className="text-sm opacity-90 mb-3">{product.description}</p>
                       <p className="text-md font-bold mb-4">£{product.price}/month</p>
 
-                    <motion.div
-                      whileTap={{ scale: 0.95 }}
-                      transition={{ type: "spring", stiffness: 300 }}
-                    >
-                      <Button
-                        className="hero-button-primary mt-4"
-                        onClick={() => setClickedProductId(product.id)}
+                      <motion.div
+                        whileTap={{ scale: 0.95 }}
+                        transition={{ type: "spring", stiffness: 300 }}
                       >
-                        Subscribe
-                      </Button>
-                      {clickedProductId === product.id && (
-                      <p className="mt-2 text-sm text-green-400 text-center animate-bounce">
-                        🎉 Ooooh NICE!
-                      </p>
-                    )}
-                    </motion.div>
-                    
+                        <Button
+                          className="hero-button-primary mt-4"
+                          onClick={() => setClickedProductId(product.id)}
+                        >
+                          Subscribe
+                        </Button>
+                        {clickedProductId === product.id && (
+                          <p className="mt-2 text-sm text-green-400 text-center animate-bounce">
+                            🎉 Ooooh NICE!
+                          </p>
+                        )}
+                      </motion.div>
+
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+              <div className="mt-6 flex justify-center">
+                <Button
+                  variant="ghost"
+                  className="text-white border border-white hover:bg-white/10"
+                  onClick={() => setTab("edit")}
+                >
+                  Back to Editing
+                </Button>
               </div>
             </div>
           </TabsContent>

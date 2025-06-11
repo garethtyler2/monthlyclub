@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from "@/lib/supabase/client";
+import { LoadingOverlay } from '@/components/ui/loading-overlay';
 
 export default function CreateBusinessPage() {
   const [name, setName] = useState('');
@@ -13,6 +14,7 @@ export default function CreateBusinessPage() {
   const [businessType, setBusinessType] = useState("");
   const [customBusinessType, setCustomBusinessType] = useState("");
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const phrases = ['the service you offer', 'products and prices'];
   const [typing, setTyping] = useState('');
@@ -66,7 +68,7 @@ export default function CreateBusinessPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setLoading(true);
     const user = (await supabase.auth.getUser()).data.user;
     if (!user) return alert("You must be logged in.");
 
@@ -154,10 +156,12 @@ export default function CreateBusinessPage() {
     }));
 
     await supabase.from("products").insert(productInserts);
-
+    
     window.location.href = `/create-a-business/step-two?id=${business.id}`;
   };
-
+  if (loading ) {
+    return <LoadingOverlay show message="Generating your business page and products" />;
+  }
   return (
     <section className="py-10 md:py-24 relative overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">

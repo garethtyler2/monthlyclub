@@ -18,6 +18,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [hasBusiness, setHasBusiness] = useState(false);
   
   useEffect(() => {
     const getUser = async () => {
@@ -27,6 +28,17 @@ const Navbar = () => {
       setUser(user);
       setLoading(false);
 
+      if (user) {
+        const { data: businessData, error } = await supabase
+          .from("businesses")
+          .select("id")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (businessData) {
+          setHasBusiness(true);
+        }
+      }
     };
 
     getUser();
@@ -55,6 +67,13 @@ const Navbar = () => {
           <Link href="/guides" className="text-sm font-medium hover:text-white transition-colors">
             Guides
           </Link>
+          {!loading && user && !hasBusiness && (
+            <Link href="/create-a-business/step-one">
+              <Button className="hero-button-primary" size="sm">
+                Create Business
+              </Button>
+            </Link>
+          )}
           {!loading && user && (
             <Button variant="outline" size="sm" onClick={handleLogout}>
               Log out
@@ -88,6 +107,15 @@ const Navbar = () => {
               >
                 Guides
               </Link>
+              {!loading && user && !hasBusiness && (
+                <Link
+                  href="/create-a-business/step-one"
+                  className="hero-button-primary text-sm font-medium hover:text-white transition-colors p-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Create Business
+                </Link>
+              )}
               {!loading && user && (
                 <Button variant="outline" size="sm" onClick={handleLogout}>
                   Log out
