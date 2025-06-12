@@ -11,6 +11,12 @@ export default function HomePage() {
   return (
     <>
       <Head>
+        <title>Monthly Club | Subscription Tools for Local Service Businesses & Creators</title>
+        <meta
+          name="description"
+          content="Create, promote, and grow subscription-based plans for your service business or content brand. Monthly Club is built for barbers, cleaners, coaches, and creators."
+        />
+        <link rel="canonical" href="https://www.monthlyclubhq.com/" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
