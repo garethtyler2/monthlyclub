@@ -32,6 +32,8 @@ export default function ConfirmBusinessPage() {
   const [saving, setSaving] = useState(false);
   const [clickedProductId, setClickedProductId] = useState<string | null>(null);
   const [tab, setTab] = useState("edit");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,7 +71,6 @@ export default function ConfirmBusinessPage() {
     setSaving(true);
 
     try {
-      // Update business description and name
       const { error: businessError } = await supabase
         .from("businesses")
         .update({ description: business.description, name: business.name })
@@ -77,7 +78,6 @@ export default function ConfirmBusinessPage() {
 
       if (businessError) throw new Error("Failed to update business");
 
-      // Delete existing products
       const { error: deleteError } = await supabase
         .from("products")
         .delete()
@@ -85,7 +85,6 @@ export default function ConfirmBusinessPage() {
 
       if (deleteError) throw new Error("Failed to delete existing products");
 
-      // Insert updated products
       const cleanedProducts = products.map((product) => ({
         business_id: businessId,
         name: product.name,
@@ -99,7 +98,7 @@ export default function ConfirmBusinessPage() {
 
       if (insertError) throw new Error("Failed to insert updated products");
 
-      window.location.href = `/create-a-business/step-three?id=${businessId}`;
+      // No redirect here, we want to proceed to Stripe setup instead
     } catch (err) {
       console.error("Save error:", err);
       alert("There was a problem saving your business details. Please try again.");
@@ -108,8 +107,64 @@ export default function ConfirmBusinessPage() {
     }
   };
 
-    if (loading ) {
-    return <LoadingOverlay show message="Generating your business page and products" />;
+  const handleSaveAndStripe = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
+    setLoading(true);
+    try {
+      await handleSave();
+      await handleStripeSetup();
+    } catch (err) {
+      console.error("Error during save and stripe setup:", err);
+      setLoading(false);
+    }
+  };
+  const handleStripeSetup = async () => {
+    setLoading(true);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const userId = user?.id;
+
+    if (!userId) {
+      alert("User not logged in.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/stripe/create-onboarding-link", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          businessId,
+          name,
+          email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data?.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Something went wrong creating the Stripe link.");
+      }
+    } catch (error) {
+      console.error("Stripe onboarding error:", error);
+      alert("Error initiating Stripe onboarding.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <LoadingOverlay show message="Redirecting you to Stripe for setup..." />;
   }
 
   return (
@@ -230,7 +285,7 @@ export default function ConfirmBusinessPage() {
                 </Button>
                 <Button
                   className="hero-button-primary w-full md:w-auto"
-                  onClick={handleSave}
+                  onClick={handleSaveAndStripe}
                   disabled={saving}
                 >
                   {saving ? "Saving..." : "Continue to Stripe Setup"}

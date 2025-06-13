@@ -72,6 +72,29 @@ export default function CreateBusinessPage() {
     const user = (await supabase.auth.getUser()).data.user;
     if (!user) return alert("You must be logged in.");
 
+    const slugify = (text: string) =>
+      text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-');
+
+    const baseSlug = slugify(name);
+    let slug = baseSlug;
+    let counter = 1;
+
+    while (true) {
+      const { data: existing } = await supabase
+        .from("businesses")
+        .select("id")
+        .eq("slug", slug);
+
+      if (!existing || existing.length === 0) break;
+      slug = `${baseSlug}-${counter++}`;
+    }
+
     let finalBusinessType = businessType;
     if (businessType === "Other" && customBusinessType) {
       const { data: insertedType } = await supabase.from("service_types").insert([
@@ -118,7 +141,8 @@ export default function CreateBusinessPage() {
           name,
           description,
           image_url: imageUrl,
-          service_type: finalBusinessType
+          service_type: finalBusinessType,
+          slug
         }
       ])
       .select()
