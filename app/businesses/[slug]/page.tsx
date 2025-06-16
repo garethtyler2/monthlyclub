@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import ProductsList from "@/components/business/products-list";
+import ProductsListWrapper from "./ProductsListWrapper";
 
 const gradientStyles = [
   "from-brand-blue/10 to-transparent border-brand-blue/20",
@@ -72,7 +72,7 @@ export default async function BusinessPage({ params }: { params: { slug: string 
         {/* Products */}
         {products && products.length > 0 && (
           <>
-            <ProductsList products={products} />
+            <ProductsListWrapper products={products} />
           </>
         )}
       </div>

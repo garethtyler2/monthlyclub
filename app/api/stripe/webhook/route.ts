@@ -7,12 +7,12 @@ import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-04-10",
+  apiVersion: "2025-05-28.basil",
 });
 
 export async function POST(req: Request) {
   const body = await req.text();
-  const sig = headers().get("stripe-signature") as string;
+  const sig = req.headers.get("stripe-signature") as string;
 
   let event: Stripe.Event;
 
