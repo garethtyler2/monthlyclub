@@ -11,7 +11,7 @@ export default function CompletionPage() {
   const [slug, setSlug] = useState("")
   const [copied, setCopied] = useState(false)
 
-  const baseUrl = "https://monthlyclubhq.com/businesses"
+  const baseUrl = "https://www.monthlyclubhq.com/businesses"
 
   useEffect(() => {
     const fetchBusinessSlug = async () => {

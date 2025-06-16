@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: /login
 
-Sitemap: https://monthlyclubhq.com/sitemap.xml
+Sitemap: https://www.monthlyclubhq.com/sitemap.xml

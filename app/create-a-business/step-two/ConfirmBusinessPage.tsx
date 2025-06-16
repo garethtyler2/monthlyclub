@@ -1,5 +1,8 @@
 "use client";
 
+"use client";
+
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
@@ -199,9 +202,11 @@ export default function ConfirmBusinessPage() {
               {/* Show uploaded business image if present */}
               {business?.image_url && (
                 <div className="flex justify-center mb-6">
-                  <img
+                  <Image
                     src={business.image_url}
                     alt="Business profile"
+                    width={128}
+                    height={128}
                     className="w-32 h-32 rounded-full object-cover border-2 border-white shadow"
                   />
                 </div>
@@ -300,9 +305,11 @@ export default function ConfirmBusinessPage() {
               )}
               {business?.image_url && (
                 <div className="flex justify-center mb-6">
-                  <img
+                  <Image
                     src={business.image_url}
                     alt="Business profile"
+                    width={128}
+                    height={128}
                     className="w-32 h-32 rounded-full object-cover border-2 border-white shadow"
                   />
                 </div>

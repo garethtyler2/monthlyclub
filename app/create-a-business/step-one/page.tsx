@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from "next/image";
 import { HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from "@/lib/supabase/client";
@@ -215,9 +216,11 @@ export default function CreateBusinessPage() {
                 Business Profile Image
               </label>
               <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center relative">
-                <img
+                <Image
                   src={image ? URL.createObjectURL(image) : "/images/Monthly Club logo.png"}
                   alt="Profile Preview"
+                  width={128}
+                  height={128}
                   className="object-cover w-full h-full"
                 />
                 <label

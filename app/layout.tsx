@@ -22,11 +22,11 @@ export const metadata: Metadata = {
     template: "%s | Monthly Club",
   },
   description: "Monthly Club helps local service businesses offer subscriptions online. Create, sell, and manage recurring service plans with ease.",
-  metadataBase: new URL("https://monthlyclubhq.com"),
+  metadataBase: new URL("https://www.monthlyclubhq.com"),
   openGraph: {
     title: "Monthly Club",
     description: "Subscription tools for local service businesses. Empowering recurring revenue through modern online service plans.",
-    url: "https://monthlyclubhq.com",
+    url: "https://www.monthlyclubhq.com",
     siteName: "Monthly Club",
     locale: "en_GB",
     type: "website",
