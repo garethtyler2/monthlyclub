@@ -44,7 +44,7 @@ export default function LoginPageContent() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [router]);
+  }, [router, redirectTo]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -34,7 +34,7 @@ export default function CompletionPage() {
     }
 
     fetchBusinessSlug()
-  }, [supabase])
+  }, [])
 
   const fullUrl = `${baseUrl}/${slug}`
 

@@ -1,7 +1,7 @@
 // Redesigned layout inspired by the CTA component, glass card, and brand styling.
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from "next/image";
 import { HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,7 +17,7 @@ export default function CreateBusinessPage() {
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const phrases = ['the service you offer', 'products and prices'];
+  const phrases = useMemo(() => ['the service you offer', 'products and prices'], []);
   const [typing, setTyping] = useState('');
   const [index, setIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -48,7 +48,7 @@ export default function CreateBusinessPage() {
 
     const interval = setInterval(updateTyping, 100);
     return () => clearInterval(interval);
-  }, [typing, isDeleting, index]);
+  }, [typing, isDeleting, index, phrases]);
 
   useEffect(() => {
     const fetchServiceTypes = async () => {

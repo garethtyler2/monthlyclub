@@ -17,9 +17,13 @@ const gradientStyles = [
 ];
 
 // This makes it a Server Component
-export default async function BusinessPage({ params }: { params: { slug: string } }) {
-  const slug = params.slug;
+export default async function BusinessPage(
+  props: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await props.params;
+
   const supabase = await createClient();
+
 
   // Fetch business by slug
   const { data: business, error: businessError } = await supabase
