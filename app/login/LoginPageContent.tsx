@@ -90,8 +90,8 @@ export default function LoginPageContent() {
       <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center">
         <div className="mb-6">
           <Image
-            src="/Monthly Club logo.png"
-            alt="Monthly Club logo"
+            src="/images/MonthlyClubLogo.png"
+            alt="Monthly Club Logo"
             width={200}
             height={20}
             className="mx-auto mb-"

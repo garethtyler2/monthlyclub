@@ -217,7 +217,7 @@ export default function CreateBusinessPage() {
               </label>
               <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center relative">
                 <Image
-                  src={image ? URL.createObjectURL(image) : "/images/Monthly Club logo.png"}
+                  src={image ? URL.createObjectURL(image) : "/images/MonthlyClubLogo.png"}
                   alt="Profile Preview"
                   width={128}
                   height={128}
