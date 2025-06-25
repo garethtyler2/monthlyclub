@@ -1,7 +1,9 @@
 {
-  "functions": {
-    "api/cron/daily-billing/route.ts": {
-        "runtime": "@vercel/node"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron/daily-billing",
+      "schedule": "0 6 * * *"
     }
-  }
+  ]
 }
