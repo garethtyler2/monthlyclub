@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/cron/daily-billing/route.ts": {
+      "runtime": "edge"
+    }
+  },
+  "cron": [
+    {
+      "path": "/api/cron/daily-billing",
+      "schedule": "0 6 * * *"
+    }
+  ]
+}

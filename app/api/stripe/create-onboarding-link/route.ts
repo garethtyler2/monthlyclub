@@ -65,7 +65,7 @@ export async function POST(req: Request) {
 
   const accountLink = await stripe.accountLinks.create({
     account: accountId,
-    refresh_url: ``,
+    refresh_url: `${origin}/refresh`,
     return_url: `${origin}/stripe-business-setup-completion`,
     type: "account_onboarding",
   });

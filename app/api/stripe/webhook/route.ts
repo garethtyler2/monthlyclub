@@ -1,17 +1,14 @@
-
-
-
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { headers } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-05-28.basil",
 });
 
 export async function POST(req: Request) {
-  const body = await req.text();
+  const body = Buffer.from(await req.arrayBuffer());
   const sig = req.headers.get("stripe-signature") as string;
 
   let event: Stripe.Event;
@@ -27,7 +24,13 @@ export async function POST(req: Request) {
     return new NextResponse("Webhook Error", { status: 400 });
   }
 
-  const supabase = await createClient();
+    const supabase = createClient(
+        process.env.SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+        auth: { persistSession: false, autoRefreshToken: false },
+        }
+    );
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
@@ -38,7 +41,7 @@ export async function POST(req: Request) {
     const metadata = session.metadata || {};
     const productId = metadata.product_id;
     const userId = metadata.user_id;
-    const paymentDay = metadata.payment_day;
+    const paymentDay = metadata.preferred_payment_day;
     const customerReference = metadata.customer_reference;
 
     if (!productId || !userId || !customerId) {
@@ -46,14 +49,39 @@ export async function POST(req: Request) {
       return new NextResponse("Bad Request", { status: 400 });
     }
 
-    // Insert into purchases
+    // 1. Attach the saved payment method to the customer and set as default
+    if (session.setup_intent) {
+      console.log("Webhook: setup_intent ID in session", session.setup_intent);
+
+      try {
+        const setupIntent = await stripe.setupIntents.retrieve(
+          session.setup_intent as string
+        );
+
+        console.log("Webhook: retrieved setup intent", setupIntent.id);
+        console.log("Webhook: payment method on intent", setupIntent.payment_method);
+
+        if (setupIntent.payment_method) {
+          await stripe.customers.update(customerId, {
+            invoice_settings: {
+              default_payment_method: setupIntent.payment_method as string,
+            },
+          });
+          console.log("Webhook: default payment method set on customer");
+        } else {
+          console.warn("No payment method found on setup intent:", setupIntent.id);
+        }
+      } catch (err) {
+        console.error("Failed to retrieve or update setup intent:", err);
+      }
+    }
+
+    // Insert into subscriptions
     const { data: purchase, error: purchaseError } = await supabase
-      .from("purchases")
+      .from("subscriptions")
       .insert({
         user_id: userId,
         product_id: productId,
-        stripe_subscription_id: subscriptionId || null,
-        stripe_payment_intent_id: session.payment_intent as string | null,
         status: "active",
         start_date: new Date().toISOString(),
         created_at: new Date().toISOString(),
@@ -62,7 +90,7 @@ export async function POST(req: Request) {
       .single();
 
     if (purchaseError) {
-      console.error("Failed to insert into purchases:", purchaseError);
+      console.error("Failed to insert into subscriptions:", purchaseError);
       return new NextResponse("Database Error", { status: 500 });
     }
 
@@ -73,8 +101,8 @@ export async function POST(req: Request) {
         user_id: userId,
         product_id: productId,
         purchase_id: purchase.id,
-        payment_day: parseInt(paymentDay),
-        status: "scheduled",
+        scheduled_for: parseInt(paymentDay),
+        status: "active",
         customer_reference: customerReference,
         created_at: new Date().toISOString(),
       });

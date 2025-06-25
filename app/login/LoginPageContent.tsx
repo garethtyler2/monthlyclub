@@ -123,7 +123,7 @@ export default function LoginPageContent() {
             <div className="flex-1">
               <button
                 onClick={() => handleOAuthSignIn("google")}
-                className="w-full border border-gray-300 hover:bg-red-500 text-black px-4 py-2 rounded flex items-center justify-center space-x-2"
+                className="w-full border border-gray-300 hover:bg-red-200 text-black px-4 py-2 rounded flex items-center justify-center space-x-2"
                 type="button"
               >
                 <svg className="w-5 h-5" viewBox="0 0 48 48">
@@ -138,7 +138,7 @@ export default function LoginPageContent() {
             <div className="flex-1">
               <button
                 onClick={() => handleOAuthSignIn("facebook")}
-                className="w-full border border-gray-300 hover:bg-blue-500 text-black px-4 py-2 rounded flex items-center justify-center space-x-2"
+                className="w-full border border-gray-300 hover:bg-blue-200 text-black px-4 py-2 rounded flex items-center justify-center space-x-2"
                 type="button"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">

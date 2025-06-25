@@ -39,7 +39,7 @@ export default function ProductsList({ products }: ProductsListProps) {
       const res = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, reference, preferredPaymentDate }),
+        body: JSON.stringify({ productId, reference, preferredPaymentDay: preferredPaymentDate, }),
       });
 
       if (!res.ok) {

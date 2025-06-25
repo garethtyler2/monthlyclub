@@ -55,13 +55,25 @@ export async function POST(request: Request) {
   }
 
   // 4. Create Stripe Checkout session (payment mode)
-  const session = await stripe.checkout.sessions.create({
-    mode: "setup",
-    customer: customerData.stripe_customer_id,
-    currency: "gbp",
-    success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/cancel`,
-  });
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "setup",
+      customer: customerData.stripe_customer_id,
+      currency: "gbp",
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/cancel`,
+      metadata: {
+        user_id: user.id,
+        business_id: product.business.stripe_account_id,
+        product_id: product.id,
+        customer_reference: reference,
+        preferred_payment_day: preferredPaymentDay,
+      },
+    });
 
-  return NextResponse.json({ url: session.url }, { status: 200 });
+    return NextResponse.json({ url: session.url }, { status: 200 });
+  } catch (err) {
+    console.error("Stripe session creation failed:", err);
+    return NextResponse.json({ error: "Failed to create checkout session" }, { status: 400 });
+  }
 }

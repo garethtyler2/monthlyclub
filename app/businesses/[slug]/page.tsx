@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import ProductsListWrapper from "./ProductsListWrapper";
+import ProductsListWrapper from "@/components/business/ProductsListWrapper";
 
 const gradientStyles = [
   "from-brand-blue/10 to-transparent border-brand-blue/20",
@@ -40,12 +40,21 @@ export default async function BusinessPage(
       </div>
     );
   }
+  console.log("Slug:", slug);
+  console.log("Business:", business);
+  console.log("Business Error:", businessError);
 
   // Fetch related products
-  const { data: products } = await supabase
+  const { data: products, error: productsError } = await supabase
     .from("products")
     .select("*")
     .eq("business_id", business.id);
+
+  const session = await supabase.auth.getSession();
+  console.log("Supabase session:", session);
+  console.log("Business ID:", business?.id);
+  console.log("Products:", products);
+  console.log("Products Error:", productsError);
 
   return (
     <div className="relative py-10 overflow-hidden text-white">
@@ -76,6 +85,7 @@ export default async function BusinessPage(
         {/* Products */}
         {products && products.length > 0 && (
           <>
+            {console.log("Fetched products:", products)}
             <ProductsListWrapper products={products} />
           </>
         )}

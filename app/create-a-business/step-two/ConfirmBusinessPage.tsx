@@ -155,6 +155,7 @@ export default function ConfirmBusinessPage() {
 
       if (response.ok && data?.url) {
         window.location.href = data.url;
+        return; // Prevent setLoading(false) from running
       } else {
         alert("Something went wrong creating the Stripe link.");
       }
