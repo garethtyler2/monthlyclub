@@ -1,7 +1,6 @@
 {
   "functions": {
     "api/cron/daily-billing/route.ts": {
-      "runtime": "edge"
     }
   }
 }
