@@ -60,7 +60,7 @@ export async function POST(request: Request) {
       mode: "setup",
       customer: customerData.stripe_customer_id,
       currency: "gbp",
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/success`,
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/subscription/success`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/cancel`,
       metadata: {
         user_id: user.id,
