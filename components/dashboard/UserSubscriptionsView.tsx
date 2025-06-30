@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ManagePaymentDayModal from "@/components/dashboard/ManagePaymentDayModal";
+import CancelSubscriptionModal from "@/components/dashboard/CancelSubscriptionModal";
 import { Label } from "@/components/ui/label";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { supabase } from "@/lib/supabase/client";
@@ -51,6 +52,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [openSubId, setOpenSubId] = useState<string | null>(null);
+  const [cancelSubId, setCancelSubId] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -61,8 +63,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
     const { data: subs } = await supabase
       .from("subscriptions")
       .select("*")
-      .eq("user_id", user.id)
-      .eq("status", "active");
+      .eq("user_id", user.id);
 
     const { data: prods } = await supabase
       .from("products")
@@ -118,13 +119,15 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
     return <LoadingOverlay show message="Loading your subscriptions..." />;
   }
 
+  const cancelledSubs = subscriptions.filter((s) => s.status === "cancelled");
+
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-semibold text-white">Your Subscriptions</h2>
       {subscriptions.length === 0 ? (
         <p className="text-muted-foreground">You don’t have any active subscriptions yet.</p>
       ) : (
-        subscriptions.map((sub) => {
+        subscriptions.filter(sub => sub.status === "active").map((sub) => {
           const product = products.find((p) => p.id === sub.product_id);
           const schedule = scheduledPayments.find((s) => s.purchase_id === sub.id);
           if (!product) return null;
@@ -162,15 +165,20 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                       fetchData();
                     }}
                   />
+                  <CancelSubscriptionModal
+                    isOpen={cancelSubId === sub.id}
+                    onClose={() => setCancelSubId(null)}
+                    subscriptionId={sub.id}
+                    onSuccess={() => {
+                      fetchData();
+                    }}
+                  />
                   <Button variant="outline" onClick={() => setOpenSubId(sub.id)}>
                     Change Payment Day
                   </Button>
                   <Button
                     variant="destructive"
-                    onClick={() => {
-                      // TODO: Implement cancel functionality
-                      alert("Cancel functionality not implemented yet.");
-                    }}
+                    onClick={() => setCancelSubId(sub.id)}
                   >
                     Cancel Subscription
                   </Button>
@@ -206,6 +214,65 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
             </Card>
           );
         })
+      )}
+      {cancelledSubs.length > 0 && (
+        <>
+          <h2 className="text-xl font-semibold text-white mt-8">Cancelled Subscriptions</h2>
+          {cancelledSubs.map((sub) => {
+            const product = products.find((p) => p.id === sub.product_id);
+            const schedule = scheduledPayments.find((s) => s.purchase_id === sub.id);
+            const subscriptionPayments = payments.filter(p => p.subscription_id === sub.id);
+            if (!product) return null;
+
+            return (
+              <Card
+                key={sub.id}
+                className={cn(
+                  "bg-gradient-to-b text-white border-none animate-fade-in opacity-60",
+                  gradientStyles[Math.floor(Math.random() * gradientStyles.length)]
+                )}
+              >
+                <CardContent className="p-5">
+                  <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
+                  <p className="text-sm text-muted-foreground mb-2">From: {product.business?.name}</p>
+                  <p className="text-sm opacity-80 mb-2">{product.description}</p>
+                  <p className="text-sm font-medium mb-4">£{product.price} / month</p>
+                  <div className="text-sm mb-4">
+                    <span className="block text-muted-foreground">This subscription has been cancelled.</span>
+                    <span className="block text-muted-foreground">Reference: {schedule?.customer_reference || "—"}</span>
+                  </div>
+                  <Accordion type="single" collapsible className="mt-4">
+                    <AccordionItem value="history">
+                      <AccordionTrigger className="text-white">Payment History</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-3">
+                          {subscriptionPayments.length > 0 ? (
+                            subscriptionPayments.map((payment) => (
+                              <div
+                                key={payment.id}
+                                className="flex justify-between items-center p-3 rounded-md bg-white/5 border border-white/10"
+                              >
+                                <div className="text-sm">
+                                  <p className="font-medium text-white">{new Date(payment.paid_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p>
+                                  <p className="text-xs text-muted-foreground capitalize">{payment.status}</p>
+                                </div>
+                                <div className="text-sm font-semibold text-white">
+                                  £{(payment.amount / 100).toFixed(2)}
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-sm text-muted-foreground">No payments to show yet.</p>
+                          )}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </>
       )}
     </div>
   );
