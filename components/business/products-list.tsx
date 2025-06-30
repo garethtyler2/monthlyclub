@@ -31,12 +31,14 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [reference, setReference] = useState("");
   const [preferredPaymentDate, setPreferredPaymentDate] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSelect = (productId: string) => {
     setSelectedProductId(productId);
   };
 
   const handleContinue = async (productId: string) => {
+    setIsLoading(true);
     try {
       const res = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
@@ -52,11 +54,14 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
       const { url } = await res.json();
       if (url) {
         window.location.href = url;
+        setIsLoading(false);
       } else {
         console.error("No URL returned from checkout session");
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Checkout error:", error);
+      setIsLoading(false);
     }
   };
 
@@ -128,8 +133,12 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                         </div>
                       </div>
                     </div>
-                    <Button className="hero-button-primary mt-4" onClick={() => handleContinue(product.id)}>
-                      Continue
+                    <Button
+                      className="hero-button-primary mt-4"
+                      onClick={() => handleContinue(product.id)}
+                      disabled={isLoading || !preferredPaymentDate}
+                    >
+                      {isLoading ? "Processing..." : "Continue"}
                     </Button>
                   </div>
                 )}

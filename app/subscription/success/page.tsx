@@ -179,7 +179,7 @@ export default function SubscriptionSuccessPage() {
           {/* Footer message */}
           <div className="text-center mt-8 animate-fade-in delay-500">
             <p className="text-sm text-gray-500 mt-1">
-              Questions? Contact us anytime for support.
+              Questions? <a href="/contact" className="text-brand-purple underline hover:text-brand-purple/80">Contact us</a> anytime for support.
             </p>
           </div>
         </div>
