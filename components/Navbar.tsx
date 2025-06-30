@@ -133,7 +133,7 @@ const Navbar = () => {
               )}
             </div>
             {user ? (
-              <div className="flex flex-col pt-4 border-t border-white/10 space-y-2 px-2">
+              <div className="flex flex-col pt-4 border-t border-white/10 space-y-2 px-4 mb-4">
                 <div className="flex items-center space-x-3">
                   <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue">
                     <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>

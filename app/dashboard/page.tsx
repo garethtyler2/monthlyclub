@@ -1,11 +1,9 @@
-
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import UserSubscriptionsView from "@/components/dashboard/UserSubscriptionsView";
-// import { BusinessOwnerView } from "@/components/dashboard/BusinessOwnerView";
+import { BusinessOwnerView } from "@/components/dashboard/BusinessOwnerView";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 
 export default function DashboardPage() {
@@ -54,8 +52,18 @@ export default function DashboardPage() {
   return (
     <section className="max-w-5xl mx-auto px-4 py-12 space-y-12">
       <h1 className="text-3xl font-bold text-white">Welcome to Your Dashboard</h1>
-      {/* {businessId && <BusinessOwnerView businessId={businessId} />} */}
-      <UserSubscriptionsView userId={user.id} />
+
+      {businessId && (
+        <>
+          <h2 className="text-2xl font-semibold text-white">Business Overview</h2>
+          <BusinessOwnerView businessId={businessId} />
+        </>
+      )}
+
+      <>
+        <h2 className="text-2xl font-semibold text-white">Your Subscriptions</h2>
+        <UserSubscriptionsView userId={user.id} />
+      </>
     </section>
   );
 }
