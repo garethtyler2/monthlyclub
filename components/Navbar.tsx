@@ -74,10 +74,25 @@ const Navbar = () => {
               </Button>
             </Link>
           )}
-          {!loading && user && (
-            <Button variant="outline" size="sm" onClick={handleLogout}>
-              Log out
-            </Button>
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center space-x-2 focus:outline-none cursor-pointer">
+                <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue">
+                  <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
+                </Avatar>
+                <span className="text-sm text-muted-foreground max-w-[140px] truncate" title={user?.email}>
+                  {user?.email?.replace(/@.*/, '@...')}
+                </span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="mt-2">
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard">Dashboard</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </nav>
 
@@ -116,12 +131,43 @@ const Navbar = () => {
                   Create Business
                 </Link>
               )}
-              {!loading && user && (
-                <Button variant="outline" size="sm" onClick={handleLogout}>
-                  Log out
-                </Button>
-              )}
             </div>
+            {user ? (
+              <div className="flex flex-col pt-4 border-t border-white/10 space-y-2 px-2">
+                <div className="flex items-center space-x-3">
+                  <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue">
+                    <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm text-muted-foreground max-w-[140px] truncate" title={user?.email}>
+                    {user?.email?.replace(/@.*/, '@...')}
+                  </span>
+                </div>
+                <Link
+                  href="/dashboard"
+                  className="text-sm pt-2 font-medium text-white hover:underline"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-sm pt-2 text-white hover:underline text-left"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              !loading && (
+                <div className="flex flex-col pt-2 border-t border-white/10 space-y-2">
+                  <Button
+                    className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90 w-full"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Link href="/login" className="text-white">Access Monthly Club</Link>
+                  </Button>
+                </div>
+              )
+            )}
           </div>
         </div>
       )}

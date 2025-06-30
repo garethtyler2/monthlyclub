@@ -16,6 +16,8 @@ interface Product {
 
 interface ProductsListProps {
   products: Product[];
+  userSubscriptions: { product_id: string }[];
+  isOwner?: boolean;
 }
 
 const gradientStyles = [
@@ -25,7 +27,7 @@ const gradientStyles = [
   "from-brand-pink/10 to-transparent border-brand-pink/20",
 ];
 
-export default function ProductsList({ products }: ProductsListProps) {
+export default function ProductsList({ products, userSubscriptions, isOwner = false }: ProductsListProps) {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [reference, setReference] = useState("");
   const [preferredPaymentDate, setPreferredPaymentDate] = useState("");
@@ -64,6 +66,9 @@ export default function ProductsList({ products }: ProductsListProps) {
       <div className="space-y-4">
         {products.map((product, index) => {
           const isSelected = selectedProductId === product.id;
+          const alreadySubscribed = userSubscriptions.some(
+            (sub) => sub.product_id === product.id
+          );
           return (
             <Card
               key={product.id}
@@ -78,8 +83,16 @@ export default function ProductsList({ products }: ProductsListProps) {
                 <p className="text-sm opacity-90 mb-3">{product.description}</p>
                 <p className="text-md font-bold mb-4">£{product.price}/month</p>
                 {!isSelected && (
-                  <Button className="hero-button-primary mt-4" onClick={() => handleSelect(product.id)}>
-                    Select
+                  <Button
+                    className="hero-button-primary mt-4"
+                    onClick={() => handleSelect(product.id)}
+                    disabled={alreadySubscribed || isOwner}
+                  >
+                    {alreadySubscribed
+                      ? "Already Subscribed"
+                      : isOwner
+                      ? "You Own This Product"
+                      : "Select"}
                   </Button>
                 )}
                 {isSelected && (

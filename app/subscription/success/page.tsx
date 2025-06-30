@@ -18,6 +18,7 @@ function formatOrdinal(n: number) {
 type ProductWithBusiness = {
   name: string;
   description: string;
+  price: number;
   business: {
     name: string;
   };
@@ -31,6 +32,7 @@ export default function SubscriptionSuccessPage() {
     productDescription: string;
     businessName: string;
     preferredPaymentDay: number;
+    price: number;
   } | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -66,7 +68,7 @@ export default function SubscriptionSuccessPage() {
       // Step 2: Fetch product and business manually
       const { data: product, error: productError } = await supabase
         .from("products")
-        .select("name, description, business:businesses(name)")
+        .select("name, description, price, business:businesses(name)")
         .eq("id", scheduled.product_id)
         .single<ProductWithBusiness>();
 
@@ -80,6 +82,7 @@ export default function SubscriptionSuccessPage() {
         productDescription: product.description ?? "No description provided",
         businessName: product.business?.name ?? "Unknown business",
         preferredPaymentDay: scheduled.scheduled_for,
+        price: product.price ?? 0,
       });
       setLoading(false);
     }
@@ -111,18 +114,22 @@ export default function SubscriptionSuccessPage() {
           </div>
 
           {/* Subscription Details Card */}
-          <Card className="backdrop-blur-sm bg-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 mb-6">
-            <CardContent className="p-4">
-              (
+          <Card className="bg-gradient-to-b from-brand-purple/10 to-transparent border-brand-purple/20 text-white border-none shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 mb-6">
+            <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="text-center pb-4 border-b border-gray-100">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-1">
+                    <h2 className="text-xl font-semibold text-white mb-1">
                       {scheduledInfo?.productName}
                     </h2>
-                    <p className="text-sm text-gray-500 italic">"{scheduledInfo?.productDescription}"</p>
-                    <p className="text-sm text-gray-900 mt-2">
-                      <span className="font-medium">From:</span> {scheduledInfo?.businessName}
-                    </p>
+                    <p className="text-sm text-white/80 italic">"{scheduledInfo?.productDescription}"</p>
+                    <div className="flex flex-col items-center sm:items-end mt-4">
+                      <p className="text-xl font-bold text-white">
+                        £{scheduledInfo?.price}/month
+                      </p>
+                      <p className="text-xs text-white/70 mt-1 italic">
+                        from {scheduledInfo?.businessName}
+                      </p>
+                    </div>
                   </div>
 
                   <div className="space-y-3">
@@ -153,7 +160,6 @@ export default function SubscriptionSuccessPage() {
                     </div>
                   </div>
                 </div>
-              )
             </CardContent>
           </Card>
 
