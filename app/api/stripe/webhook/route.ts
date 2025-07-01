@@ -10,7 +10,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(req: Request) {
   const body = Buffer.from(await req.arrayBuffer());
   const sig = req.headers.get("stripe-signature") as string;
-
+  
   let event: Stripe.Event;
 
   try {
@@ -95,14 +95,26 @@ export async function POST(req: Request) {
     }
 
     // Insert into scheduled_payments
+    // Fetch product price
+    const { data: product, error: productError } = await supabase
+      .from("products")
+      .select("price, business_id")
+      .eq("id", productId)
+      .single();
+      if (productError || !product) {
+        return NextResponse.json({ error: "Product not found" }, { status: 400 });
+        }
+    const businessId = product.business_id;
     const { error: scheduleError } = await supabase
       .from("scheduled_payments")
       .insert({
         user_id: userId,
         product_id: productId,
+        business_id: businessId,
         purchase_id: purchase.id,
         scheduled_for: parseInt(paymentDay),
         status: "active",
+        amount: product.price * 100,
         customer_reference: customerReference,
         created_at: new Date().toISOString(),
       });

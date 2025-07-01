@@ -44,14 +44,9 @@ export function BusinessOwnerView({ businessId }: BusinessOwnerViewProps) {
     return paidDate.getMonth() === currentMonth && paidDate.getFullYear() === currentYear;
   });
   const totalThisMonth = paymentsThisMonth.reduce((sum, p) => sum + p.amount, 0);
-  const expectedThisMonth = scheduledPayments.filter(p => {
-    const scheduledDate = new Date(p.scheduled_for);
-    return (
-      scheduledDate.getMonth() === currentMonth &&
-      scheduledDate.getFullYear() === currentYear &&
-      p.status === "scheduled"
-    );
-  }).reduce((sum, p) => sum + p.amount, 0);
+  const expectedThisMonth = scheduledPayments
+    .filter(p => p.status === "active")
+    .reduce((sum, p) => sum + (typeof p.amount === "number" ? p.amount : 0), 0);
 
   return (
     <div className="space-y-4">

@@ -123,7 +123,6 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold text-white">Your Subscriptions</h2>
       {subscriptions.length === 0 ? (
         <p className="text-muted-foreground">You don’t have any active subscriptions yet.</p>
       ) : (
