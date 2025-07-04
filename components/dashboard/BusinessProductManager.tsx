@@ -154,7 +154,10 @@ export default function BusinessProductManager({ businessId }: { businessId: str
           {/* Mobile Card View */}
           <div className="block md:hidden space-y-4">
             {products.map((product) => (
-              <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-0 shadow-md">
+              <Card
+                key={product.id}
+                className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border border-brand-blue/20 bg-gradient-to-br from-brand-blue/10 to-transparent shadow-md"
+              >
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="font-semibold text-lg text-foreground leading-tight flex-1 mr-3">
@@ -188,7 +191,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
             <div className="bg-white/5 rounded-xl shadow-lg overflow-hidden border border-white/10">
               <div className="overflow-x-auto">
                 <table className="w-full text-white text-sm">
-                  <thead className="bg-white/10 text-muted-foreground">
+                  <thead className="bg-gradient-to-r from-brand-purple/10 to-transparent border-b border-brand-purple/20 text-white">
                     <tr>
                       <th className="px-4 py-3 text-left font-semibold">Product</th>
                       <th className="px-4 py-3 text-left font-semibold">Description</th>
@@ -197,9 +200,9 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                       <th className="px-4 py-3 text-center font-semibold">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/10">
+                  <tbody className="bg-gradient-to-r from-brand-purple/5 to-transparent divide-y divide-brand-purple/10">
                     {products.map((product) => (
-                      <tr key={product.id} className="hover:bg-white/5 transition-colors duration-200">
+                      <tr key={product.id} className="hover:bg-brand-purple/10 transition-colors duration-200">
                         <td className="px-4 py-3 font-medium">{product.name}</td>
                         <td className="px-4 py-3">{product.description}</td>
                         <td className="px-4 py-3 text-right">£{product.price.toFixed(2)}</td>
@@ -259,7 +262,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                 <Button variant="outline" onClick={closeEditModal}>
                   Cancel
                 </Button>
-                <Button onClick={saveChanges}>
+                <Button className="hero-button-primary" onClick={saveChanges}>
                   Save Changes
                 </Button>
               </DialogFooter>
