@@ -30,17 +30,14 @@ export async function GET(req: Request) {
   }
 
   try {
-    const payouts = await stripe.payouts.list(
-      { limit: 100 },
-      { stripeAccount: business.stripe_account_id }
-    );
+    const balance = await stripe.balance.retrieve({
+      stripeAccount: business.stripe_account_id,
+    });
 
-    const recentlyPaidButPending = payouts.data
-      .filter(p => p.status === "pending")
-      .reduce((sum, p) => sum + p.amount, 0);
+    const futurePayouts = balance.pending.reduce((sum, item) => sum + item.amount, 0);
 
     return NextResponse.json({
-      recentlyPaidButPending,
+      futurePayouts,
     });
   } catch (err) {
     console.error("Stripe API error:", err);

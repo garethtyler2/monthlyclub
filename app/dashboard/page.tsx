@@ -51,7 +51,6 @@ export default function DashboardPage() {
 
   return (
     <section className="max-w-5xl mx-auto px-4 py-12 space-y-12">
-      <h1 className="text-3xl font-bold text-white">Welcome to Your Dashboard</h1>
 
       {businessId && (
         <>

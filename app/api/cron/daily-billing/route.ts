@@ -19,7 +19,7 @@ export async function GET() {
 
   const today = new Date().getDate(); // e.g. 25
   const todayDate = new Date().toISOString().split("T")[0];
-  const todayAsDate = new Date(todayDate);
+
   console.log("Today's day of the month:", today);
   console.log("Checking for run_date:", todayDate);
   // Check if the cron has already run today
@@ -39,7 +39,7 @@ export async function GET() {
 
   const { data: scheduled, error: scheduledError } = await supabase
     .from("scheduled_payments")
-    .select("*, subscriptions(*), products(*, businesses(stripe_account_id))")
+    .select("*, subscriptions(*), products(*, businesses(id, stripe_account_id))")
     .eq("scheduled_for", today)
     .eq("status", "active");
 
@@ -109,17 +109,12 @@ export async function GET() {
           subscription_id: record.purchase_id,
           product_id: product.id,
           user_id: record.user_id,
+          business_id: business.id,
         },
       });
+      console.log("Resolved business object:", record.products?.businesses);
+      console.log("Resolved business_id:", record.products?.businesses?.id);
 
-      await supabase.from("payments").insert({
-        user_id: record.user_id,
-        purchase_id: record.purchase_id,
-        stripe_invoice_id: paymentIntent.id,
-        amount: product.price,
-        status: "pending",
-        created_at: new Date().toISOString(),
-      });
 
       succeededCount++;
       console.log(`PaymentIntent created: ${paymentIntent.id}`);

@@ -134,7 +134,7 @@ export async function POST(req: Request) {
     const subscriptionId = metadata.subscription_id;
     const userId = metadata.user_id;
     const productId = metadata.product_id;
-
+    const businessId = metadata.business_id;
     if (!subscriptionId || !userId || !productId) {
       console.error("Missing metadata in payment intent");
       return new NextResponse("Bad Request", { status: 400 });
@@ -146,6 +146,7 @@ export async function POST(req: Request) {
       subscription_id: subscriptionId,
       amount: intent.amount,
       currency: intent.currency,
+      business_id: businessId,
       stripe_payment_intent_id: intent.id,
       status: "succeeded",
       paid_at: new Date().toISOString(),
