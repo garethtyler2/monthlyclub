@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase/client";
 import UserSubscriptionsView from "@/components/dashboard/UserSubscriptionsView";
 import { BusinessOwnerView } from "@/components/dashboard/BusinessOwnerView";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
+import BusinessProductManager from "@/components/dashboard/BusinessProductManager";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
@@ -54,8 +55,11 @@ export default function DashboardPage() {
 
       {businessId && (
         <>
-          <h2 className="text-2xl font-semibold text-white">Business Overview</h2>
+          <h1 className="text-2xl font-semibold text-white">Business Overview</h1>
           <BusinessOwnerView businessId={businessId} />
+
+          <h2 className="text-2xl font-semibold text-white">Product Manager</h2>
+          <BusinessProductManager businessId={businessId} />
         </>
       )}
 
