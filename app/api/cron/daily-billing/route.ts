@@ -18,7 +18,24 @@ export async function GET() {
   );
 
   const today = new Date().getDate(); // e.g. 25
+  const todayDate = new Date().toISOString().split("T")[0];
+  const todayAsDate = new Date(todayDate);
   console.log("Today's day of the month:", today);
+  console.log("Checking for run_date:", todayDate);
+  // Check if the cron has already run today
+  const { data: alreadyRunToday,  error: checkError } = await supabase
+    .from("daily_billing_logs")
+    .select("id")
+    .eq("run_date", todayDate)
+    .limit(1)
+    .single();
+  console.log("alreadyRunToday data:", alreadyRunToday);
+  console.log("alreadyRunToday error:", checkError);
+
+  if (alreadyRunToday) {
+    console.log("Cron already ran today, skipping execution.");
+    return new NextResponse("Billing already processed today", { status: 200 });
+  }
 
   const { data: scheduled, error: scheduledError } = await supabase
     .from("scheduled_payments")
@@ -33,10 +50,22 @@ export async function GET() {
     return new NextResponse("Error loading scheduled payments", { status: 500 });
   }
 
+  let skippedCount = 0;
+  let skipReasons: string[] = [];
+  let succeededCount = 0;
+
   for (const record of scheduled) {
     try {
       const product = record.products;
       const business = product.businesses;
+
+      if (!business?.stripe_account_id) {
+        console.warn(`Missing Stripe account for business tied to product ${product.id}`);
+        skippedCount++;
+        skipReasons.push(`Missing Stripe account for business ${business.id}`);
+        continue;
+      }
+
       const amountInPence = product.price * 100;
 
       const { data: customerData, error: customerError } = await supabase
@@ -47,6 +76,8 @@ export async function GET() {
 
       if (customerError || !customerData) {
         console.error("Missing Stripe customer:", customerError);
+        skippedCount++;
+        skipReasons.push(`Missing Stripe customer for user ${record.user_id}`);
         continue;
       }
 
@@ -58,6 +89,8 @@ export async function GET() {
 
       if (!paymentMethodId || typeof paymentMethodId !== "string") {
         console.warn("No default payment method found for customer:", customerData.stripe_customer_id);
+        skippedCount++;
+        skipReasons.push(`No default payment method for customer ${customerData.stripe_customer_id}`);
         continue;
       }
 
@@ -88,12 +121,24 @@ export async function GET() {
         created_at: new Date().toISOString(),
       });
 
+      succeededCount++;
       console.log(`PaymentIntent created: ${paymentIntent.id}`);
       console.log(`Successfully charged customer ${record.user_id}`);
     } catch (err) {
       console.error("Error processing payment for record:", record.id, err);
+      skippedCount++;
+      skipReasons.push(`Error processing payment for record ${record.id}`);
     }
   }
 
+  const { error: logInsertError } = await supabase.from("daily_billing_logs").insert({
+    run_date: todayDate,
+    payments_found: scheduled?.length || 0,
+    payments_succeeded: succeededCount,
+    notes: `Daily billing cron executed. Skipped ${skippedCount} payments. ${skipReasons.join(" | ")}`,
+  });
+  if (logInsertError) {
+    console.error("Failed to insert billing log:", logInsertError);
+    }
   return new NextResponse("Cron run complete", { status: 200 });
 }

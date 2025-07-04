@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
   const { data: business, error } = await supabase
     .from("businesses")
-    .select("id, stripe_account_id")
+    .select("id, stripe_account_id, slug")
     .eq("user_id", userId)
     .single();
 
@@ -41,6 +41,9 @@ export async function POST(req: Request) {
         type: "express",
         capabilities: {
           transfers: { requested: true },
+        },
+        business_profile: {
+          url: `https://www.monthlyclubhq.com/business/${business.slug}`,
         },
       });
       console.log("✅ Stripe account created:", account.id);

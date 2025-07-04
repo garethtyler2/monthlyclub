@@ -8,42 +8,38 @@ interface BusinessOwnerViewProps {
 }
 
 export function BusinessOwnerView({ businessId }: BusinessOwnerViewProps) {
-  const [payments, setPayments] = useState<any[]>([]);
   const [scheduledPayments, setScheduledPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [recentlyPaidButPending, setRecentlyPaidButPending] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
       setLoading(true);
-
-      const { data: paymentData } = await supabase
-        .from("payments")
-        .select("*")
-        .eq("business_id", businessId)
-        .eq("status", "paid");
 
       const { data: upcoming } = await supabase
         .from("scheduled_payments")
         .select("*")
         .eq("business_id", businessId);
 
-      setPayments(paymentData || []);
       setScheduledPayments(upcoming || []);
+
+      try {
+        const res = await fetch("/api/stripe/business-overview");
+        const stripeData = await res.json();
+        setRecentlyPaidButPending(stripeData.recentlyPaidButPending);
+      } catch (error) {
+        console.error("Failed to fetch Stripe overview", error);
+      }
+
       setLoading(false);
     };
 
     fetchStats();
   }, [businessId]);
 
-  const totalEarned = payments.reduce((sum, p) => sum + p.amount, 0);
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
-  const paymentsThisMonth = payments.filter((p) => {
-    const paidDate = new Date(p.paid_at);
-    return paidDate.getMonth() === currentMonth && paidDate.getFullYear() === currentYear;
-  });
-  const totalThisMonth = paymentsThisMonth.reduce((sum, p) => sum + p.amount, 0);
   const expectedThisMonth = scheduledPayments
     .filter(p => p.status === "active")
     .reduce((sum, p) => sum + (typeof p.amount === "number" ? p.amount : 0), 0);
@@ -54,14 +50,21 @@ export function BusinessOwnerView({ businessId }: BusinessOwnerViewProps) {
         <p className="text-muted-foreground">Loading business stats...</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-white">
-          <div className="bg-white/10 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">Total Revenue</p>
-            <p className="text-2xl font-semibold">£{(totalEarned / 100).toFixed(2)}</p>
-          </div>
-          <div className="bg-white/10 p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">Revenue This Month</p>
-            <p className="text-2xl font-semibold">£{(totalThisMonth / 100).toFixed(2)}</p>
-          </div>
+            <div className="bg-white/10 p-4 rounded-lg">
+            <p className="text-sm text-muted-foreground">Waiting to be Paid Out</p>
+            <p className="text-2xl font-semibold">
+                {recentlyPaidButPending !== null ? `£${(recentlyPaidButPending / 100).toFixed(2)}` : "—"}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+                Payments from customers can take up to 7 days to reach your bank account.
+            </p>
+            </div>
+          {/* <div className="bg-white/10 p-4 rounded-lg">
+            <p className="text-sm text-muted-foreground">Next Payout</p>
+            <p className="text-2xl font-semibold">
+              {nextPayout !== null ? `£${(nextPayout / 100).toFixed(2)}` : "—"}
+            </p>
+          </div> */}
           <div className="bg-white/10 p-4 rounded-lg">
             <p className="text-muted-foreground">This Month’s Scheduled Income</p>
             <p className="text-2xl font-semibold">£{(expectedThisMonth / 100).toFixed(2)}</p>
