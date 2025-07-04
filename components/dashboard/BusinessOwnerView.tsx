@@ -8,7 +8,7 @@ interface BusinessOwnerViewProps {
 }
 
 export function BusinessOwnerView({ businessId }: BusinessOwnerViewProps) {
-  const [scheduledPayments, setScheduledPayments] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [futurePayouts, setFuturePayouts] = useState<number | null>(null);
   const [totalPaidToDate, setTotalPaidToDate] = useState<number | null>(null);
@@ -17,12 +17,26 @@ export function BusinessOwnerView({ businessId }: BusinessOwnerViewProps) {
     const fetchStats = async () => {
       setLoading(true);
 
-      const { data: upcoming } = await supabase
-        .from("scheduled_payments")
-        .select("*")
+      const { data: productData } = await supabase
+        .from("products")
+        .select("price, id")
         .eq("business_id", businessId);
 
-      setScheduledPayments(upcoming || []);
+      const enrichedProducts = await Promise.all(
+        (productData || []).map(async (product) => {
+          const { count } = await supabase
+            .from("subscriptions")
+            .select("id", { count: "exact" })
+            .eq("product_id", product.id)
+            .eq("status", "active");
+
+          return {
+            ...product,
+            subscriberCount: count || 0,
+          };
+        })
+      );
+      setProducts(enrichedProducts);
 
       const { data: payments } = await supabase
         .from("payments")
@@ -47,9 +61,10 @@ export function BusinessOwnerView({ businessId }: BusinessOwnerViewProps) {
     fetchStats();
   }, [businessId]);
 
-  const expectedThisMonth = scheduledPayments
-    .filter(p => p.status === "active")
-    .reduce((sum, p) => sum + (typeof p.amount === "number" ? p.amount : 0), 0);
+  const expectedThisMonth = products.reduce(
+    (sum, p) => sum + (typeof p.price === "number" ? p.price * p.subscriberCount : 0),
+    0
+  ) * 100;
 
   return (
     <div className="space-y-4">

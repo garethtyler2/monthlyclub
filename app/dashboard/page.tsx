@@ -51,14 +51,14 @@ export default function DashboardPage() {
   }
 
   return (
-    <section className="max-w-5xl mx-auto px-4 py-12 space-y-12">
+    <section className="max-w-5xl mx-auto px-4 py-12 space-y-6">
 
       {businessId && (
         <>
           <h1 className="text-2xl font-semibold text-white">Business Overview</h1>
           <BusinessOwnerView businessId={businessId} />
 
-          <h2 className="text-2xl font-semibold text-white">Product Manager</h2>
+          <h2 className="text-lg font-semibold text-white">Your Products</h2>
           <BusinessProductManager businessId={businessId} />
         </>
       )}
