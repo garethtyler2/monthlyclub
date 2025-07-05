@@ -170,15 +170,20 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                   <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
                     {product.description}
                   </p>
-                  <div className="flex justify-between items-center pt-3 border-t border-border">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">Subscribers</span>
-                      <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-                        {product.subscriberCount}
+                  <div className="flex flex-col gap-2 pt-3 border-t border-border">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">Subscribers</span>
+                        <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                          {product.subscriberCount}
+                        </div>
                       </div>
+                      <Button size="sm" variant="outline" onClick={() => openEditModal(product)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
                     </div>
-                    <Button size="sm" variant="outline" onClick={() => openEditModal(product)}>
-                      <Pencil className="h-4 w-4" />
+                    <Button size="sm" variant="secondary" className="w-full">
+                      Manage Users
                     </Button>
                   </div>
                 </CardContent>
@@ -193,7 +198,8 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                 <table className="w-full text-white text-sm">
                   <thead className="bg-gradient-to-r from-brand-purple/10 to-transparent border-b border-brand-purple/20 text-white">
                     <tr>
-                      <th className="px-4 py-3 text-left font-semibold">Product</th>
+                      <th className="px-4 py-3">Edit</th>
+                      <th className="px-4 py-3 text-left font-semibold">Title</th>
                       <th className="px-4 py-3 text-left font-semibold">Description</th>
                       <th className="px-4 py-3 text-right font-semibold">Price (£)</th>
                       <th className="px-4 py-3 text-right font-semibold">Subscribers</th>
@@ -203,14 +209,21 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                   <tbody className="bg-gradient-to-r from-brand-purple/5 to-transparent divide-y divide-brand-purple/10">
                     {products.map((product) => (
                       <tr key={product.id} className="hover:bg-brand-purple/10 transition-colors duration-200">
+                        <td className="px-4 py-3 text-center">
+                          <Button size="sm" variant="outline" onClick={() => openEditModal(product)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        </td>
                         <td className="px-4 py-3 font-medium">{product.name}</td>
                         <td className="px-4 py-3">{product.description}</td>
                         <td className="px-4 py-3 text-right">£{product.price.toFixed(2)}</td>
                         <td className="px-4 py-3 text-right">{product.subscriberCount}</td>
                         <td className="px-4 py-3 text-center">
-                          <Button size="sm" variant="outline" onClick={() => openEditModal(product)}>
-                            <Pencil className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-2 justify-center">
+                            <Button size="sm" variant="secondary">
+                              Manage Users
+                            </Button>
+                          </div>
                         </td>
                       </tr>
                     ))}
