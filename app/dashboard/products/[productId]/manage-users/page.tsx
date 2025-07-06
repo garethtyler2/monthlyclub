@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 
 interface Subscription {
   id: string;
@@ -25,6 +26,8 @@ export default function ManageUsersPage() {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [productName, setProductName] = useState('');
+  const [selectedSubId, setSelectedSubId] = useState<string | null>(null);
+  const [isCancelling, setIsCancelling] = useState(false);
   const pageSize = 10;
 
 
@@ -62,7 +65,42 @@ export default function ManageUsersPage() {
     setHasMore(subs.length === pageSize);
     setLoading(false);
   };
+    const handleCancelSubscription = async () => {
+    if (!selectedSubId) {
+      console.warn('No subscription ID selected for cancellation');
+      return;
+    }
 
+    console.log(`Attempting to cancel subscription with ID: ${selectedSubId}`);
+    setIsCancelling(true);
+
+    const cancelledAt = new Date().toISOString();
+
+    const { data: subData, error: subError, status: subStatus, statusText: subStatusText } = await supabase
+      .from('subscriptions')
+      .update({ status: 'cancelled', cancel_at: cancelledAt })
+      .eq('id', selectedSubId);
+
+    console.log('Supabase subscription update response:', { subData, subError, subStatus, subStatusText });
+
+    const { data: schedData, error: schedError, status: schedStatus, statusText: schedStatusText } = await supabase
+      .from('scheduled_payments')
+      .update({ status: 'cancelled', cancel_at: cancelledAt })
+      .eq('purchase_id', selectedSubId);
+
+    console.log('Supabase scheduled_payments update response:', { schedData, schedError, schedStatus, schedStatusText });
+
+    setIsCancelling(false);
+    setSelectedSubId(null);
+
+    if (subError || schedError) {
+      console.error('Error cancelling subscription or scheduled payment:', subError, schedError);
+      alert(`Failed to cancel subscription or scheduled payment.`);
+      return;
+    }
+
+    fetchSubscribers();
+  };
   useEffect(() => {
     fetchSubscribers();
 
@@ -111,9 +149,33 @@ export default function ManageUsersPage() {
                       Ref: {sub.customer_reference ?? 'None'}
                     </p>
                   </div>
-                  <Button size="sm" variant="destructive">
-                    Cancel
-                  </Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => setSelectedSubId(sub.id)}
+                      >
+                        Cancel
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Confirm Cancellation</DialogTitle>
+                      </DialogHeader>
+                      <p className="text-sm text-muted-foreground">
+                        Are you sure you want to cancel this subscription? This action cannot be undone.
+                      </p>
+                      <DialogFooter className="mt-4">
+                        <Button variant="ghost" onClick={() => setSelectedSubId(null)}>
+                          Close
+                        </Button>
+                        <Button variant="destructive" onClick={handleCancelSubscription} disabled={isCancelling}>
+                          {isCancelling ? 'Cancelling...' : 'Confirm Cancel'}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </CardContent>
               </Card>
             ))}
