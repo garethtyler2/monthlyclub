@@ -75,7 +75,15 @@ export async function POST(req: Request) {
         console.error("Failed to retrieve or update setup intent:", err);
       }
     }
+    const { data: userProfile, error: profileError } = await supabase
+        .from("user_profiles")
+        .select("email")
+        .eq("id", userId)
+        .single();
 
+        if (profileError) {
+        console.error("Failed to fetch user profile:", profileError);
+        }
     // Insert into subscriptions
     const { data: purchase, error: purchaseError } = await supabase
       .from("subscriptions")
@@ -83,8 +91,10 @@ export async function POST(req: Request) {
         user_id: userId,
         product_id: productId,
         status: "active",
+        customer_reference: customerReference,
         start_date: new Date().toISOString(),
         created_at: new Date().toISOString(),
+        email: userProfile?.email ?? null,
       })
       .select()
       .single();

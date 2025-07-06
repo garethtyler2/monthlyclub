@@ -182,7 +182,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                         <Pencil className="h-4 w-4" />
                       </Button>
                     </div>
-                    <Button size="sm" variant="secondary" className="w-full">
+                    <Button size="sm" variant="secondary" className="w-full" onClick={() => window.location.href = `/dashboard/products/${product.id}/manage-users`}>
                       Manage Users
                     </Button>
                   </div>
@@ -201,7 +201,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                       <th className="px-4 py-3">Edit</th>
                       <th className="px-4 py-3 text-left font-semibold">Title</th>
                       <th className="px-4 py-3 text-left font-semibold">Description</th>
-                      <th className="px-4 py-3 text-right font-semibold">Price (£)</th>
+                      <th className="px-4 py-3 text-right font-semibold">Price</th>
                       <th className="px-4 py-3 text-right font-semibold">Subscribers</th>
                       <th className="px-4 py-3 text-center font-semibold">Actions</th>
                     </tr>
@@ -220,7 +220,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                         <td className="px-4 py-3 text-right">{product.subscriberCount}</td>
                         <td className="px-4 py-3 text-center">
                           <div className="flex gap-2 justify-center">
-                            <Button size="sm" variant="secondary">
+                            <Button size="sm" variant="secondary" onClick={() => window.location.href = `/dashboard/products/${product.id}/manage-users`}>
                               Manage Users
                             </Button>
                           </div>
