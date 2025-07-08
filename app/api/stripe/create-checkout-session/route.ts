@@ -54,7 +54,25 @@ export async function POST(request: Request) {
     customerData = { stripe_customer_id: customer.id };
   }
 
-  // 4. Create Stripe Checkout session (payment mode)
+  // 4. Check if customer has a default payment method
+  const stripeCustomer = await stripe.customers.retrieve(customerData.stripe_customer_id);
+
+  if ('deleted' in stripeCustomer && stripeCustomer.deleted) {
+    return NextResponse.json({ error: "Customer was deleted in Stripe" }, { status: 400 });
+  }
+
+  const defaultPaymentMethod = (stripeCustomer as Stripe.Customer).invoice_settings?.default_payment_method;
+
+  if (defaultPaymentMethod) {
+    const confirmUrl = new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/subscription/confirm`);
+    confirmUrl.searchParams.set("productId", productId);
+    confirmUrl.searchParams.set("reference", reference);
+    confirmUrl.searchParams.set("preferredPaymentDay", preferredPaymentDay);
+
+    return NextResponse.json({ url: confirmUrl.toString() }, { status: 200 });
+  }
+
+  // 5. Create Stripe Checkout session (payment mode)
   try {
     const session = await stripe.checkout.sessions.create({
       mode: "setup",

@@ -31,12 +31,12 @@ export default function CancelSubscriptionModal({
 
     const { error: subError } = await supabase
         .from("subscriptions")
-        .update({ status: "cancelled" })
+        .update({ status: "cancelled", cancel_at: new Date().toISOString() })
         .eq("id", subscriptionId);
 
     const { error: schedError } = await supabase
         .from("scheduled_payments")
-        .update({ status: "cancelled" })
+        .update({ status: "cancelled", cancel_at: new Date().toISOString()  })
         .eq("purchase_id", subscriptionId);
 
     setLoading(false);
