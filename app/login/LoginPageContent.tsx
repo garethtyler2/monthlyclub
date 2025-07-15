@@ -239,8 +239,8 @@ export default function LoginPageContent() {
 
         <p className="mt-12 text-xs text-gray-500">
           By signing in, you agree to our{" "}
-          <Link href="#" className="underline hover:text-gray-700">Terms</Link> and{" "}
-          <Link href="#" className="underline hover:text-gray-700">Privacy Policy</Link>.
+          <Link href="/terms" className="underline hover:text-gray-700">Terms</Link> and{" "}
+          <Link href="/privacy" className="underline hover:text-gray-700">Privacy Policy</Link>.
         </p>
       </div>
     </div>

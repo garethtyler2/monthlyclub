@@ -2,17 +2,28 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-05-28.basil",
 });
 
 export async function POST(req: Request) {
-  const { userId } = await req.json();
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const {
+    data: { user },
+    error: userFetchError,
+  } = await supabase.auth.getUser();
+
+  if (!user || userFetchError) {
+    return NextResponse.json({ error: "Unauthorized or failed to fetch user" }, { status: 401 });
+  }
+
+  const userId = user.id;
+  const email = user.email;
+
   console.log("➡️ Received userId:", userId);
 
   if (!userId) {
@@ -45,6 +56,9 @@ export async function POST(req: Request) {
         business_profile: {
           url: `https://www.monthlyclubhq.com/business/${business.slug}`,
         },
+        individual: {
+          email: email || undefined,
+        },
       });
       console.log("✅ Stripe account created:", account.id);
     } catch (err) {
@@ -71,6 +85,9 @@ export async function POST(req: Request) {
     refresh_url: `${origin}/refresh`,
     return_url: `${origin}/stripe-business-setup-completion`,
     type: "account_onboarding",
+        collection_options: {
+            fields: "eventually_due",
+            },
   });
 
   console.log("🔗 Stripe onboarding link created:", accountLink.url);

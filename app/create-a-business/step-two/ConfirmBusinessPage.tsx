@@ -138,7 +138,7 @@ export default function ConfirmBusinessPage() {
     }
 
     try {
-      const response = await fetch("/api/stripe/create-onboarding-link", {
+      const response = await fetch("/api/stripe/create-business", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

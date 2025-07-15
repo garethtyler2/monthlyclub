@@ -88,6 +88,12 @@ const Navbar = () => {
                 <DropdownMenuItem asChild>
                   <Link href="/dashboard">Dashboard</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/api/stripe/update-payment-details">Update Payment Details</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/api/stripe/update-business-details">Update Business Details</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout}>
                   Logout
                 </DropdownMenuItem>
@@ -148,6 +154,20 @@ const Navbar = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Dashboard
+                </Link>
+                <Link
+                  href="/api/stripe/update-payment-details"
+                  className="text-sm pt-2 font-medium text-white hover:underline"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Update Payment Details
+                </Link>
+                <Link
+                  href="/api/stripe/update-business-details"
+                  className="text-sm pt-2 font-medium text-white hover:underline"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Update Business Details
                 </Link>
                 <button
                   onClick={handleLogout}
