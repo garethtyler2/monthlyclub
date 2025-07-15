@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Subscription {
   id: string;
@@ -28,6 +29,8 @@ export default function ManageUsersPage() {
   const [productName, setProductName] = useState('');
   const [selectedSubId, setSelectedSubId] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [transactions, setTransactions] = useState<{ [key: string]: any[] }>({});
+  const [expandedUserTransactions, setExpandedUserTransactions] = useState<string | null>(null);
   const pageSize = 10;
 
 
@@ -61,8 +64,30 @@ export default function ManageUsersPage() {
       return;
     }
 
-    setSubscriptions(subs);
-    setHasMore(subs.length === pageSize);
+    const uniqueSubs = Array.from(
+      new Map(subs.map(sub => [sub.user_id, sub])).values()
+    );
+    setSubscriptions(uniqueSubs);
+    setHasMore(uniqueSubs.length === pageSize);
+
+    if (subs.length > 0) {
+      const userIds = subs.map((sub) => sub.user_id);
+      const { data: paymentData, error: paymentError } = await supabase
+        .from('payments')
+        .select('*')
+        .in('user_id', userIds);
+
+      if (paymentError) {
+        console.error('Error fetching payments:', paymentError);
+      } else {
+        const groupedPayments = userIds.reduce((acc: { [key: string]: any[] }, userId) => {
+          acc[userId] = paymentData?.filter((p) => p.user_id === userId) || [];
+          return acc;
+        }, {});
+        setTransactions(groupedPayments);
+      }
+    }
+
     setLoading(false);
   };
     const handleCancelSubscription = async () => {
@@ -141,41 +166,78 @@ export default function ManageUsersPage() {
           <div className="space-y-4">
             {subscriptions.map((sub) => (
               <Card key={sub.id} className="bg-white/5 border border-white/10">
-                <CardContent className="p-4 flex justify-between items-center">
-                  <div>
-                    <p className="text-white font-medium">{sub.user_profiles?.email ?? 'Unknown'}</p>
-                    <p className="text-xs text-muted-foreground">Started: {new Date(sub.start_date).toLocaleDateString()}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Ref: {sub.customer_reference ?? 'None'}
-                    </p>
-                  </div>
-                  <Dialog>
-                    <DialogTrigger asChild>
+                <CardContent className="p-4 flex flex-col gap-3">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-white font-medium">{sub.user_profiles?.email ?? 'Unknown'}</p>
+                      <p className="text-xs text-muted-foreground">Started: {new Date(sub.start_date).toLocaleDateString()}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Ref: {sub.customer_reference ?? 'None'}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => setSelectedSubId(sub.id)}
+                          >
+                            Cancel
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Confirm Cancellation</DialogTitle>
+                          </DialogHeader>
+                          <p className="text-sm text-muted-foreground">
+                            Are you sure you want to cancel this subscription? This action cannot be undone.
+                          </p>
+                          <DialogFooter className="mt-4">
+                            <Button variant="ghost" onClick={() => setSelectedSubId(null)}>
+                              Close
+                            </Button>
+                            <Button variant="destructive" onClick={handleCancelSubscription} disabled={isCancelling}>
+                              {isCancelling ? 'Cancelling...' : 'Confirm Cancel'}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
                       <Button
                         size="sm"
-                        variant="destructive"
-                        onClick={() => setSelectedSubId(sub.id)}
+                        variant="secondary"
+                        onClick={() =>
+                          setExpandedUserTransactions(
+                            expandedUserTransactions === sub.user_id ? null : sub.user_id
+                          )
+                        }
                       >
-                        Cancel
+                        {expandedUserTransactions === sub.user_id ? (
+                          <>
+                            Hide Transactions <ChevronUp className="ml-1 w-4 h-4" />
+                          </>
+                        ) : (
+                          <>
+                            Show Transactions <ChevronDown className="ml-1 w-4 h-4" />
+                          </>
+                        )}
                       </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Confirm Cancellation</DialogTitle>
-                      </DialogHeader>
-                      <p className="text-sm text-muted-foreground">
-                        Are you sure you want to cancel this subscription? This action cannot be undone.
-                      </p>
-                      <DialogFooter className="mt-4">
-                        <Button variant="ghost" onClick={() => setSelectedSubId(null)}>
-                          Close
-                        </Button>
-                        <Button variant="destructive" onClick={handleCancelSubscription} disabled={isCancelling}>
-                          {isCancelling ? 'Cancelling...' : 'Confirm Cancel'}
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                    </div>
+                  </div>
+                  {expandedUserTransactions === sub.user_id && (
+                    <div className="mt-3 space-y-2 text-sm text-muted-foreground">
+                      {transactions[sub.user_id]?.length ? (
+                        transactions[sub.user_id].map((txn) => (
+                          <div key={txn.id} className="border-t pt-1">
+                            Amount: £{txn.amount / 100} – Status: {txn.status} – Date:{' '}
+                            {new Date(txn.created_at).toLocaleDateString()}
+                          </div>
+                        ))
+                      ) : (
+                        <p className="italic">No transactions found</p>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
