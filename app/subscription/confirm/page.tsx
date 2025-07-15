@@ -1,7 +1,7 @@
 // @ts-nocheck
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,7 +15,7 @@ function formatOrdinal(n: number) {
   return `${n}${suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]}`;
 }
 
-export default function SubscriptionConfirmPage() {
+function SubscriptionConfirmPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -194,5 +194,13 @@ export default function SubscriptionConfirmPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SubscriptionConfirmPage() {
+  return (
+    <Suspense fallback={<LoadingOverlay show message="Loading..." />}>
+      <SubscriptionConfirmPageInner />
+    </Suspense>
   );
 }
