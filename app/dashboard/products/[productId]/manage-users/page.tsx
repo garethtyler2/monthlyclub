@@ -167,7 +167,7 @@ export default function ManageUsersPage() {
             {subscriptions.map((sub) => (
               <Card key={sub.id} className="bg-white/5 border border-white/10">
                 <CardContent className="p-4 flex flex-col gap-3">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                       <p className="text-white font-medium">{sub.user_profiles?.email ?? 'Unknown'}</p>
                       <p className="text-xs text-muted-foreground">Started: {new Date(sub.start_date).toLocaleDateString()}</p>
@@ -175,12 +175,13 @@ export default function ManageUsersPage() {
                         Ref: {sub.customer_reference ?? 'None'}
                       </p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-end w-full sm:w-auto">
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
                             size="sm"
                             variant="destructive"
+                            className="w-full sm:w-auto"
                             onClick={() => setSelectedSubId(sub.id)}
                           >
                             Cancel
@@ -194,9 +195,6 @@ export default function ManageUsersPage() {
                             Are you sure you want to cancel this subscription? This action cannot be undone.
                           </p>
                           <DialogFooter className="mt-4">
-                            <Button variant="ghost" onClick={() => setSelectedSubId(null)}>
-                              Close
-                            </Button>
                             <Button variant="destructive" onClick={handleCancelSubscription} disabled={isCancelling}>
                               {isCancelling ? 'Cancelling...' : 'Confirm Cancel'}
                             </Button>
@@ -206,6 +204,7 @@ export default function ManageUsersPage() {
                       <Button
                         size="sm"
                         variant="secondary"
+                        className="w-full sm:w-auto"
                         onClick={() =>
                           setExpandedUserTransactions(
                             expandedUserTransactions === sub.user_id ? null : sub.user_id
@@ -225,16 +224,34 @@ export default function ManageUsersPage() {
                     </div>
                   </div>
                   {expandedUserTransactions === sub.user_id && (
-                    <div className="mt-3 space-y-2 text-sm text-muted-foreground">
+                    <div className="space-y-3 w-full mt-3">
                       {transactions[sub.user_id]?.length ? (
-                        transactions[sub.user_id].map((txn) => (
-                          <div key={txn.id} className="border-t pt-1">
-                            Amount: £{txn.amount / 100} – Status: {txn.status} – Date:{' '}
-                            {new Date(txn.created_at).toLocaleDateString()}
-                          </div>
-                        ))
+                        [...transactions[sub.user_id]]
+                          .sort((a, b) => new Date(b.paid_at || b.created_at).getTime() - new Date(a.paid_at || a.created_at).getTime())
+                          .map((txn) => (
+                            <div
+                              key={txn.id}
+                              className={`flex justify-between items-center p-3 rounded-md border border-white/10 ${
+                                txn.status === 'failed' ? 'bg-red-500/10' : 'bg-white/5'
+                              }`}
+                            >
+                              <div className="text-sm">
+                                <p className="font-medium text-white">
+                                  {new Date(txn.paid_at || txn.created_at).toLocaleDateString("en-GB", {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  })}
+                                </p>
+                                <p className="text-xs text-muted-foreground capitalize">{txn.status}</p>
+                              </div>
+                              <div className="text-sm font-semibold text-white">
+                                £{(txn.amount / 100).toFixed(2)}
+                              </div>
+                            </div>
+                          ))
                       ) : (
-                        <p className="italic">No transactions found</p>
+                        <p className="text-sm text-muted-foreground">No payments to show yet.</p>
                       )}
                     </div>
                   )}

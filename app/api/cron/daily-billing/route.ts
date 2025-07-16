@@ -115,12 +115,41 @@ export async function GET() {
       console.log("Resolved business object:", record.products?.businesses);
       console.log("Resolved business_id:", record.products?.businesses?.id);
 
+      const { error: insertSuccessError } = await supabase.from("payments").insert({
+        user_id: record.user_id,
+        product_id: product.id,
+        subscription_id: record.subscriptions?.id,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        business_id: business.id,
+        stripe_payment_intent_id: paymentIntent.id,
+        status: "succeeded",
+        paid_at: new Date().toISOString(),
+      });
+      if (insertSuccessError) {
+        console.error("Failed to log successful payment:", insertSuccessError);
+      }
 
       succeededCount++;
       console.log(`PaymentIntent created: ${paymentIntent.id}`);
       console.log(`Successfully charged customer ${record.user_id}`);
     } catch (err) {
       console.error("Error processing payment for record:", record.id, err);
+      const metadata = record?.stripe_payment_metadata || {};
+      const { error: insertFailureError } = await supabase.from("payments").insert({
+        user_id: record.user_id,
+        product_id: record.products?.id,
+        subscription_id: record.subscriptions?.id,
+        amount: record.products?.price * 100,
+        currency: "gbp",
+        business_id: record.products?.businesses?.id,
+        stripe_payment_intent_id: null,
+        status: "failed",
+        paid_at: new Date().toISOString(),
+      });
+      if (insertFailureError) {
+        console.error("Failed to log failed payment:", insertFailureError);
+      }
       skippedCount++;
       skipReasons.push(`Error processing payment for record ${record.id}`);
     }

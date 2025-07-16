@@ -137,39 +137,5 @@ export async function POST(req: Request) {
     return new NextResponse("Success", { status: 200 });
   }
 
-  if (event.type === "payment_intent.succeeded") {
-    const intent = event.data.object as Stripe.PaymentIntent;
-
-    const metadata = intent.metadata || {};
-    const subscriptionId = metadata.subscription_id;
-    const userId = metadata.user_id;
-    const productId = metadata.product_id;
-    const businessId = metadata.business_id;
-    if (!subscriptionId || !userId || !productId) {
-      console.error("Missing metadata in payment intent");
-      return new NextResponse("Bad Request", { status: 400 });
-    }
-
-    const { error: paymentError } = await supabase.from("payments").insert({
-      user_id: userId,
-      product_id: productId,
-      subscription_id: subscriptionId,
-      amount: intent.amount,
-      currency: intent.currency,
-      business_id: businessId,
-      stripe_payment_intent_id: intent.id,
-      status: "succeeded",
-      paid_at: new Date().toISOString(),
-    });
-
-    if (paymentError) {
-      console.error("Failed to insert into payments:", paymentError);
-      return new NextResponse("Database Error", { status: 500 });
-    }
-
-    console.log("Payment recorded successfully for PaymentIntent:", intent.id);
-    return new NextResponse("Payment recorded", { status: 200 });
-  }
-
   return new NextResponse("Event received", { status: 200 });
 }
