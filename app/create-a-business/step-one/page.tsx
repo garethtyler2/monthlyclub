@@ -12,6 +12,7 @@ export default function CreateBusinessPage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState<File | null>(null);
+  const [accountType, setAccountType] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [customBusinessType, setCustomBusinessType] = useState("");
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
@@ -143,6 +144,7 @@ export default function CreateBusinessPage() {
           description,
           image_url: imageUrl,
           service_type: finalBusinessType,
+          business_type: accountType,
           slug
         }
       ])
@@ -255,6 +257,37 @@ export default function CreateBusinessPage() {
                 placeholder="Business Name"
               />
             </div>
+            <div>
+  <label className="block text-base font-semibold mb-1 text-gray-100">Are you an individual or a company?</label>
+  <div className="flex gap-4">
+    <label className="flex items-center gap-2 text-white">
+      <input
+        type="radio"
+        name="business_type"
+        value="individual"
+        checked={accountType === "individual"}
+        onChange={() => setAccountType("individual")}
+        required
+      />
+      Individual
+    </label>
+    <label className="flex items-center gap-2 text-white">
+      <input
+        type="radio"
+        name="business_type"
+        value="company"
+        checked={accountType === "company"}
+        onChange={() => setAccountType("company")}
+      />
+      Company
+    </label>
+  </div>
+</div>
+{accountType === "company" && (
+  <div className="mt-2 text-sm text-yellow-300 bg-yellow-500/10 border border-yellow-500 rounded p-3">
+    As a company, Stripe will ask you to provide additional business information such as your Companies House number and registered address.
+  </div>
+)}
             <div>
               <label className="block text-base font-semibold mb-1 text-gray-100">Service Type</label>
               <select

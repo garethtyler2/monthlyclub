@@ -1,7 +1,5 @@
 "use client";
 
-"use client";
-
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
@@ -30,8 +28,9 @@ export default function ConfirmBusinessPage() {
   const businessId = searchParams.get("id");
 
   const [business, setBusiness] = useState<any>(null);
+  const [businessType, setBusinessType] = useState("individual");
   const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [clickedProductId, setClickedProductId] = useState<string | null>(null);
   const [tab, setTab] = useState("edit");
@@ -41,7 +40,7 @@ export default function ConfirmBusinessPage() {
   useEffect(() => {
     const fetchData = async () => {
       if (!businessId) return;
-      setLoading(true);
+      setLoading(false);
 
       const { data: businessData } = await supabase
         .from("businesses")
@@ -55,6 +54,7 @@ export default function ConfirmBusinessPage() {
         .eq("business_id", businessId);
 
       setBusiness(businessData);
+      setBusinessType(businessData?.business_type || "individual");
       setProducts(productData || []);
       setLoading(false);
     };
@@ -127,11 +127,17 @@ export default function ConfirmBusinessPage() {
 
     const {
       data: { user },
+      error: userError,
     } = await supabase.auth.getUser();
 
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const token = session?.access_token;
     const userId = user?.id;
 
-    if (!userId) {
+    if (!userId || !token) {
       alert("User not logged in.");
       setLoading(false);
       return;
@@ -142,12 +148,14 @@ export default function ConfirmBusinessPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           userId,
           businessId,
           name,
           email,
+          business_type: businessType,
         }),
       });
 
@@ -155,14 +163,14 @@ export default function ConfirmBusinessPage() {
 
       if (response.ok && data?.url) {
         window.location.href = data.url;
-        return; // Prevent setLoading(false) from running
+        return; // skip further execution
       } else {
         alert("Something went wrong creating the Stripe link.");
+        setLoading(false);
       }
     } catch (error) {
       console.error("Stripe onboarding error:", error);
       alert("Error initiating Stripe onboarding.");
-    } finally {
       setLoading(false);
     }
   };

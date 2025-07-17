@@ -5,21 +5,30 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-05-28.basil",
 });
-
+console.log("🚀 API route hit");
 export async function POST(req: Request) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
+  const authHeader = req.headers.get("authorization");
+  const token = authHeader?.replace("Bearer ", "");
+
   const {
     data: { user },
     error: userFetchError,
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getUser(token);
+
+  console.log("🔍 user:", user);
+  console.log("❗ userFetchError:", userFetchError);
 
   if (!user || userFetchError) {
     return NextResponse.json({ error: "Unauthorized or failed to fetch user" }, { status: 401 });
   }
+
+  const body = await req.json();
+  const accountType = body?.business_type ?? "individual"; // default to individual
 
   const userId = user.id;
   const email = user.email;
@@ -50,14 +59,15 @@ export async function POST(req: Request) {
     try {
       account = await stripe.accounts.create({
         type: "express",
+        business_type: accountType,
+        ...(accountType === "individual"
+          ? { individual: { email: email || undefined } }
+          : { company: {} }),
         capabilities: {
           transfers: { requested: true },
         },
         business_profile: {
           url: `https://www.monthlyclubhq.com/business/${business.slug}`,
-        },
-        individual: {
-          email: email || undefined,
         },
       });
       console.log("✅ Stripe account created:", account.id);
@@ -70,7 +80,7 @@ export async function POST(req: Request) {
 
     const { error: updateError } = await supabase
       .from("businesses")
-      .update({ stripe_account_id: accountId })
+      .update({ stripe_account_id: accountId, business_type: accountType })
       .eq("id", business.id);
 
     if (updateError) {
