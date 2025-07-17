@@ -109,6 +109,13 @@ const Navbar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
+            {!loading && !user && (
+              <Link href="/login">
+                <Button className="hero-button-primary" size="sm">
+                  Login / Sign Up
+                </Button>
+              </Link>
+            )}
           </nav>
 
           {/* Mobile Navigation Toggle */}
@@ -191,13 +198,10 @@ const Navbar = () => {
                 </div>
               ) : (
                 !loading && (
-                  <div className="flex flex-col pt-2 border-t border-white/10 space-y-2">
-                    <Button
-                      className="bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:opacity-90 w-full"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      <Link href="/login" className="text-white">Access Monthly Club</Link>
-                    </Button>
+                  <div className="flex flex-col p-4 border-t border-white/10 space-y-2">
+                    <Link href="/login" className="hero-button-primary text-sm font-medium hover:text-white transition-colors p-2">
+                      Login / Sign Up
+                    </Link>
                   </div>
                 )
               )}

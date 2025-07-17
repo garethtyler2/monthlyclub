@@ -166,7 +166,7 @@ export default function LoginPageContent() {
               onClick={() => setShowEmailForm(true)}
               className="hero-button-primary w-full text-sm text-white bg-brand-purple py-2 mt-6 rounded hover:bg-brand-purple/90 transition"
             >
-              Sign in with Email
+              {authMode === "sign-in" ? "Sign in with Email" : "Sign up with Email"}
             </button>
           ) : (
             <>

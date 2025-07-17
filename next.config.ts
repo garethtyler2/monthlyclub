@@ -3,7 +3,16 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: false, 
   images: {
-    domains: ['developers.google.com', 'qnecyousolguftvceaao.supabase.co'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'developers.google.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'qnecyousolguftvceaao.supabase.co',
+      },
+    ],
   },
 
   async rewrites() {
