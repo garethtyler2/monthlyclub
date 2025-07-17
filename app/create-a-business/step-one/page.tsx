@@ -7,6 +7,7 @@ import { HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from "@/lib/supabase/client";
 import { LoadingOverlay } from '@/components/ui/loading-overlay';
+import { useRouter } from 'next/navigation';
 
 export default function CreateBusinessPage() {
   const [name, setName] = useState('');
@@ -17,6 +18,8 @@ export default function CreateBusinessPage() {
   const [customBusinessType, setCustomBusinessType] = useState("");
   const [serviceTypes, setServiceTypes] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasBusiness, setHasBusiness] = useState(false);
+  const router = useRouter();
 
   const phrases = useMemo(() => ['the service you offer', 'products and prices'], []);
   const [typing, setTyping] = useState('');
@@ -66,6 +69,25 @@ export default function CreateBusinessPage() {
     };
 
     fetchServiceTypes();
+  }, []);
+
+  useEffect(() => {
+    const checkExistingBusiness = async () => {
+      const userResult = await supabase.auth.getUser();
+      const user = userResult.data.user;
+      if (!user) return;
+
+      const { data: businesses, error } = await supabase
+        .from("businesses")
+        .select("id")
+        .eq("user_id", user.id);
+
+      if (businesses && businesses.length > 0) {
+        setHasBusiness(true);
+      }
+    };
+
+    checkExistingBusiness();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -186,6 +208,24 @@ export default function CreateBusinessPage() {
     
     window.location.href = `/create-a-business/step-two?id=${business.id}`;
   };
+
+  if (hasBusiness) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black bg-opacity-80 flex flex-col items-center justify-center text-white text-center px-4">
+        <h2 className="text-2xl font-bold mb-4">You already have a business</h2>
+        <p className="mb-6">Each account is limited to one business. You can manage your existing business from your dashboard.</p>
+        <div className="flex flex-col gap-4 w-full max-w-xs">
+          <Button onClick={() => router.push("/dashboard")} className="w-full hero-button-primary">
+            Go to Dashboard
+          </Button>
+          <Button onClick={() => router.push("/")} variant="outline" className="w-full">
+            Return Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   if (loading ) {
     return <LoadingOverlay show message="Generating your business page and products" />;
   }
