@@ -56,6 +56,28 @@ export function EditBusinessModal({ business }: { business: any }) {
     let imageUrl = editImageUrl;
 
     if (newImageFile) {
+      // Delete the old image if one exists and it's a Supabase storage URL
+      if (editImageUrl && editImageUrl.includes("business-profile-images")) {
+        try {
+          const url = new URL(editImageUrl);
+          const filePath = url.pathname.split("business-profile-images/")[1]?.replace(/^\/+/, "");
+
+          if (filePath) {
+            const { error: deleteError } = await supabase.storage
+              .from("business-profile-images")
+              .remove([filePath]);
+
+            if (deleteError) {
+              console.warn("Failed to delete old image:", deleteError.message || deleteError);
+            } else {
+              console.log("Old image deleted:", filePath);
+            }
+          }
+        } catch (err) {
+          console.error("Invalid image URL:", err);
+        }
+      }
+
       const user = (await supabase.auth.getUser()).data.user;
       if (!user) {
         alert("You must be logged in.");
@@ -100,7 +122,7 @@ export function EditBusinessModal({ business }: { business: any }) {
     if (!error) {
       setEditing(false);
       if (editSlug !== business.slug) {
-        router.push(`/business/${editSlug}`);
+        router.push(`/businesses/${editSlug}`);
       } else {
         router.refresh();
       }
@@ -143,7 +165,7 @@ export function EditBusinessModal({ business }: { business: any }) {
         <div className="mb-1 text-white text-sm">
           <label className="block text-sm font-medium mb-1">Site URL</label>
           <div className="flex flex-col gap-1">
-            <span className="text-gray-400 text-sm">https://www.monthlyclubhq.com/business/</span>
+            <span className="text-gray-400 text-sm">https://www.monthlyclubhq.com/businesses/</span>
             <Input
               value={editSlug}
               onChange={(e) => {

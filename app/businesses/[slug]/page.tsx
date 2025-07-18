@@ -1,4 +1,4 @@
-// app/business/[slug]/page.tsx
+// app/businesses/[slug]/page.tsx
 
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
@@ -63,12 +63,6 @@ export default async function BusinessPage(
   // Extract current user ID and check if the user is the owner
   const currentUserId = session.data?.session?.user?.id;
   const isOwner = business?.user_id === currentUserId;
-
-  console.log("Supabase session:", session);
-  console.log("Business ID:", business?.id);
-  console.log("Products:", products);
-  console.log("Products Error:", productsError);
-  console.log("User Subscriptions:", subscriptions);
 
   return (
     <div className="relative py-10 overflow-hidden text-white">

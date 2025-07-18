@@ -14,6 +14,7 @@ import { Card } from "@/components/ui/card";
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [businessId, setBusinessId] = useState<string | null>(null);
+  const [businessSlug, setBusinessSlug] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showStripeReminder, setShowStripeReminder] = useState(false);
 
@@ -28,12 +29,13 @@ export default function DashboardPage() {
       if (user) {
         const { data: business } = await supabase
           .from("businesses")
-          .select("id, stripe_verification_prompt_dismissed")
+          .select("id, slug, stripe_verification_prompt_dismissed")
           .eq("user_id", user.id)
           .single();
 
         if (business) {
           setBusinessId(business.id);
+          setBusinessSlug(business.slug);
 
           const { data: scheduledPayments } = await supabase
             .from("scheduled_payments")
@@ -115,6 +117,22 @@ export default function DashboardPage() {
             </Card>
           )}
           <h1 className="text-2xl font-semibold text-white">Business Overview</h1>
+          <div className="flex gap-4 mb-4">
+            <Link href={`https://www.monthlyclubhq.com/business/${businessSlug}`}>
+              <Button variant="default">View Business Page</Button>
+            </Link>
+            <Button
+              variant="outline"
+              onClick={() => {
+                const shareUrl = `https://www.monthlyclubhq.com/business/${businessSlug}`;
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                  alert("Business page link copied to clipboard!");
+                });
+              }}
+            >
+              Share Business Page
+            </Button>
+          </div>
           <BusinessOwnerView businessId={businessId} />
 
           <h2 className="text-lg font-semibold text-white">Your Products</h2>

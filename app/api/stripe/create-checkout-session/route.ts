@@ -89,6 +89,66 @@ export async function POST(request: Request) {
       },
     });
 
+    // Insert into subscriptions
+    const { data: userProfile, error: profileError } = await supabase
+      .from("user_profiles")
+      .select("email")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Failed to fetch user profile:", profileError);
+    }
+
+    const { data: purchase, error: purchaseError } = await supabase
+      .from("subscriptions")
+      .insert({
+        user_id: user.id,
+        product_id: product.id,
+        status: "active",
+        customer_reference: reference,
+        start_date: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        email: userProfile?.email ?? null,
+      })
+      .select()
+      .single();
+
+    if (purchaseError) {
+      console.error("Failed to insert into subscriptions:", purchaseError);
+      return NextResponse.json({ error: "Failed to insert subscription" }, { status: 500 });
+    }
+
+    // Fetch business_id for the product directly from products table
+    const { data: productInfo, error: productInfoError } = await supabase
+      .from("products")
+      .select("business_id")
+      .eq("id", product.id)
+      .single();
+
+    if (productInfoError || !productInfo?.business_id) {
+      return NextResponse.json({ error: "Failed to get business ID for product" }, { status: 400 });
+    }
+
+    const { error: scheduleError } = await supabase
+      .from("scheduled_payments")
+      .insert({
+        user_id: user.id,
+        product_id: product.id,
+        business_id: productInfo.business_id,
+        purchase_id: purchase.id,
+        scheduled_for: parseInt(preferredPaymentDay),
+        status: "active",
+        amount: product.price * 100,
+        customer_reference: reference,
+        created_at: new Date().toISOString(),
+      });
+
+    if (scheduleError) {
+      console.error("Failed to insert into scheduled_payments:", scheduleError);
+      return NextResponse.json({ error: "Failed to insert scheduled payment" }, { status: 500 });
+    }
+
     return NextResponse.json({ url: session.url }, { status: 200 });
   } catch (err) {
     console.error("Stripe session creation failed:", err);

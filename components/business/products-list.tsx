@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useEffect } from "react";
+import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,7 +36,17 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
   const [preferredPaymentDate, setPreferredPaymentDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSelect = (productId: string) => {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const handleSelect = async (productId: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session?.user) {
+      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      return;
+    }
+
     setSelectedProductId(productId);
   };
 
