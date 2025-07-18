@@ -14,7 +14,7 @@ export default function HomePage() {
         <title>Monthly Club | Subscription Tools for Local Service Businesses & Creators</title>
         <meta
           name="description"
-          content="Create, promote, and grow subscription-based plans for your service business or content brand. Monthly Club is built for barbers, cleaners, coaches, and creators."
+          content="Create, promote, and grow subscription-based plans for your service business or content brand. Monthly Club is built for sports clubs, hairdressers, beauticians, content creators, and more."
         />
         <link rel="canonical" href="https://www.monthlyclubhq.com/" />
         <script

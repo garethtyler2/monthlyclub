@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import ProductsListWrapper from "@/components/business/ProductsListWrapper";
+import { EditBusinessModal } from "@/components/business/EditBusinessModal";
 
 const gradientStyles = [
   "from-brand-blue/10 to-transparent border-brand-blue/20",
@@ -74,7 +75,11 @@ export default async function BusinessPage(
       {/* Background gradients */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 md:w-96 md:h-96 bg-brand-purple/20 rounded-full blur-[128px] -z-10" />
       <div className="absolute bottom-0 right-1/2 translate-x-1/2 w-80 h-80 md:w-96 md:h-96 bg-brand-blue/20 rounded-full blur-[128px] -z-10" />
-
+      {isOwner && (
+        <div className="flex justify-center mt-4 mb-4">
+          <EditBusinessModal business={business} />
+        </div>
+      )}
       <div className="container mx-auto px-4 md:px-6 max-w-3xl">
         {/* Business Info */}
         {business?.name && (

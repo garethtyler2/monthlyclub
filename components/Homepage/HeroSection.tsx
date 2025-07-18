@@ -20,7 +20,6 @@ const audiences = [
   'Gyms',
   'Barbers',
   'Cleaners',
-  'Dog Groomers',
   'Dog Walkers',
   'Electricians',
   'Gardeners',
