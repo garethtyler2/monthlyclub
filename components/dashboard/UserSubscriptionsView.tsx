@@ -116,7 +116,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
   }
 
   if (loading) {
-    return <LoadingOverlay show message="Loading your subscriptions..." />;
+    return <LoadingOverlay show message="Loading your dashboard..." />;
   }
 
   const cancelledSubs = subscriptions.filter((s) => s.status === "cancelled");

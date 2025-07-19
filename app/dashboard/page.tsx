@@ -116,23 +116,9 @@ export default function DashboardPage() {
               </div>
             </Card>
           )}
+
           <h1 className="text-2xl font-semibold text-white">Business Overview</h1>
-          <div className="flex gap-4 mb-4">
-            <Link href={`https://www.monthlyclubhq.com/business/${businessSlug}`}>
-              <Button variant="default">View Business Page</Button>
-            </Link>
-            <Button
-              variant="outline"
-              onClick={() => {
-                const shareUrl = `https://www.monthlyclubhq.com/business/${businessSlug}`;
-                navigator.clipboard.writeText(shareUrl).then(() => {
-                  alert("Business page link copied to clipboard!");
-                });
-              }}
-            >
-              Share Business Page
-            </Button>
-          </div>
+
           <BusinessOwnerView businessId={businessId} />
 
           <h2 className="text-lg font-semibold text-white">Your Products</h2>

@@ -67,7 +67,7 @@ export async function POST(req: Request) {
           transfers: { requested: true },
         },
         business_profile: {
-          url: `https://www.monthlyclubhq.com/business/${business.slug}`,
+          url: `https://www.monthlyclubhq.com/businesses/${business.slug}`,
         },
       });
       console.log("✅ Stripe account created:", account.id);

@@ -21,6 +21,7 @@ const Navbar = () => {
   const [loading, setLoading] = useState(true);
   const [hasBusiness, setHasBusiness] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
+  const [businessSlug, setBusinessSlug] = useState<string | null>(null);
   
   useEffect(() => {
     const getUser = async () => {
@@ -33,13 +34,14 @@ const Navbar = () => {
       if (user) {
         const { data: businessData, error } = await supabase
           .from("businesses")
-          .select("id")
+          .select("id, slug")
           .eq("user_id", user.id)
           .maybeSingle();
 
         if (businessData) {
           setHasBusiness(true);
         }
+        setBusinessSlug(businessData?.slug ?? null);
       }
     };
 
@@ -94,14 +96,24 @@ const Navbar = () => {
                   </span>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="mt-2">
+                  {businessSlug && (
+                    <DropdownMenuItem>
+                      <button
+                        onClick={() => handleRedirect(`/businesses/${businessSlug}`)}
+                        className="w-full text-left"
+                      >
+                        My Business Page
+                      </button>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link href="/dashboard">Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <button onClick={() => handleRedirect("/api/stripe/update-payment-details")}>Update Payment Details</button>
+                    <button onClick={() => handleRedirect("/api/stripe/update-payment-details")}>Stripe - Payment Details</button>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <button onClick={() => handleRedirect("/api/stripe/update-business-details")}>Update Business Details</button>
+                    <button onClick={() => handleRedirect("/api/stripe/update-business-details")}>Stripe - Business Details</button>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     Logout
@@ -164,6 +176,17 @@ const Navbar = () => {
                       {user?.email?.replace(/@.*/, '@...')}
                     </span>
                   </div>
+                  {businessSlug && (
+                    <button
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        handleRedirect(`/businesses/${businessSlug}`);
+                      }}
+                      className="text-sm pt-2 font-medium text-white hover:underline text-left"
+                    >
+                      My Business Page
+                    </button>
+                  )}
                   <Link
                     href="/dashboard"
                     className="text-sm pt-2 font-medium text-white hover:underline"
@@ -178,7 +201,7 @@ const Navbar = () => {
                     }}
                     className="text-sm pt-2 font-medium text-white hover:underline text-left"
                   >
-                    Update Payment Details
+                    Stripe - Payment Details
                   </button>
                   <button
                     onClick={() => {
@@ -187,7 +210,7 @@ const Navbar = () => {
                     }}
                     className="text-sm pt-2 font-medium text-white hover:underline text-left"
                   >
-                    Update Business Details
+                    Stripe - Business Details
                   </button>
                   <button
                     onClick={handleLogout}
