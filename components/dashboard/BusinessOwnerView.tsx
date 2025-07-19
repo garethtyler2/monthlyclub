@@ -11,7 +11,7 @@ export function BusinessOwnerView({ businessId }: BusinessOwnerViewProps) {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [futurePayouts, setFuturePayouts] = useState<number | null>(null);
-  const [totalPaidToDate, setTotalPaidToDate] = useState<number | null>(null);
+  const [totalEarnedToDate, setTotalEarnedToDate] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -45,7 +45,7 @@ export function BusinessOwnerView({ businessId }: BusinessOwnerViewProps) {
         .eq("status", "succeeded");
 
       const total = payments?.reduce((sum, p) => sum + (typeof p.amount === "number" ? p.amount : 0), 0) || 0;
-      setTotalPaidToDate(total);
+      setTotalEarnedToDate(total);
 
       try {
         const res = await fetch("/api/stripe/business-overview");
@@ -73,9 +73,9 @@ export function BusinessOwnerView({ businessId }: BusinessOwnerViewProps) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-white">
           <div className="rounded-xl border border-green-400/20 bg-green-500/10 p-5">
-            <p className="text-sm font-medium text-muted-foreground">Total Paid to Date</p>
+            <p className="text-sm font-medium text-muted-foreground">Total Earned to Date</p>
             <p className="mt-2 text-3xl font-bold tracking-tight text-green-300">
-              {totalPaidToDate !== null ? `£${(totalPaidToDate / 100).toFixed(2)}` : "—"}
+              {totalEarnedToDate !== null ? `£${(totalEarnedToDate / 100).toFixed(2)}` : "—"}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               Total value of all successful customer payments received.
