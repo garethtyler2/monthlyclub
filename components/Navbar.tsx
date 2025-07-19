@@ -60,6 +60,14 @@ const Navbar = () => {
     window.location.href = path;
   };
 
+  const onCreateBusinessClick = () => {
+    if (!user) {
+      window.location.href = "/login?redirect=/create-a-business/step-one";
+    } else {
+      window.location.href = "/create-a-business/step-one";
+    }
+  };
+
   return (
     <>
       <LoadingOverlay show={loadingUpdate} />
@@ -78,12 +86,10 @@ const Navbar = () => {
             <Link href="/guides" className="text-sm font-medium hover:text-white transition-colors">
               Guides
             </Link>
-            {!loading && user && !hasBusiness && (
-              <Link href="/create-a-business/step-one">
-                <Button className="hero-button-primary" size="sm">
-                  Create Business
-                </Button>
-              </Link>
+            {!hasBusiness && (
+              <button onClick={onCreateBusinessClick} className="hero-button-primary text-sm font-medium hover:underline underline-offset-4 transition-colors">
+                Create Business
+              </button>
             )}
             {user && (
               <DropdownMenu>
@@ -123,7 +129,7 @@ const Navbar = () => {
             )}
             {!loading && !user && (
               <Link href="/login">
-                <Button className="hero-button-primary" size="sm">
+                <Button variant="outline" size="sm">
                   Login / Sign Up
                 </Button>
               </Link>
@@ -156,14 +162,16 @@ const Navbar = () => {
                 >
                   Guides
                 </Link>
-                {!loading && user && !hasBusiness && (
-                  <Link
-                    href="/create-a-business/step-one"
-                    className="hero-button-primary text-sm font-medium hover:text-white transition-colors p-2"
-                    onClick={() => setIsMenuOpen(false)}
+                {!hasBusiness && (
+                  <button
+                    onClick={() => {
+                      onCreateBusinessClick();
+                      setIsMenuOpen(false);
+                    }}
+                    className="hero-button-primary text-sm font-medium hover:underline underline-offset-4 transition-colors p-2"
                   >
                     Create Business
-                  </Link>
+                  </button>
                 )}
               </div>
               {user ? (
@@ -222,7 +230,7 @@ const Navbar = () => {
               ) : (
                 !loading && (
                   <div className="flex flex-col p-4 border-t border-white/10 space-y-2">
-                    <Link href="/login" className="hero-button-primary text-sm font-medium hover:text-white transition-colors p-2">
+                    <Link href="/login" className="text-sm font-medium hover:text-white transition-colors p-2" >
                       Login / Sign Up
                     </Link>
                   </div>
