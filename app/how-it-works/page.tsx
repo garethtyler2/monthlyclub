@@ -91,12 +91,11 @@ const HowItWorks = () => {
             <Zap className="w-4 h-4 mr-2" />
             How It Works
           </Badge>
-          <h1 className="text-5xl md:text-7xl font-bold bg-clip-text gradient-text mb-6 animate-scale-in">
-            How to Start a Subscription Business in 4 Easy Steps
+          <h1 className="text-4xl md:text-7xl font-bold bg-clip-text gradient-text mb-6 animate-scale-in leading-tight">
+            Launch Your Subscription Business <br className="md:hidden" /> in 4 Easy Steps
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-slide-in-up">
-            Learn how to build a subscription business from scratch. Our platform makes it simple to launch a custom monthly club, collect payments, and grow your income—all in just four easy steps.
-          </p>
+            Transform your creativity into recurring revenue. Follow four simple steps to build and grow your subscription business.          </p>
           <Link href="/create-a-business/step-one">
             <Button className="hero-button-primary animate-pulse-glow">
               Get Started Today

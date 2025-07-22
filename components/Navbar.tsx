@@ -86,6 +86,12 @@ const Navbar = () => {
             <Link href="/how-it-works" className="text-sm font-medium hover:text-white transition-colors">
               How It Works
             </Link>
+            <Link href="/pricing" className="text-sm font-medium hover:text-white transition-colors">
+              Pricing
+            </Link>
+            <Link href="/features" className="text-sm font-medium hover:text-white transition-colors">
+              Features
+            </Link>
             <Link href="/guides" className="text-sm font-medium hover:text-white transition-colors">
               Guides
             </Link>
@@ -164,6 +170,20 @@ const Navbar = () => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   How It Works
+                </Link>
+                <Link
+                  href="/pricing"
+                  className="text-sm font-medium hover:text-white transition-colors p-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Pricing
+                </Link>
+                <Link
+                  href="/features"
+                  className="text-sm font-medium hover:text-white transition-colors p-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Features
                 </Link>
                 <Link
                   href="/guides"

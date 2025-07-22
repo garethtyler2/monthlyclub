@@ -69,7 +69,7 @@ export default function GuidesHomePage() {
               </div>
 
               <h1
-                className="animate-fade-in text-4xl sm:text-6xl font-bold"
+                className="animate-fade-in gradient-text text-4xl sm:text-6xl font-bold"
                 style={{ animationDelay: "400ms" }}
               >
                 Learn How to Launch and Grow Your Service Subscription

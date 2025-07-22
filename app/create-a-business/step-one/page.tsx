@@ -21,6 +21,16 @@ export default function CreateBusinessPage() {
   const [hasBusiness, setHasBusiness] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.replace(`/login?redirect=${encodeURIComponent('/create-a-business/step-one')}`);
+      }
+    };
+    checkAuth();
+  }, []);
+
   const phrases = useMemo(() => ['the service you offer', 'products and prices'], []);
   const [typing, setTyping] = useState('');
   const [index, setIndex] = useState(0);
