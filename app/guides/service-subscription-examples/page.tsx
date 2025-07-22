@@ -104,7 +104,7 @@ export default function ServiceSubscriptionExamplesPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Create Your Subscription Page Today</Link>
+                <Link href="/create-a-business/step-one">Create Your Subscription Page Today</Link>
               </Button>
             </div>
           </div>
