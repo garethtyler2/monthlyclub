@@ -41,7 +41,7 @@ export default function SubscriptionBillingToolsPage() {
                 "name": "Monthly Club",
                 "logo": {
                   "@type": "ImageObject",
-                  "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                  "url": "https://www.monthlyclubhq.com/images/MonthlyClubLogo.png"
                 }
               },
               "datePublished": "2024-06-01",

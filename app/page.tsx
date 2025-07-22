@@ -31,12 +31,23 @@ export default function HomePage() {
                 "url": "https://www.monthlyclubhq.com",
                 "logo": {
                   "@type": "ImageObject",
-                  "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                  "url": "https://www.monthlyclubhq.com/images/MonthlyClubHomepageImage.png"
                 }
               }
             })
           }}
         />
+        <meta property="og:title" content="Monthly Club | Subscription Tools for Local Service Businesses & Creators" />
+        <meta property="og:description" content="Create, promote, and grow subscription-based plans for your service business or content brand." />
+        <meta property="og:url" content="https://www.monthlyclubhq.com/" />
+        <meta property="og:image" content="https://www.monthlyclubhq.com/images/MonthlyClubHomepageImage.png" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Monthly Club" />
+
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Monthly Club | Subscription Tools for Local Service Businesses & Creators" />
+        <meta name="twitter:description" content="Create, promote, and grow subscription-based plans for your service business or content brand." />
+        <meta name="twitter:image" content="https://www.monthlyclubhq.com/images/MonthlyClubHomepageImage.png" />
       </Head>
       <Hero />
       <Features />

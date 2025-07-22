@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server"
-import { supabase } from "@/lib/supabase/client"
-import { createClient } from "@/lib/supabase/server"
 
 export async function GET() {
-  const supabase = await createClient()
   const baseUrl = "https://www.monthlyclubhq.com"
 
   const formatDate = (date: string | Date) =>
@@ -12,6 +9,7 @@ export async function GET() {
   // Only include the homepage and all guides for sitemap
   const staticPaths = [
     "",
+    "how-it-works",
     "guides/automate-payments-stripe",
     "guides/cleaning-subscription-model",
     "guides/create-subscription-plan",

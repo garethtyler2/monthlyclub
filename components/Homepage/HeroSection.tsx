@@ -2,8 +2,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 

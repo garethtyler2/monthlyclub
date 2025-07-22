@@ -83,6 +83,9 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-4">
+            <Link href="/how-it-works" className="text-sm font-medium hover:text-white transition-colors">
+              How It Works
+            </Link>
             <Link href="/guides" className="text-sm font-medium hover:text-white transition-colors">
               Guides
             </Link>
@@ -155,6 +158,13 @@ const Navbar = () => {
             />
             <div className="md:hidden border-t border-white/10 animate-fade-in relative z-50">
               <div className="container mx-auto px-4 py-4 flex flex-col space-y-3">
+                <Link
+                  href="/how-it-works"
+                  className="text-sm font-medium hover:text-white transition-colors p-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  How It Works
+                </Link>
                 <Link
                   href="/guides"
                   className="text-sm font-medium hover:text-white transition-colors p-2"

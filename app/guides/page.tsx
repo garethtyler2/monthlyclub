@@ -47,7 +47,7 @@ export default function GuidesHomePage() {
                   "url": "https://www.monthlyclubhq.com",
                   "logo": {
                     "@type": "ImageObject",
-                    "url": "https://www.monthlyclubhq.com/images/Monthly%20Club%20logo.png"
+                    "url": "https://www.monthlyclubhq.com/images/MonthlyClubLogo.png"
                   }
                 }
               })
