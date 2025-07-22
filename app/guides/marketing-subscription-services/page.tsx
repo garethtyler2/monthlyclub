@@ -114,7 +114,7 @@ export default function MarketingSubscriptionServicesPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Start Growing Your Subscribers Today</Link>
+                <Link href="/create-a-business/step-one">Start Growing Your Subscribers Today</Link>
               </Button>
             </div>
           </div>

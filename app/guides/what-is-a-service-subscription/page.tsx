@@ -111,7 +111,7 @@ export default function WhatIsAServiceSubscriptionPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Start Your Free Early Access</Link>
+                <Link href="/create-a-business/step-one">Start Your Free Early Access</Link>
               </Button>
             </div>
           </div>

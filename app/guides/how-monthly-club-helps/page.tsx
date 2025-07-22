@@ -109,7 +109,7 @@ export default function HowMonthlyClubHelpsPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Start Growing with Monthly Club</Link>
+                <Link href="/create-a-business/step-one">Start Growing with Monthly Club</Link>
               </Button>
             </div>
           </div>

@@ -113,7 +113,7 @@ export default function CleaningSubscriptionModelPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Start Earning Recurring Income Today</Link>
+                <Link href="/create-a-business/step-one">Start Earning Recurring Income Today</Link>
               </Button>
             </div>
           </div>

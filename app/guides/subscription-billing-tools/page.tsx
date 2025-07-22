@@ -107,7 +107,7 @@ export default function SubscriptionBillingToolsPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Start Simplifying Your Billing Today</Link>
+                <Link href="/create-a-business/step-one">Start Simplifying Your Billing Today</Link>
               </Button>
             </div>
           </div>

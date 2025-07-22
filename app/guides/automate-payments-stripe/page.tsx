@@ -113,7 +113,7 @@ export default function AutomatePaymentsStripePage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Get Started with Stripe & Monthly Club</Link>
+                <Link href="/create-a-business/step-one">Get Started with Stripe & Monthly Club</Link>
               </Button>
             </div>
           </div>

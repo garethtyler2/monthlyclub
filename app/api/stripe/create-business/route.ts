@@ -65,6 +65,7 @@ export async function POST(req: Request) {
           : { company: {} }),
         capabilities: {
           transfers: { requested: true },
+          card_payments: { requested: true },
         },
         business_profile: {
           url: `https://www.monthlyclubhq.com/businesses/${business.slug}`,

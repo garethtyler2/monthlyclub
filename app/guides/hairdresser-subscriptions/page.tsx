@@ -112,7 +112,7 @@ export default function HairdresserSubscriptionsPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Launch Your Subscription Plan Today</Link>
+                <Link href="/create-a-business/step-one">Launch Your Subscription Plan Today</Link>
               </Button>
             </div>
           </div>

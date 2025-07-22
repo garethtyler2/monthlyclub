@@ -102,7 +102,7 @@ export default function RecurringRevenueBenefitsPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Start Your Subscription Journey Today</Link>
+                <Link href="/create-a-business/step-one">Start Your Subscription Journey Today</Link>
               </Button>
             </div>
           </div>

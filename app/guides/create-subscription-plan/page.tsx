@@ -111,7 +111,7 @@ export default function CreateSubscriptionPlanPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/">Build Your Plan and Start Earning</Link>
+                <Link href="/create-a-business/step-one">Build Your Plan and Start Earning</Link>
               </Button>
             </div>
           </div>

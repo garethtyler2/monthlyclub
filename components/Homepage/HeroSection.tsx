@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 
+import { Card, CardContent } from "@/components/ui/card";
 import React, { useEffect, useState } from 'react';
 import { CheckCircle } from "lucide-react";
 import Link from "next/link";
@@ -143,11 +144,22 @@ const Hero = () => {
           >
             <Link
               href="/guides/service-subscription-examples"
-              className="inline-flex items-center text-sm font-medium text-brand-purple hover:underline hover:underline-offset-2"
+              className="inline-flex items-center text-sm mb-10 font-medium text-brand-purple hover:underline hover:underline-offset-2"
             >
               See real subscription examples →
             </Link>
           </div>
+                    <div
+            className="flex flex-col items-center justify-center text-center text-sm font-medium rounded-full border border-white/10 bg-white/5 px-4 py-2 mb-6 animate-fade-in space-y-1 w-full max-w-xs mx-auto"
+            style={{ animationDelay: "200ms" }}
+          >
+            <span className="text-brand-purple text-center w-full sm:w-auto">✨ Pay-As-You-Go</span>
+            <span className="text-center w-full sm:w-auto">One simple rate. No tiers. No surprises.</span>
+            <Link href="/pricing" className="ml-2 text-brand-purple underline hover:text-brand-purple/80">
+              See pricing →
+            </Link>
+          </div>
+
         </div>
       </div>
       <style jsx>{`
