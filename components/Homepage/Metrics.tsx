@@ -139,7 +139,7 @@ const Metrics = () => {
           ))}
         </div>
             <Button asChild className="w-1/2 mt-10 hero-button-primary">
-            <Link href="#">Join the Beta!</Link>
+            <Link href="create-a-business/step-one">Start Your Business Now!</Link>
           </Button>
       </div>
     </section>
