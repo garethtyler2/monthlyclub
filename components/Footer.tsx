@@ -26,13 +26,36 @@ const Footer = () => {
           {/* Navigation Links */}
           <div className="grid grid-cols-2 gap-8">
             {/* Explore Links */}
-
+            <div>
+              <h3 className="text-sm font-medium mb-4">Explore</h3>
+              <ul className="space-y-3 text-sm">
+                <li>
+                  <Link href="/how-it-works" className="text-muted-foreground hover:text-primary transition-colors">
+                    How It Works
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/pricing" className="text-muted-foreground hover:text-primary transition-colors">
+                    Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/features" className="text-muted-foreground hover:text-primary transition-colors">
+                    Features
+                  </Link>
+                </li>
+              </ul>
+            </div>
             
             {/* About Links */}
             <div>
               <h3 className="text-sm font-medium mb-4">About</h3>
               <ul className="space-y-3 text-sm">
-
+                <li>
+                  <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">
+                    About
+                  </Link>
+                </li>
                 <li>
                   <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">
                     Contact Us
