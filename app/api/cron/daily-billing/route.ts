@@ -62,7 +62,7 @@ export async function GET() {
       if (!business?.stripe_account_id) {
         console.warn(`Missing Stripe account for business tied to product ${product.id}`);
         skippedCount++;
-        skipReasons.push(`Missing Stripe account for business ${business.id}`);
+        skipReasons.push(`Missing Stripe account for business ${business?.id || "unknown"}`);
         continue;
       }
 
@@ -135,7 +135,6 @@ export async function GET() {
       console.log(`Successfully charged customer ${record.user_id}`);
     } catch (err) {
       console.error("Error processing payment for record:", record.id, err);
-      const metadata = record?.stripe_payment_metadata || {};
       const { error: insertFailureError } = await supabase.from("payments").insert({
         user_id: record.user_id,
         product_id: record.products?.id,
@@ -164,5 +163,6 @@ export async function GET() {
   if (logInsertError) {
     console.error("Failed to insert billing log:", logInsertError);
     }
+  console.log(`Cron run summary: ${succeededCount} succeeded, ${skippedCount} skipped.`);
   return new NextResponse("Cron run complete", { status: 200 });
 }

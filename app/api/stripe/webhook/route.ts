@@ -137,5 +137,13 @@ export async function POST(req: Request) {
     return new NextResponse("Success", { status: 200 });
   }
 
+  if (event.type === "payment_intent.payment_failed") {
+    const failedIntent = event.data.object as Stripe.PaymentIntent;
+    console.warn("Payment failed:", failedIntent.id, failedIntent.last_payment_error?.message);
+
+    // Optional: Log to Supabase or notify stakeholders
+    return new NextResponse("Payment failure logged", { status: 200 });
+  }
+
   return new NextResponse("Event received", { status: 200 });
 }
