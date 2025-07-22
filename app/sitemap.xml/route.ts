@@ -10,6 +10,8 @@ export async function GET() {
   const staticPaths = [
     "",
     "how-it-works",
+    "pricing",
+    "features",
     "guides/automate-payments-stripe",
     "guides/cleaning-subscription-model",
     "guides/create-subscription-plan",
