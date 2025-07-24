@@ -87,7 +87,7 @@ const Navbar = () => {
       <LoadingOverlay show={loadingUpdate} />
       <header className="fixed top-0 left-0 w-full z-50 bg-background/80 backdrop-blur-md border-b border-white/10">
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between h-16">
-          <div className="flex items-center">
+          <div className="hidden md:flex items-center">
             <Link href="/" className="flex items-center">
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-purple to-brand-blue">
                 Monthly Club
@@ -181,16 +181,19 @@ const Navbar = () => {
           </nav>
 
           {/* Mobile Navigation Toggle & Avatar */}
-          <div className="flex items-center md:hidden space-x-2">
+          <div className="md:hidden flex items-center w-full px-4">
             <button
-              className="md:hidden"
+              className=""
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle Menu"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
+            <span className="flex-1 text-center text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-purple to-brand-blue">
+              Monthly Club
+            </span>
             {/* Mobile Avatar Dropdown */}
-            {user && (
+            {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger className="focus:outline-none cursor-pointer ml-1">
                   <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue w-8 h-8">
@@ -242,6 +245,8 @@ const Navbar = () => {
                   <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            ) : (
+              <div className="w-8" />
             )}
           </div>
         </div>
