@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ManagePaymentDayModal from "@/components/dashboard/ManagePaymentDayModal";
@@ -28,6 +29,7 @@ interface Product {
   price: number;
   business: {
     name: string;
+    slug: string;
   };
 }
 
@@ -73,9 +75,9 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
         description,
         price,
         business:business_id (
-          name
+          name, slug
         )
-      `)as unknown as { data: Product[] };
+      `) as unknown as { data: Product[] };
 
     const { data: schedules } = await supabase
       .from("scheduled_payments")
@@ -146,7 +148,15 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
             >
               <CardContent className="p-5">
                 <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-                <p className="text-sm text-muted-foreground mb-2">From: {product.business?.name}</p>
+                <p className="text-sm text-muted-foreground mb-2">
+                  From:{" "}
+                  <Link
+                    href={`/businesses/${product.business?.slug}`}
+                    className="underline hover:text-white transition-colors"
+                  >
+                    {product.business?.name}
+                  </Link>
+                </p>
                 <p className="text-sm opacity-80 mb-2">{product.description}</p>
                 <p className="text-sm font-medium mb-4">£{product.price} / month</p>
                 <div className="text-sm mb-4">
@@ -233,7 +243,15 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
               >
                 <CardContent className="p-5">
                   <h3 className="text-lg font-semibold mb-2">{product.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">From: {product.business?.name}</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    From:{" "}
+                    <Link
+                      href={`/businesses/${product.business?.slug}`}
+                      className="underline hover:text-white transition-colors"
+                    >
+                      {product.business?.name}
+                    </Link>
+                  </p>
                   <p className="text-sm opacity-80 mb-2">{product.description}</p>
                   <p className="text-sm font-medium mb-4">£{product.price} / month</p>
                   <div className="text-sm mb-4">

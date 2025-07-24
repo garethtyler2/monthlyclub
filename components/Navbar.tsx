@@ -20,8 +20,11 @@ const Navbar = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [hasBusiness, setHasBusiness] = useState(false);
+  const [hasSubscriptions, setHasSubscriptions] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [businessSlug, setBusinessSlug] = useState<string | null>(null);
+  const [businessName, setBusinessName] = useState<string | null>(null);
+  const [businessImageUrl, setBusinessImageUrl] = useState<string | null>(null);
   
   useEffect(() => {
     const getUser = async () => {
@@ -34,7 +37,7 @@ const Navbar = () => {
       if (user) {
         const { data: businessData, error } = await supabase
           .from("businesses")
-          .select("id, slug")
+          .select("id, slug, name, image_url")
           .eq("user_id", user.id)
           .maybeSingle();
 
@@ -42,6 +45,17 @@ const Navbar = () => {
           setHasBusiness(true);
         }
         setBusinessSlug(businessData?.slug ?? null);
+        setBusinessName(businessData?.name ?? null);
+        setBusinessImageUrl(businessData?.image_url ?? null);
+
+        // Check for subscriptions
+        const { data: subData } = await supabase
+          .from("subscriptions")
+          .select("id")
+          .eq("user_id", user.id);
+        if (subData && subData.length > 0) {
+          setHasSubscriptions(true);
+        }
       }
     };
 
@@ -102,37 +116,58 @@ const Navbar = () => {
             )}
             {user && (
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center space-x-2 focus:outline-none cursor-pointer">
+                <DropdownMenuTrigger className="focus:outline-none cursor-pointer">
                   <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue">
-                    <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
+                    {businessImageUrl ? (
+                      <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
+                    ) : (
+                      <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
+                    )}
                   </Avatar>
-                  <span className="text-sm text-muted-foreground max-w-[140px] truncate" title={user?.email}>
-                    {user?.email?.replace(/@.*/, '@...')}
-                  </span>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="mt-2">
-                  {businessSlug && (
-                    <DropdownMenuItem>
-                      <button
-                        onClick={() => handleRedirect(`/businesses/${businessSlug}`)}
-                        className="w-full text-left"
-                      >
-                        My Business Page
-                      </button>
-                    </DropdownMenuItem>
+                  <div className="px-3 py-2 border-b border-muted capitalize text-sm text-muted-foreground">
+                    {businessName ?? user?.email?.replace(/@.*/, '@...')}
+                  </div>
+
+                  {hasBusiness && (
+                    <>
+                      <div className="px-3 pt-3 pb-1 text-xs font-semibold text-muted-foreground">My Business</div>
+                     <DropdownMenuItem asChild>
+                        <Link href="/dashboard/business">Business Dashboard</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <button
+                          onClick={() => handleRedirect(`/businesses/${businessSlug}`)}
+                          className="w-full text-left"
+                        >
+                          My Business Page
+                        </button>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem asChild>
+                        <button onClick={() => handleRedirect("/api/stripe/update-business-details")}>
+                          Stripe - Business Details
+                        </button>
+                      </DropdownMenuItem>
+                    </>
                   )}
-                  <DropdownMenuItem asChild>
-                    <Link href="/dashboard">Dashboard</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <button onClick={() => handleRedirect("/api/stripe/update-payment-details")}>Stripe - Payment Details</button>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <button onClick={() => handleRedirect("/api/stripe/update-business-details")}>Stripe - Business Details</button>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
-                    Logout
-                  </DropdownMenuItem>
+
+                  {hasSubscriptions && (
+                    <>
+                      <div className="px-3 pt-3 pb-1 text-xs font-semibold text-muted-foreground">My Subscriptions</div>
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard/subscriptions">My Subscriptions</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <button onClick={() => handleRedirect("/api/stripe/update-payment-details")}>
+                          Stripe - Payment Details
+                        </button>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+
+                  <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
@@ -145,14 +180,70 @@ const Navbar = () => {
             )}
           </nav>
 
-          {/* Mobile Navigation Toggle */}
-          <button
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle Menu"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile Navigation Toggle & Avatar */}
+          <div className="flex items-center md:hidden space-x-2">
+            <button
+              className="md:hidden"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle Menu"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            {/* Mobile Avatar Dropdown */}
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="focus:outline-none cursor-pointer ml-1">
+                  <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue w-8 h-8">
+                    {businessImageUrl ? (
+                      <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
+                    ) : (
+                      <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
+                    )}
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="mt-2">
+                  <div className="px-3 py-2 border-b border-muted capitalize text-sm text-muted-foreground">
+                    {businessName ?? user?.email?.replace(/@.*/, '@...')}
+                  </div>
+                  {hasBusiness && (
+                    <>
+                      <div className="px-3 pt-3 pb-1 text-xs font-semibold text-muted-foreground">My Business</div>
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard/business">Business Dashboard</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <button
+                          onClick={() => handleRedirect(`/businesses/${businessSlug}`)}
+                          className="w-full text-left"
+                        >
+                          My Business Page
+                        </button>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <button onClick={() => handleRedirect("/api/stripe/update-business-details")}>
+                          Stripe - Business Details
+                        </button>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  {hasSubscriptions && (
+                    <>
+                      <div className="px-3 pt-3 pb-1 text-xs font-semibold text-muted-foreground">My Subscriptions</div>
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard/subscriptions">My Subscriptions</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <button onClick={() => handleRedirect("/api/stripe/update-payment-details")}>
+                          Stripe - Payment Details
+                        </button>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
 
         {/* Mobile Navigation Menu */}
@@ -204,67 +295,12 @@ const Navbar = () => {
                   </button>
                 )}
               </div>
-              {user ? (
-                <div className="flex flex-col pt-4 border-t border-white/10 space-y-2 px-4 mb-4">
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue">
-                      <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm text-muted-foreground max-w-[140px] truncate" title={user?.email}>
-                      {user?.email?.replace(/@.*/, '@...')}
-                    </span>
-                  </div>
-                  {businessSlug && (
-                    <button
-                      onClick={() => {
-                        setIsMenuOpen(false);
-                        handleRedirect(`/businesses/${businessSlug}`);
-                      }}
-                      className="text-sm pt-2 font-medium text-white hover:underline text-left"
-                    >
-                      My Business Page
-                    </button>
-                  )}
-                  <Link
-                    href="/dashboard"
-                    className="text-sm pt-2 font-medium text-white hover:underline"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    Dashboard
+              {!loading && !user && (
+                <div className="flex flex-col p-4 border-t border-white/10 space-y-2">
+                  <Link href="/login" className="text-sm font-medium hover:text-white transition-colors p-2" >
+                    Login / Sign Up
                   </Link>
-                  <button
-                    onClick={() => {
-                      handleRedirect("/api/stripe/update-payment-details");
-                      setIsMenuOpen(false);
-                    }}
-                    className="text-sm pt-2 font-medium text-white hover:underline text-left"
-                  >
-                    Stripe - Payment Details
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleRedirect("/api/stripe/update-business-details");
-                      setIsMenuOpen(false);
-                    }}
-                    className="text-sm pt-2 font-medium text-white hover:underline text-left"
-                  >
-                    Stripe - Business Details
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="text-sm pt-2 text-white hover:underline text-left"
-                  >
-                    Logout
-                  </button>
                 </div>
-              ) : (
-                !loading && (
-                  <div className="flex flex-col p-4 border-t border-white/10 space-y-2">
-                    <Link href="/login" className="text-sm font-medium hover:text-white transition-colors p-2" >
-                      Login / Sign Up
-                    </Link>
-                  </div>
-                )
               )}
             </div>
           </div>
