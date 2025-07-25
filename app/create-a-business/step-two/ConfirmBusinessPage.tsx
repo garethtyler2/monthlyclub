@@ -162,6 +162,11 @@ export default function ConfirmBusinessPage() {
       const data = await response.json();
 
       if (response.ok && data?.url) {
+        // Update business status to "pre-stripe" before redirecting
+        await supabase
+          .from("businesses")
+          .update({ status: "pre-stripe" })
+          .eq("id", businessId);
         window.location.href = data.url;
         return; // skip further execution
       } else {

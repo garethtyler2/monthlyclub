@@ -30,6 +30,8 @@ export default function CompletionPage() {
 
       if (error || !data?.slug) return
 
+      await supabase.from("businesses").update({ status: "active" }).eq("user_id", user.id);
+
       setSlug(data.slug)
     }
 
@@ -69,4 +71,3 @@ export default function CompletionPage() {
     </section>
   )
 }
-

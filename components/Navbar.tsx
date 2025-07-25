@@ -37,11 +37,11 @@ const Navbar = () => {
       if (user) {
         const { data: businessData, error } = await supabase
           .from("businesses")
-          .select("id, slug, name, image_url")
+          .select("id, slug, name, image_url, status")
           .eq("user_id", user.id)
           .maybeSingle();
 
-        if (businessData) {
+        if (businessData?.status === "active") {
           setHasBusiness(true);
         }
         setBusinessSlug(businessData?.slug ?? null);

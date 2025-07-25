@@ -89,11 +89,20 @@ export default function CreateBusinessPage() {
 
       const { data: businesses, error } = await supabase
         .from("businesses")
-        .select("id")
+        .select("id, status, slug")
         .eq("user_id", user.id);
 
-      if (businesses && businesses.length > 0) {
+      const activeBusiness = businesses?.find((b) => b.status === "active");
+      if (activeBusiness) {
         setHasBusiness(true);
+      } else {
+        const inProgressBusiness = businesses?.find((b) =>
+          b.status === "draft" || b.status === "pre-stripe"
+        );
+
+        if (inProgressBusiness) {
+          router.replace(`/create-a-business/step-two?id=${inProgressBusiness.id}`);
+        }
       }
     };
 
@@ -177,7 +186,8 @@ export default function CreateBusinessPage() {
           image_url: imageUrl,
           service_type: finalBusinessType,
           business_type: accountType,
-          slug
+          slug,
+          status: "draft"
         }
       ])
       .select()
