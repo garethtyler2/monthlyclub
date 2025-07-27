@@ -25,6 +25,7 @@ const Navbar = () => {
   const [businessSlug, setBusinessSlug] = useState<string | null>(null);
   const [businessName, setBusinessName] = useState<string | null>(null);
   const [businessImageUrl, setBusinessImageUrl] = useState<string | null>(null);
+  const [businessStatus, setBusinessStatus] = useState<string | null>(null);
   
   useEffect(() => {
     const getUser = async () => {
@@ -41,12 +42,13 @@ const Navbar = () => {
           .eq("user_id", user.id)
           .maybeSingle();
 
-        if (businessData?.status === "active") {
+        if (businessData) {
           setHasBusiness(true);
         }
         setBusinessSlug(businessData?.slug ?? null);
         setBusinessName(businessData?.name ?? null);
         setBusinessImageUrl(businessData?.image_url ?? null);
+        setBusinessStatus(businessData?.status ?? null);
 
         // Check for subscriptions
         const { data: subData } = await supabase
@@ -109,11 +111,16 @@ const Navbar = () => {
             <Link href="/guides" className="text-sm font-medium hover:text-white transition-colors">
               Guides
             </Link>
-            {!hasBusiness && (
+            {(!hasBusiness && (
               <button onClick={onCreateBusinessClick} className="hero-button-primary text-sm font-medium hover:underline underline-offset-4 transition-colors">
                 Create Business
               </button>
-            )}
+            )) ||
+              ((businessStatus === 'draft' || businessStatus === 'pre-stripe') && (
+                <button onClick={onCreateBusinessClick} className="hero-button-primary text-sm font-medium hover:underline underline-offset-4 transition-colors">
+                  Finish Business Setup
+                </button>
+              ))}
             {user && (
               <DropdownMenu>
                 <DropdownMenuTrigger className="focus:outline-none cursor-pointer">
@@ -189,9 +196,11 @@ const Navbar = () => {
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            <span className="flex-1 text-center text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-purple to-brand-blue">
+
+            <Link href="/" className="flex-1 text-center text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-purple to-brand-blue">
               Monthly Club
-            </span>
+            </Link>
+       
             {/* Mobile Avatar Dropdown */}
             {user ? (
               <DropdownMenu>
@@ -288,7 +297,7 @@ const Navbar = () => {
                 >
                   Guides
                 </Link>
-                {!hasBusiness && (
+                {(!hasBusiness && (
                   <button
                     onClick={() => {
                       onCreateBusinessClick();
@@ -298,7 +307,18 @@ const Navbar = () => {
                   >
                     Create Business
                   </button>
-                )}
+                )) ||
+                  ((businessStatus === 'draft' || businessStatus === 'pre-stripe') && (
+                    <button
+                      onClick={() => {
+                        onCreateBusinessClick();
+                        setIsMenuOpen(false);
+                      }}
+                      className="hero-button-primary text-sm font-medium hover:underline underline-offset-4 transition-colors p-2"
+                    >
+                      Finish Business Setup
+                    </button>
+                  ))}
               </div>
               {!loading && !user && (
                 <div className="flex flex-col p-4 border-t border-white/10 space-y-2">
