@@ -13,6 +13,7 @@ export default function CreateBusinessPage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [accountType, setAccountType] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [customBusinessType, setCustomBusinessType] = useState("");
@@ -249,6 +250,15 @@ export default function CreateBusinessPage() {
   if (loading ) {
     return <LoadingOverlay show message="Generating your business page and products" />;
   }
+
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
+
   return (
     <section className="py-10 md:py-24 relative overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">
@@ -279,7 +289,7 @@ export default function CreateBusinessPage() {
               </label>
               <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-dashed border-gray-300 flex items-center justify-center relative">
                 <Image
-                  src={image ? URL.createObjectURL(image) : "/images/MonthlyClubLogo.png"}
+                  src={imagePreviewUrl || "/images/MonthlyClubLogo.png"}
                   alt="Profile Preview"
                   width={128}
                   height={128}
@@ -295,7 +305,16 @@ export default function CreateBusinessPage() {
                   id="image-upload"
                   type="file"
                   accept="image/*"
-                  onChange={(e) => setImage(e.target.files?.[0] ?? null)}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] ?? null;
+                    setImage(file);
+                    if (file) {
+                      const previewUrl = URL.createObjectURL(file);
+                      setImagePreviewUrl(previewUrl);
+                    } else {
+                      setImagePreviewUrl(null);
+                    }
+                  }}
                   className="absolute inset-0 opacity-0 cursor-pointer"
                 />
               </div>
