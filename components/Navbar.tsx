@@ -137,10 +137,25 @@ const Navbar = () => {
                     {businessName ?? user?.email?.replace(/@.*/, '@...')}
                   </div>
 
+                  {businessStatus === null && (
+                    <DropdownMenuItem asChild>
+                      <button onClick={() => handleRedirect("/create-a-business/step-one")}>
+                        Create Business
+                      </button>
+                    </DropdownMenuItem>
+                  )}
+                  {(businessStatus === "draft" || businessStatus === "pre-stripe") && (
+                    <DropdownMenuItem asChild>
+                      <button onClick={() => handleRedirect("/create-a-business/step-one")}>
+                        Finish Business Setup
+                      </button>
+                    </DropdownMenuItem>
+                  )}
+
                   {hasBusiness && (
                     <>
                       <div className="px-3 pt-3 pb-1 text-xs font-semibold text-muted-foreground">My Business</div>
-                     <DropdownMenuItem asChild>
+                      <DropdownMenuItem asChild>
                         <Link href="/dashboard/business">Business Dashboard</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
@@ -151,7 +166,6 @@ const Navbar = () => {
                           My Business Page
                         </button>
                       </DropdownMenuItem>
-
                       <DropdownMenuItem asChild>
                         <button onClick={() => handleRedirect("/api/stripe/update-business-details")}>
                           Stripe - Business Details
@@ -217,6 +231,20 @@ const Navbar = () => {
                   <div className="px-3 py-2 border-b border-muted capitalize text-sm text-muted-foreground">
                     {businessName ?? user?.email?.replace(/@.*/, '@...')}
                   </div>
+                  {businessStatus === null && (
+                    <DropdownMenuItem asChild>
+                      <button onClick={() => handleRedirect("/create-a-business/step-one")}>
+                        Start A Business
+                      </button>
+                    </DropdownMenuItem>
+                  )}
+                  {(businessStatus === "draft" || businessStatus === "pre-stripe") && (
+                    <DropdownMenuItem asChild>
+                      <button onClick={() => handleRedirect("/create-a-business/step-one")}>
+                        Finish Business Setup
+                      </button>
+                    </DropdownMenuItem>
+                  )}
                   {hasBusiness && (
                     <>
                       <div className="px-3 pt-3 pb-1 text-xs font-semibold text-muted-foreground">My Business</div>
