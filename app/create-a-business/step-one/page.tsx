@@ -30,7 +30,15 @@ export default function CreateBusinessPage() {
       }
     };
     checkAuth();
-  }, []);
+  }, [router]);
+
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
 
   const phrases = useMemo(() => ['the service you offer', 'products and prices'], []);
   const [typing, setTyping] = useState('');
@@ -108,7 +116,7 @@ export default function CreateBusinessPage() {
     };
 
     checkExistingBusiness();
-  }, []);
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -251,13 +259,6 @@ export default function CreateBusinessPage() {
     return <LoadingOverlay show message="Generating your business page and products" />;
   }
 
-  useEffect(() => {
-    return () => {
-      if (imagePreviewUrl) {
-        URL.revokeObjectURL(imagePreviewUrl);
-      }
-    };
-  }, [imagePreviewUrl]);
 
   return (
     <section className="py-10 md:py-24 relative overflow-hidden">
