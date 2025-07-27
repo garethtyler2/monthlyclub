@@ -130,7 +130,12 @@ const Hero = () => {
               </div>
             ))}
           </div>
-
+            <Link
+              href="/pricing"
+              className="text-sm mt-6 mb-2 font-medium text-brand-purple hover:underline hover:underline-offset-2"
+            >
+              See Pricing →
+            </Link>
           <p
             className="mt-10 text-sm text-muted-foreground max-w-2xl animate-fade-in"
             style={{ animationDelay: "1200ms" }}
@@ -149,16 +154,7 @@ const Hero = () => {
               See real subscription examples →
             </Link>
           </div>
-                    <div
-            className="flex flex-col items-center justify-center text-center text-sm font-medium rounded-full border border-white/10 bg-white/5 px-4 py-2 mb-6 animate-fade-in space-y-1 w-full max-w-xs mx-auto"
-            style={{ animationDelay: "200ms" }}
-          >
-            <span className="text-brand-purple text-center w-full sm:w-auto">✨ Pay-As-You-Go</span>
-            <span className="text-center w-full sm:w-auto">One simple rate. No tiers. No surprises.</span>
-            <Link href="/pricing" className="ml-2 text-brand-purple underline hover:text-brand-purple/80">
-              See pricing →
-            </Link>
-          </div>
+
 
         </div>
       </div>
@@ -172,6 +168,6 @@ const Hero = () => {
   );
 };
 
-const features = ["No Tech Skills Needed", "Recurring Payments", "Branded Service Page"];
+const features = ["Stable Predictable Income","No Tech Skills Needed", "Recurring Payments", "Branded Service Page", "Pay As You Go - No Surprises"];
 
 export default Hero;

@@ -7,6 +7,14 @@ import Link from "next/link";
 
 const featureItems = [
   {
+    icon: BarChart,
+    title: "Reliable Income",
+    description: "With recurring payments, you know exactly what you'll earn and when—no more chasing payments.",
+    className: "border-brand-indigo/20 bg-gradient-to-b from-brand-indigo/10 to-transparent",
+    delay: 600,
+    link: "/"
+  },
+  {
     icon: Clipboard,
     title: "Create Service Plans",
     description: "Easily build subscription plans for any service—from beauty to gardening—in minutes.",
