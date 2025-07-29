@@ -84,6 +84,19 @@ export async function POST(req: Request) {
         if (profileError) {
         console.error("Failed to fetch user profile:", profileError);
         }
+    
+    const { data: existingSubscription, error: existingSubError } = await supabase
+      .from("subscriptions")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("product_id", productId)
+      .maybeSingle();
+
+    if (existingSubscription) {
+      console.log("Subscription already exists for user and product. Skipping insert.");
+      return new NextResponse("Subscription already exists", { status: 200 });
+    }
+
     // Insert into subscriptions
     const { data: purchase, error: purchaseError } = await supabase
       .from("subscriptions")
@@ -114,6 +127,19 @@ export async function POST(req: Request) {
       if (productError || !product) {
         return NextResponse.json({ error: "Product not found" }, { status: 400 });
         }
+
+    const { data: existingScheduled, error: existingScheduledError } = await supabase
+      .from("scheduled_payments")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("product_id", productId)
+      .maybeSingle();
+
+    if (existingScheduled) {
+      console.log("Scheduled payment already exists for user and product. Skipping insert.");
+      return new NextResponse("Scheduled payment already exists", { status: 200 });
+    }
+
     const businessId = product.business_id;
     const { error: scheduleError } = await supabase
       .from("scheduled_payments")
