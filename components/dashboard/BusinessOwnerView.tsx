@@ -78,10 +78,13 @@ export function BusinessOwnerView({ businessId }: BusinessOwnerViewProps) {
           <div className="rounded-xl border border-green-400/20 bg-green-500/10 p-5">
             <p className="text-sm font-medium text-muted-foreground">Total Earned to Date</p>
             <p className="mt-2 text-3xl font-bold tracking-tight text-green-300">
-              {totalEarnedToDate !== null ? `£${(totalEarnedToDate / 100).toFixed(2)}` : "—"}
+              {totalEarnedToDate !== null ? `£${(totalEarnedToDate / 100).toFixed(2)}` : "—"}*
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               Total value of all successful customer payments received.
+            </p>
+            <p className="text-[10px] text-muted-foreground italic">
+              * Before fees.
             </p>
           </div>
 

@@ -84,10 +84,10 @@ export default function LoginPageContent() {
   };
 
   return (
-    <div className="h-screen mb-10 flex items-center justify-center px-4">
+    <div className="h-screen mb-10 flex items-center justify-center px-4 relative overflow-hidden">
       <div className="absolute top-0 -right-64 w-96 h-96 bg-brand-purple/30 rounded-full blur-[128px]" />
       <div className="absolute -bottom-24 -left-64 w-96 h-96 bg-brand-blue/20 rounded-full blur-[128px] -z-10" />
-      <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md text-center">
+      <div className="bg-white shadow-xl rounded-xl p-3 w-full max-w-md text-center">
         <div className="mb-6">
           <Image
             src="/images/MonthlyClubLogo.png"

@@ -350,7 +350,11 @@ const Navbar = () => {
               </div>
               {!loading && !user && (
                 <div className="flex flex-col p-4 border-t border-white/10 space-y-2">
-                  <Link href="/login" className="text-sm font-medium hover:text-white transition-colors p-2" >
+                  <Link
+                    href="/login"
+                    className="text-sm font-medium hover:text-white transition-colors p-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     Login / Sign Up
                   </Link>
                 </div>

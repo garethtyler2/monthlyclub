@@ -26,7 +26,7 @@ export default function BusinessDashboardPage() {
       if (user) {
         const { data: business } = await supabase
           .from("businesses")
-          .select("id, stripe_verification_prompt_dismissed")
+          .select("id")
           .eq("user_id", user.id)
           .single();
 
@@ -42,8 +42,16 @@ export default function BusinessDashboardPage() {
             (p) => p.business_id === business.id
           );
 
-          if (hasActive && !business.stripe_verification_prompt_dismissed) {
-            setShowStripeReminder(true);
+          if (hasActive) {
+            try {
+              const res = await fetch("/api/stripe/check-requirements");
+              const result = await res.json();
+              if (result.needsID) {
+                setShowStripeReminder(true);
+              }
+            } catch (err) {
+              console.error("Error checking Stripe requirements:", err);
+            }
           }
         }
       }
@@ -75,9 +83,9 @@ export default function BusinessDashboardPage() {
     <section className="max-w-5xl mx-auto px-4 py-12 space-y-6">
       {showStripeReminder && (
         <Card className="p-4 bg-yellow-50 border-l-4 border-yellow-500">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex gap-3">
-              <AlertTriangle className="text-yellow-600" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="text-yellow-600 mt-1" />
               <div>
                 <h2 className="text-yellow-800 font-semibold">Action Needed: Verify your ID</h2>
                 <p className="text-yellow-700 text-sm">
@@ -85,9 +93,14 @@ export default function BusinessDashboardPage() {
                 </p>
               </div>
             </div>
-            <Button onClick={handleVerifyClick} className="bg-yellow-600 text-white">
-              Verify Now
-            </Button>
+            <div className="w-full sm:w-auto">
+              <Button
+                onClick={handleVerifyClick}
+                className="w-full sm:w-auto bg-yellow-600 text-white hover:bg-yellow-700 hover:text-white"
+              >
+                Verify Now
+              </Button>
+            </div>
           </div>
         </Card>
       )}
