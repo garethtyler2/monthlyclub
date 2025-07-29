@@ -50,7 +50,10 @@ export function BusinessOwnerView({ businessId }: BusinessOwnerViewProps) {
       try {
         const res = await fetch("/api/stripe/business-overview");
         const stripeData = await res.json();
-        setFuturePayouts(stripeData.futurePayouts);
+        const payoutAmount = typeof stripeData.futurePayouts === "number" && !isNaN(stripeData.futurePayouts)
+          ? stripeData.futurePayouts
+          : 0;
+        setFuturePayouts(payoutAmount);
       } catch (error) {
         console.error("Failed to fetch Stripe overview", error);
       }
