@@ -9,6 +9,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function GET() {
   console.log("Billing cron started");
 
+  const runStartedAt = new Date();
+  const batchId = crypto.randomUUID(); // Unique ID to link logs
+
   const supabase = createClient(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -16,6 +19,9 @@ export async function GET() {
       auth: { persistSession: false, autoRefreshToken: false },
     }
   );
+
+  let totalAmount = 0;
+  let totalFees = 0;
 
   const today = new Date().getDate(); // e.g. 25
   const todayDate = new Date().toISOString().split("T")[0];
@@ -39,7 +45,7 @@ export async function GET() {
 
   const { data: scheduled, error: scheduledError } = await supabase
     .from("scheduled_payments")
-    .select("*, subscriptions(*), products(*, businesses(id, stripe_account_id))")
+    .select("*, subscriptions(*), products(*, businesses(id, stripe_account_id, is_vip))")
     .eq("scheduled_for", today)
     .eq("status", "active");
 
@@ -67,6 +73,13 @@ export async function GET() {
       }
 
       const amountInPence = product.price * 100;
+
+      // Set platform fee rates
+      const STANDARD_FEE_RATE = 0.015; // 1.5%
+      const VIP_FEE_RATE = 0.001; // 0.1%
+
+      const platformFeeRate = business.is_vip ? VIP_FEE_RATE : STANDARD_FEE_RATE;
+      const applicationFee = Math.floor(amountInPence * platformFeeRate);
 
       const { data: customerData, error: customerError } = await supabase
         .from("stripe_customers")
@@ -100,8 +113,8 @@ export async function GET() {
         customer: customerData.stripe_customer_id,
         payment_method: paymentMethodId,
         off_session: true, // 🔥 critical
-        confirm: true,    
-        application_fee_amount: Math.floor(amountInPence * 0.015), // 1.5% fee
+        confirm: true,
+        application_fee_amount: applicationFee,
         transfer_data: {
           destination: business.stripe_account_id,
         },
@@ -131,6 +144,23 @@ export async function GET() {
       }
 
       succeededCount++;
+      totalAmount += paymentIntent.amount;
+      totalFees += applicationFee;
+
+      await supabase.from("billing_run_details").insert({
+        run_date: todayDate,
+        business_id: business.id,
+        user_id: record.user_id,
+        product_id: product.id,
+        subscription_id: record.subscriptions?.id,
+        amount: paymentIntent.amount,
+        fee: applicationFee,
+        stripe_payment_intent_id: paymentIntent.id,
+        status: "succeeded",
+        reason: null,
+        batch_id: batchId,
+      });
+
       console.log(`PaymentIntent created: ${paymentIntent.id}`);
       console.log(`Successfully charged customer ${record.user_id}`);
     } catch (err) {
@@ -149,16 +179,41 @@ export async function GET() {
       if (insertFailureError) {
         console.error("Failed to log failed payment:", insertFailureError);
       }
+
+      await supabase.from("billing_run_details").insert({
+        run_date: todayDate,
+        business_id: record.products?.businesses?.id,
+        user_id: record.user_id,
+        product_id: record.products?.id,
+        subscription_id: record.subscriptions?.id,
+        amount: record.products?.price * 100,
+        fee: 0,
+        stripe_payment_intent_id: null,
+        status: "failed",
+        reason: `Error processing payment for record ${record.id}`,
+        batch_id: batchId,
+      });
+
       skippedCount++;
       skipReasons.push(`Error processing payment for record ${record.id}`);
     }
   }
 
+  const runEndedAt = new Date();
+
   const { error: logInsertError } = await supabase.from("daily_billing_logs").insert({
     run_date: todayDate,
     payments_found: scheduled?.length || 0,
     payments_succeeded: succeededCount,
+    total_payments: scheduled?.length || 0,
+    total_succeeded: succeededCount,
+    total_failed: skippedCount,
+    total_amount: totalAmount,
+    total_fees: totalFees,
+    run_started_at: runStartedAt.toISOString(),
+    run_ended_at: runEndedAt.toISOString(),
     notes: `Daily billing cron executed. Skipped ${skippedCount} payments. ${skipReasons.join(" | ")}`,
+    batch_id: batchId,
   });
   if (logInsertError) {
     console.error("Failed to insert billing log:", logInsertError);

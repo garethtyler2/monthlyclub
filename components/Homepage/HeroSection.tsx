@@ -140,7 +140,7 @@ const Hero = () => {
             className="mt-10 text-sm text-muted-foreground max-w-2xl animate-fade-in"
             style={{ animationDelay: "1200ms" }}
           >
-            Whether you're a gardener, a cleaner, or a mobile beauty pro—Monthly Club gives you the tools to grow with subscriptions. Easy setup, automated payments, and a storefront you can share anywhere.
+            Whether you're a gardener, content creator, or a mobile beauty pro—Monthly Club gives you the tools to grow with subscriptions. Easy setup, automated payments, and a storefront you can share anywhere.
           </p>
 
           <div
