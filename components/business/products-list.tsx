@@ -97,7 +97,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4 text-white">{product.name}</h3>
+                <h3 className="text-xl font-semibold mb-4 capitalize text-white">{product.name}</h3>
                 <p className="text-sm opacity-90 mb-3">{product.description}</p>
                 <p className="text-md font-bold mb-4">£{product.price}/month</p>
                 {!isSelected && (
