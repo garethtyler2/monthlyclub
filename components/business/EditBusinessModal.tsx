@@ -134,7 +134,7 @@ export function EditBusinessModal({ business }: { business: any }) {
   return (
     <Dialog open={editing} onOpenChange={setEditing}>
       <DialogTrigger asChild>
-        <Button className="hero-button-primary">Edit Business</Button>
+        <Button className="hero-button-primary">Edit Business Info</Button>
       </DialogTrigger>
       <DialogContent className="bg-gray-900 border border-white/10 text-white">
         <DialogTitle asChild>

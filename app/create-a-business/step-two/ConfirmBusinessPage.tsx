@@ -11,9 +11,10 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Trash } from "lucide-react";
+import { Trash, Info } from "lucide-react";
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
 
 const gradientStyles = [
@@ -23,13 +24,22 @@ const gradientStyles = [
   "from-brand-pink/10 to-transparent border-brand-pink/20",
 ];
 
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  product_type: 'subscription' | 'credit_builder';
+  is_credit_builder: boolean;
+}
+
 export default function ConfirmBusinessPage() {
   const searchParams = useSearchParams();
   const businessId = searchParams.get("id");
 
   const [business, setBusiness] = useState<any>(null);
   const [businessType, setBusinessType] = useState("individual");
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [clickedProductId, setClickedProductId] = useState<string | null>(null);
@@ -68,6 +78,49 @@ export default function ConfirmBusinessPage() {
     );
   };
 
+  const addNewProduct = () => {
+    setProducts((prev) => [
+      ...prev,
+      { 
+        id: `temp-${Date.now()}`, 
+        name: "", 
+        description: "", 
+        price: 0,
+        product_type: 'subscription',
+        is_credit_builder: false
+      }
+    ]);
+  };
+
+  const handleProductTypeChange = (index: number, isCreditBuilder: boolean) => {
+    setProducts((prev) =>
+      prev.map((p, i) => {
+        if (i === index) {
+          if (isCreditBuilder) {
+            return {
+              ...p,
+              name: "Credit Builder",
+              description: "Build up credit over time to use on any of our services. Choose how much you'd like to add each month.",
+              price: 0,
+              product_type: 'credit_builder',
+              is_credit_builder: true
+            };
+          } else {
+            return {
+              ...p,
+              name: "",
+              description: "",
+              price: 0,
+              product_type: 'subscription',
+              is_credit_builder: false
+            };
+          }
+        }
+        return p;
+      })
+    );
+  };
+
   const handleSave = async () => {
     if (!businessId) return;
 
@@ -93,110 +146,72 @@ export default function ConfirmBusinessPage() {
         name: product.name,
         description: product.description,
         price: product.price,
+        product_type: product.product_type || 'subscription',
+        is_credit_builder: product.is_credit_builder || false,
       }));
 
       const { error: insertError } = await supabase
         .from("products")
         .insert(cleanedProducts);
 
-      if (insertError) throw new Error("Failed to insert updated products");
+      if (insertError) throw new Error("Failed to insert products");
 
-      // No redirect here, we want to proceed to Stripe setup instead
-    } catch (err) {
-      console.error("Save error:", err);
-      alert("There was a problem saving your business details. Please try again.");
-    } finally {
+      setSaving(false);
+      setTab("preview");
+    } catch (error) {
+      console.error("Error saving:", error);
       setSaving(false);
     }
   };
 
   const handleSaveAndStripe = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-
-    setLoading(true);
-    try {
-      await handleSave();
-      await handleStripeSetup();
-    } catch (err) {
-      console.error("Error during save and stripe setup:", err);
-      setLoading(false);
-    }
+    e?.preventDefault();
+    await handleSave();
+    await handleStripeSetup();
   };
+
   const handleStripeSetup = async () => {
-    setLoading(true);
-
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
-
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    const token = session?.access_token;
-    const userId = user?.id;
-
-    if (!userId || !token) {
-      alert("User not logged in.");
-      setLoading(false);
-      return;
-    }
+    if (!businessId) return;
 
     try {
       const response = await fetch("/api/stripe/create-business", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          userId,
-          businessId,
-          name,
-          email,
-          business_type: businessType,
-        }),
+        body: JSON.stringify({ businessId }),
       });
 
-      const data = await response.json();
-
-      if (response.ok && data?.url) {
-        // Update business status to "pre-stripe" before redirecting
-        await supabase
-          .from("businesses")
-          .update({ status: "pre-stripe" })
-          .eq("id", businessId);
-        window.location.href = data.url;
-        return; // skip further execution
-      } else {
-        alert("Something went wrong creating the Stripe link.");
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to create Stripe account");
       }
+
+      const { url } = await response.json();
+      window.location.href = url;
     } catch (error) {
-      console.error("Stripe onboarding error:", error);
-      alert("Error initiating Stripe onboarding.");
-      setLoading(false);
+      console.error("Error setting up Stripe:", error);
     }
   };
 
   if (loading) {
-    return <LoadingOverlay show message="Redirecting you to Stripe for setup..." />;
+    return <LoadingOverlay show message="Loading business details..." />;
   }
 
   return (
-    <div className=" py-10 overflow-hidden">
-      <div className="container mx-auto px-4 md:px-6">
-    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 md:w-96 md:h-96 bg-brand-purple/20 rounded-full blur-[128px] -z-10" />
-    <div className="absolute bottom-0 right-1/2 translate-x-1/2 w-80 h-80 md:w-96 md:h-96 bg-brand-blue/20 rounded-full blur-[128px] -z-10" />
-        <p className="text-base font-medium text-gray-100 text-center mb-2">
-          Step 2: Review your business details
-        </p>
-        <div className="max-w-3xl mx-auto mb-8">
-        <div className="w-full h-2 mb-8 bg-gray-700/50 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-brand-purple to-brand-blue w-2/3 animate-pulse" />
-        </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-brand-purple/10 via-brand-blue/10 to-transparent relative overflow-hidden">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Set Up Your Business
+            </h1>
+            <p className="text-lg text-gray-300">
+              Customize your business page and add your products
+            </p>
+          </div>
+
+          <Progress value={66} className="mb-8" />
+
         <Tabs value={tab} onValueChange={setTab} className="max-w-3xl mx-auto">
           <TabsList className="mb-6 flex justify-center">
             <TabsTrigger value="edit">Edit Info</TabsTrigger>
@@ -255,6 +270,7 @@ export default function ConfirmBusinessPage() {
                           value={product.name}
                           onChange={(e) => handleProductChange(index, "name", e.target.value)}
                           placeholder="Product Name"
+                          disabled={product.is_credit_builder}
                         />
                       </div>
                       <div>
@@ -264,17 +280,47 @@ export default function ConfirmBusinessPage() {
                           value={product.description}
                           onChange={(e) => handleProductChange(index, "description", e.target.value)}
                           placeholder="Product Description"
+                          disabled={product.is_credit_builder}
                         />
                       </div>
-                      <div>
-                        <label className="text-sm font-semibold text-white">Price (£/month)</label>
-                        <Input
-                          className="bg-gray-800 border border-white text-white placeholder-gray-400"
-                          type="number"
-                          value={product.price}
-                          onChange={(e) => handleProductChange(index, "price", parseFloat(e.target.value))}
-                          placeholder="Monthly Price"
+                      {!product.is_credit_builder && (
+                        <div>
+                          <label className="text-sm font-semibold text-white">Price (£/month)</label>
+                          <Input
+                            className="bg-gray-800 border border-white text-white placeholder-gray-400"
+                            type="number"
+                            value={product.price}
+                            onChange={(e) => handleProductChange(index, "price", parseFloat(e.target.value))}
+                            placeholder="Monthly Price"
+                          />
+                        </div>
+                      )}
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`credit-builder-${product.id}`}
+                          checked={product.is_credit_builder}
+                          onCheckedChange={(checked) => handleProductTypeChange(index, checked as boolean)}
+                          className="text-white"
                         />
+                        <label htmlFor={`credit-builder-${product.id}`} className="text-sm text-white">
+                          Enable Credit Builder Mode
+                        </label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="ghost" size="sm" className="p-1 h-auto">
+                              <Info className="w-4 h-4 text-gray-400" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80">
+                            <div className="space-y-2">
+                              <h4 className="font-medium">Credit Builder</h4>
+                              <p className="text-sm text-gray-600">
+                                Allow customers to build up credit over time that they can use on any of your services. 
+                                Customers choose how much they want to add each month, and you can charge against their balance.
+                              </p>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
                       </div>
                     </div>
                   ))}
@@ -283,12 +329,8 @@ export default function ConfirmBusinessPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() =>
-                      setProducts((prev) => [
-                        ...prev,
-                        { id: `temp-${Date.now()}`, name: "", description: "", price: 0 }
-                      ])
-                    }
+                    onClick={addNewProduct}
+                    className="text-white border border-white hover:bg-white/10"
                   >
                     + Add New Product
                   </Button>
@@ -343,9 +385,20 @@ export default function ConfirmBusinessPage() {
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <CardContent className="p-6">
-                      <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-lg font-semibold">{product.name}</h3>
+                        {product.is_credit_builder && (
+                          <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full">
+                            Credit Builder
+                          </span>
+                        )}
+                      </div>
                       <p className="text-sm opacity-90 mb-3">{product.description}</p>
-                      <p className="text-md font-bold mb-4">£{product.price}/month</p>
+                      {product.is_credit_builder ? (
+                        <p className="text-md font-bold mb-4 text-blue-300">Choose your monthly amount</p>
+                      ) : (
+                        <p className="text-md font-bold mb-4">£{product.price}/month</p>
+                      )}
 
                       <motion.div
                         whileTap={{ scale: 0.95 }}
@@ -355,7 +408,7 @@ export default function ConfirmBusinessPage() {
                           className="hero-button-primary mt-4"
                           onClick={() => setClickedProductId(product.id)}
                         >
-                          Subscribe
+                          {product.is_credit_builder ? "Start Building Credit" : "Subscribe"}
                         </Button>
                         {clickedProductId === product.id && (
                           <p className="mt-2 text-sm text-green-400 text-center animate-bounce">
@@ -380,6 +433,7 @@ export default function ConfirmBusinessPage() {
             </div>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
     </div>
   );

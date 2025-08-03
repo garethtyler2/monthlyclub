@@ -15,6 +15,8 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  product_type: 'subscription' | 'credit_builder';
+  is_credit_builder: boolean;
 }
 
 interface ProductsListProps {
@@ -34,6 +36,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [reference, setReference] = useState("");
   const [preferredPaymentDate, setPreferredPaymentDate] = useState("");
+  const [creditAmount, setCreditAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
@@ -53,10 +56,18 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
   const handleContinue = async (productId: string) => {
     setIsLoading(true);
     try {
+      const selectedProduct = products.find(p => p.id === productId);
+      const amount = selectedProduct?.is_credit_builder ? parseFloat(creditAmount) : selectedProduct?.price;
+
       const res = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId, reference, preferredPaymentDay: preferredPaymentDate, }),
+        body: JSON.stringify({ 
+          productId, 
+          reference, 
+          preferredPaymentDay: preferredPaymentDate,
+          creditAmount: selectedProduct?.is_credit_builder ? amount : undefined,
+        }),
       });
 
       if (!res.ok) {
@@ -78,6 +89,17 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
     }
   };
 
+  const isFormValid = () => {
+    const selectedProduct = products.find(p => p.id === selectedProductId);
+    if (!selectedProduct) return false;
+    
+    if (selectedProduct.is_credit_builder) {
+      return preferredPaymentDate && creditAmount && parseFloat(creditAmount) > 0;
+    }
+    
+    return preferredPaymentDate;
+  };
+
   return (
     <div>
       <h3 className="text-xl font-semibold mb-4 text-white">Available Products</h3>
@@ -97,9 +119,20 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4 capitalize text-white">{product.name}</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold capitalize text-white">{product.name}</h3>
+                  {product.is_credit_builder && (
+                    <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full">
+                      Credit Builder
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm opacity-90 mb-3">{product.description}</p>
-                <p className="text-md font-bold mb-4">£{product.price}/month</p>
+                {product.is_credit_builder ? (
+                  <p className="text-md font-bold mb-4 text-blue-300">Choose your own monthly amount</p>
+                ) : (
+                  <p className="text-md font-bold mb-4">£{product.price}/month</p>
+                )}
                 {!isSelected && (
                   <Button
                     className="hero-button-primary mt-4"
@@ -110,11 +143,30 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                       ? "Already Subscribed"
                       : isOwner
                       ? "You Own This Product"
+                      : product.is_credit_builder 
+                      ? "Start Building Credit"
                       : "Select"}
                   </Button>
                 )}
                 {isSelected && (
                   <div className="space-y-4 mt-4">
+                    {product.is_credit_builder && (
+                      <div>
+                        <Label htmlFor="creditAmount">Monthly Credit Amount (£)</Label>
+                        <Input
+                          id="creditAmount"
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          placeholder="e.g. 50.00"
+                          value={creditAmount}
+                          onChange={(e) => setCreditAmount(e.target.value)}
+                        />
+                        <p className="text-xs text-gray-400 mt-1">
+                          Choose how much credit you'd like to add each month
+                        </p>
+                      </div>
+                    )}
                     <div>
                       <Label htmlFor="reference">Reference</Label>
                       <Input
@@ -149,7 +201,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                     <Button
                       className="hero-button-primary mt-4"
                       onClick={() => handleContinue(product.id)}
-                      disabled={isLoading || !preferredPaymentDate}
+                      disabled={isLoading || !isFormValid()}
                     >
                       {isLoading ? "Processing..." : "Continue"}
                     </Button>

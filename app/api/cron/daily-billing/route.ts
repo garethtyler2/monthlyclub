@@ -143,6 +143,55 @@ export async function GET() {
         console.error("Failed to log successful payment:", insertSuccessError);
       }
 
+      // Add credit for credit builder products
+      if (product.is_credit_builder) {
+        // First get current credit balance
+        const { data: currentCredit, error: fetchError } = await supabase
+          .from("user_credits")
+          .select("balance, total_earned")
+          .eq("user_id", record.user_id)
+          .eq("business_id", business.id)
+          .single();
+
+        if (fetchError) {
+          console.error("Failed to fetch current credit:", fetchError);
+        } else {
+          const newBalance = (currentCredit?.balance || 0) + paymentIntent.amount;
+          const newTotalEarned = (currentCredit?.total_earned || 0) + paymentIntent.amount;
+
+          const { error: creditUpdateError } = await supabase
+            .from("user_credits")
+            .update({
+              balance: newBalance,
+              total_earned: newTotalEarned,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("user_id", record.user_id)
+            .eq("business_id", business.id);
+
+          if (creditUpdateError) {
+            console.error("Failed to update user credit:", creditUpdateError);
+          } else {
+            // Insert credit transaction record
+            const { error: transactionError } = await supabase
+              .from("credit_transactions")
+              .insert({
+                user_id: record.user_id,
+                business_id: business.id,
+                amount: paymentIntent.amount,
+                type: 'earned',
+                description: `Monthly credit payment - ${product.name}`,
+                related_subscription_id: record.subscriptions?.id,
+                related_payment_id: paymentIntent.id,
+              });
+
+            if (transactionError) {
+              console.error("Failed to insert credit transaction:", transactionError);
+            }
+          }
+        }
+      }
+
       succeededCount++;
       totalAmount += paymentIntent.amount;
       totalFees += applicationFee;

@@ -43,6 +43,7 @@ export async function POST(req: Request) {
     const userId = metadata.user_id;
     const paymentDay = metadata.preferred_payment_day;
     const customerReference = metadata.customer_reference;
+    const creditAmount = metadata.credit_amount;
 
     if (!productId || !userId || !customerId) {
       console.error("Missing metadata in session");
@@ -118,10 +119,10 @@ export async function POST(req: Request) {
     }
 
     // Insert into scheduled_payments
-    // Fetch product price
+    // Fetch product price and check if it's a credit builder
     const { data: product, error: productError } = await supabase
       .from("products")
-      .select("price, business_id")
+      .select("price, business_id, is_credit_builder")
       .eq("id", productId)
       .single();
       if (productError || !product) {
@@ -141,6 +142,8 @@ export async function POST(req: Request) {
     }
 
     const businessId = product.business_id;
+    const amount = product.is_credit_builder && creditAmount ? parseFloat(creditAmount) * 100 : product.price * 100;
+    
     const { error: scheduleError } = await supabase
       .from("scheduled_payments")
       .insert({
@@ -150,7 +153,7 @@ export async function POST(req: Request) {
         purchase_id: purchase.id,
         scheduled_for: parseInt(paymentDay),
         status: "active",
-        amount: product.price * 100,
+        amount: amount,
         customer_reference: customerReference,
         created_at: new Date().toISOString(),
       });
@@ -158,6 +161,28 @@ export async function POST(req: Request) {
     if (scheduleError) {
       console.error("Failed to insert into scheduled_payments:", scheduleError);
       return new NextResponse("Database Error", { status: 500 });
+    }
+
+    // Initialize user credit record if this is a credit builder product
+    if (product.is_credit_builder) {
+      const { error: creditError } = await supabase
+        .from("user_credits")
+        .upsert({
+          user_id: userId,
+          business_id: businessId,
+          balance: 0,
+          total_earned: 0,
+          total_spent: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id,business_id'
+        });
+
+      if (creditError) {
+        console.error("Error initializing user credit:", creditError);
+        // Don't fail the subscription for this, just log it
+      }
     }
 
     return new NextResponse("Success", { status: 200 });

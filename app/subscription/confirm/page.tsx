@@ -22,6 +22,7 @@ function SubscriptionConfirmPageInner() {
   const productId = searchParams.get("productId");
   const reference = searchParams.get("reference");
   const preferredPaymentDay = searchParams.get("preferredPaymentDay");
+  const creditAmount = searchParams.get("creditAmount");
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +34,7 @@ function SubscriptionConfirmPageInner() {
 
       const { data, error } = await supabase
         .from("products")
-        .select("name, description, price, business:businesses(name), business_id")
+        .select("name, description, price, business:businesses(name), business_id, is_credit_builder")
         .eq("id", productId)
         .single();
 
@@ -90,6 +91,8 @@ function SubscriptionConfirmPageInner() {
     }
 
     // 4. Insert into the scheduled_payments table
+    const amount = product.is_credit_builder && creditAmount ? parseFloat(creditAmount) * 100 : product.price * 100;
+    
     const { error: scheduleError } = await supabase
       .from("scheduled_payments")
       .insert({
@@ -99,7 +102,7 @@ function SubscriptionConfirmPageInner() {
         purchase_id: subscription.id,
         scheduled_for: parseInt(preferredPaymentDay),
         status: "active",
-        amount: product.price * 100,
+        amount: amount,
         customer_reference: reference,
         created_at: new Date().toISOString(),
       });
@@ -110,7 +113,29 @@ function SubscriptionConfirmPageInner() {
       return;
     }
 
-    // 5. Redirect to /subscription/success upon success
+    // 5. Initialize user credit record if this is a credit builder product
+    if (product.is_credit_builder) {
+      const { error: creditError } = await supabase
+        .from("user_credits")
+        .upsert({
+          user_id: user.id,
+          business_id: product.business_id,
+          balance: 0,
+          total_earned: 0,
+          total_spent: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id,business_id'
+        });
+
+      if (creditError) {
+        console.error("Error initializing user credit:", creditError);
+        // Don't fail the subscription for this, just log it
+      }
+    }
+
+    // 6. Redirect to /subscription/success upon success
     router.push("/subscription/success");
   };
 
@@ -145,7 +170,10 @@ function SubscriptionConfirmPageInner() {
                   <p className="text-sm text-white/80 italic">"{product?.description}"</p>
                   <div className="flex flex-col items-center sm:items-end mt-4">
                     <p className="text-xl font-bold text-white">
-                      £{product?.price}/month
+                      {product?.is_credit_builder && creditAmount 
+                        ? `£${creditAmount}/month` 
+                        : `£${product?.price}/month`
+                      }
                     </p>
                     <p className="text-xs text-white/70 mt-1 italic">
                       from {product?.business?.name}

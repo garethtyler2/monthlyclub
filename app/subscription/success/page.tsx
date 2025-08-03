@@ -19,6 +19,7 @@ type ProductWithBusiness = {
   name: string;
   description: string;
   price: number;
+  is_credit_builder: boolean;
   business: {
     name: string;
   };
@@ -53,7 +54,7 @@ export default function SubscriptionSuccessPage() {
 
       const { data: scheduledData, error: scheduleError } = await supabase
         .from("scheduled_payments")
-        .select("scheduled_for, product_id")
+        .select("scheduled_for, product_id, amount")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1);
@@ -68,7 +69,7 @@ export default function SubscriptionSuccessPage() {
       // Step 2: Fetch product and business manually
       const { data: product, error: productError } = await supabase
         .from("products")
-        .select("name, description, price, business:businesses(name)")
+        .select("name, description, price, business:businesses(name), is_credit_builder")
         .eq("id", scheduled.product_id)
         .single<ProductWithBusiness>();
 
@@ -77,12 +78,15 @@ export default function SubscriptionSuccessPage() {
         return;
       }
 
+      // Use the amount from scheduled payment for credit builder products, otherwise use product price
+      const displayPrice = product.is_credit_builder ? (scheduled.amount / 100) : (product.price ?? 0);
+      
       setScheduledInfo({
         productName: product.name ?? "Unknown product",
         productDescription: product.description ?? "No description provided",
         businessName: product.business?.name ?? "Unknown business",
         preferredPaymentDay: scheduled.scheduled_for,
-        price: product.price ?? 0,
+        price: displayPrice,
       });
       setLoading(false);
     }

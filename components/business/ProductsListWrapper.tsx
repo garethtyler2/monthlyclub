@@ -8,6 +8,8 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  product_type: 'subscription' | 'credit_builder';
+  is_credit_builder: boolean;
 }
 
 interface ProductsListWrapperProps {
