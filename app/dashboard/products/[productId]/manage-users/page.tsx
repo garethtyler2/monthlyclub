@@ -395,10 +395,22 @@ export default function ManageUsersPage() {
                         Ref: {sub.customer_reference ?? 'None'}
                       </p>
                       {product?.is_credit_builder && userCredits[sub.user_id] && (
-                        <div className="mt-2 p-2 bg-green-500/10 border border-green-500/20 rounded">
-                          <p className="text-xs mb-1 text-green-400 font-medium">
-                            Credit Balance: £{(userCredits[sub.user_id].balance / 100).toFixed(2)}
-                          </p>
+                        <div className="mt-3 space-y-2">
+                          {/* Cool Credit Balance Display */}
+                          <div className="relative overflow-hidden bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-400/30 rounded-lg p-3">
+                            <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 animate-pulse"></div>
+                            <div className="relative z-10">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs font-medium text-green-300 uppercase tracking-wide">Available Credit</span>
+                                <div className="w-2 h-2 bg-green-400 rounded-full animate-ping"></div>
+                              </div>
+                              <div className="text-lg font-bold text-green-200">
+                                £{(userCredits[sub.user_id].balance / 100).toFixed(2)}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Total Paid In and Spent */}
                           <div className="text-xs text-green-400/70 space-y-1">
                             <p>Total Paid In: £{(userCredits[sub.user_id].total_earned / 100).toFixed(2)}</p>
                             <p>Total Spent: £{(userCredits[sub.user_id].total_spent / 100).toFixed(2)}</p>
