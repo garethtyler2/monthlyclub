@@ -45,11 +45,12 @@ export default async function BusinessPage(
   console.log("Business:", business);
   console.log("Business Error:", businessError);
 
-  // Fetch related products
+  // Fetch related products (only active ones)
   const { data: products, error: productsError } = await supabase
     .from("products")
     .select("*")
-    .eq("business_id", business.id);
+    .eq("business_id", business.id)
+    .eq("status", "active");
 
   const session = await supabase.auth.getSession();
 

@@ -341,8 +341,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                               <Button 
                                 size="sm" 
                                 variant="outline" 
-                                className={product.subscriberCount > 0 ? "text-gray-400 cursor-not-allowed" : "text-red-600 hover:text-red-700"}
-                                disabled={product.subscriberCount > 0}
+                                className="text-red-600 hover:text-red-700"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -355,7 +354,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                                 <AlertDialogDescription>
                                   {product.subscriberCount > 0 ? (
                                     <div>
-                                      <p>You cannot delete "{product.name}" because it has {product.subscriberCount} active {product.is_credit_builder ? 'credit builders' : 'subscribers'}.</p>
+                                      <p>You cannot delete "{product.name}" because it has active {product.is_credit_builder ? 'credit builders' : 'subscribers'}.</p>
                                       <p className="mt-2 text-sm text-gray-600">
                                         Please either remove all users from this product or ask your users to cancel their subscriptions before this product can be deleted.
                                       </p>
@@ -416,8 +415,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                                 <Button 
                                   size="sm" 
                                   variant="outline" 
-                                  className={product.subscriberCount > 0 ? "text-gray-400 cursor-not-allowed" : "text-red-600 hover:text-red-700"}
-                                  disabled={product.subscriberCount > 0}
+                                  className="text-red-600 hover:text-red-700"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
@@ -430,7 +428,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                                   <AlertDialogDescription>
                                     {product.subscriberCount > 0 ? (
                                       <div>
-                                        <p>You cannot delete "{product.name}" because it has {product.subscriberCount} active {product.is_credit_builder ? 'credit builders' : 'subscribers'}.</p>
+                                        <p>You cannot delete "{product.name}" because it has active {product.is_credit_builder ? 'credit builders' : 'subscribers'}.</p>
                                         <p className="mt-2 text-sm text-gray-600">
                                           Please either remove all users from this product or ask your users to cancel their subscriptions before this product can be deleted.
                                         </p>

@@ -17,6 +17,7 @@ interface Product {
   price: number;
   product_type: 'subscription' | 'credit_builder';
   is_credit_builder: boolean;
+  status?: 'active' | 'inactive';
 }
 
 interface ProductsListProps {
