@@ -72,7 +72,19 @@ export async function GET() {
         continue;
       }
 
-      const amountInPence = product.price * 100;
+      // Validate Stripe account exists and is accessible
+      try {
+        await stripe.accounts.retrieve(business.stripe_account_id);
+      } catch (accountError) {
+        console.error(`Invalid or inaccessible Stripe account: ${business.stripe_account_id}`, accountError);
+        skippedCount++;
+        skipReasons.push(`Invalid Stripe account for business ${business.id}`);
+        continue;
+      }
+
+      const amountInPence = record.amount; // Use the actual amount from scheduled_payments
+      
+      console.log(`Processing payment for user ${record.user_id}, product ${product.id}, amount: ${amountInPence} pence (£${(amountInPence / 100).toFixed(2)})`);
 
       // Set platform fee rates
       const STANDARD_FEE_RATE = 0.015; // 1.5%
