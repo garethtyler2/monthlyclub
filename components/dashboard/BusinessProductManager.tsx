@@ -348,12 +348,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold text-white capitalize">{product.name}</h3>
-                        {product.is_credit_builder && (
-                          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs mt-1">
-                            <Sparkles className="w-3 h-3 mr-1" />
-                            Credit Builder
-                          </Badge>
-                        )}
+
                       </div>
                     </div>
                     
