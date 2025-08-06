@@ -119,107 +119,205 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-4">
-            <Link href="/how-it-works" className="text-sm font-medium hover:text-white transition-colors">
-              How It Works
-            </Link>
-            <Link href="/pricing" className="text-sm font-medium hover:text-white transition-colors">
-              Pricing
-            </Link>
-            <Link href="/features" className="text-sm font-medium hover:text-white transition-colors">
-              Features
-            </Link>
-            <Link href="/guides" className="text-sm font-medium hover:text-white transition-colors">
-              Guides
-            </Link>
-            {(!hasBusiness && (
-              <button onClick={onCreateBusinessClick} className="hero-button-primary text-sm font-medium hover:underline underline-offset-4 transition-colors">
-                Create Business
-              </button>
-            )) ||
-              ((businessStatus === 'draft' || businessStatus === 'pre-stripe') && (
-                <button onClick={onCreateBusinessClick} className="hero-button-primary text-sm font-medium hover:underline underline-offset-4 transition-colors">
-                  Finish Business Setup
-                </button>
-              ))}
-            {user && (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="focus:outline-none cursor-pointer">
-                  <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue">
-                    {businessImageUrl ? (
-                      <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
-                    ) : (
-                      <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
-                    )}
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="mt-2">
-                  <div className="px-3 py-2 border-b border-muted capitalize text-sm text-muted-foreground">
-                    {businessName ?? user?.email?.replace(/@.*/, '@...')}
-                  </div>
-
-                  {businessStatus === null && (
-                    <DropdownMenuItem asChild>
-                      <button onClick={() => handleRedirect("/create-a-business/step-one")}>
-                        Create Business
-                      </button>
-                    </DropdownMenuItem>
-                  )}
-                  {(businessStatus === "draft" || businessStatus === "pre-stripe") && (
-                    <DropdownMenuItem asChild>
-                      <button onClick={() => handleRedirect("/create-a-business/step-one")}>
-                        Finish Business Setup
-                      </button>
-                    </DropdownMenuItem>
-                  )}
-
-                  {hasBusiness && (
-                    <>
-                      <div className="px-3 pt-3 pb-1 text-xs font-semibold text-muted-foreground">My Business</div>
-                      <DropdownMenuItem asChild>
-                        <Link href="/dashboard/business">Business Dashboard</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <button
-                          onClick={() => handleRedirect(`/businesses/${businessSlug}`)}
-                          className="w-full text-left"
-                        >
-                          My Business Page
-                        </button>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <button onClick={() => handleRedirect("/api/stripe/update-business-details")}>
-                          Stripe - Business Details
-                        </button>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-
-                  {hasSubscriptions && (
-                    <>
-                      <div className="px-3 pt-3 pb-1 text-xs font-semibold text-muted-foreground">My Subscriptions</div>
-                      <DropdownMenuItem asChild>
-                        <Link href="/dashboard/subscriptions">My Subscriptions</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <button onClick={() => handleRedirect("/api/stripe/update-payment-details")}>
-                          Stripe - Payment Details
-                        </button>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-
-                  <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            {!loading && !user && (
-              <Link href="/login">
-                <Button variant="outline" size="sm">
-                  Login / Sign Up
-                </Button>
+          <nav className="hidden md:flex items-center space-x-6">
+            <div className="flex items-center space-x-6">
+              <Link 
+                href="/how-it-works" 
+                className="text-sm font-medium text-muted-foreground hover:text-white transition-colors duration-200 relative group"
+              >
+                How It Works
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-brand-purple to-brand-blue transition-all duration-200 group-hover:w-full"></span>
               </Link>
-            )}
+              <Link 
+                href="/pricing" 
+                className="text-sm font-medium text-muted-foreground hover:text-white transition-colors duration-200 relative group"
+              >
+                Pricing
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-brand-purple to-brand-blue transition-all duration-200 group-hover:w-full"></span>
+              </Link>
+              <Link 
+                href="/features" 
+                className="text-sm font-medium text-muted-foreground hover:text-white transition-colors duration-200 relative group"
+              >
+                Features
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-brand-purple to-brand-blue transition-all duration-200 group-hover:w-full"></span>
+              </Link>
+              <Link 
+                href="/guides" 
+                className="text-sm font-medium text-muted-foreground hover:text-white transition-colors duration-200 relative group"
+              >
+                Guides
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-brand-purple to-brand-blue transition-all duration-200 group-hover:w-full"></span>
+              </Link>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              {(!hasBusiness && (
+                <button 
+                  onClick={onCreateBusinessClick} 
+                  className="px-4 py-2 bg-gradient-to-r from-brand-purple to-brand-blue text-white text-sm font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Create Business
+                </button>
+              )) ||
+                ((businessStatus === 'draft' || businessStatus === 'pre-stripe') && (
+                  <button 
+                    onClick={onCreateBusinessClick} 
+                    className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    Finish Setup
+                  </button>
+                ))}
+
+              {user && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="focus:outline-none cursor-pointer group">
+                    <div className="relative">
+                      <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue ring-2 ring-white/20 group-hover:ring-brand-purple/50 transition-all duration-200">
+                        {businessImageUrl ? (
+                          <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
+                        ) : (
+                          <AvatarFallback className="text-white font-semibold">
+                            {businessName ? businessName.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="mt-3 w-64 bg-slate-800 border-white/10 backdrop-blur-md">
+                    {/* User Info Header */}
+                    <div className="px-4 py-3 border-b border-white/10">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue w-10 h-10">
+                          {businessImageUrl ? (
+                            <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
+                          ) : (
+                            <AvatarFallback className="text-white font-semibold">
+                              {businessName ? businessName.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-white text-sm truncate">
+                            {businessName ?? user?.email?.replace(/@.*/, '@...')}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {businessName ? 'Business Owner' : 'Account'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Business Setup Section */}
+                    {businessStatus === null && (
+                      <div className="px-3 py-2">
+                        <button 
+                          onClick={() => handleRedirect("/create-a-business/step-one")}
+                          className="w-full flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-brand-purple to-brand-blue text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                        >
+                          <Plus size={16} />
+                          <span>Create Business</span>
+                        </button>
+                      </div>
+                    )}
+                    {(businessStatus === "draft" || businessStatus === "pre-stripe") && (
+                      <div className="px-3 py-2">
+                        <button 
+                          onClick={() => handleRedirect("/create-a-business/step-one")}
+                          className="w-full flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
+                        >
+                          <Settings size={16} />
+                          <span>Finish Business Setup</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Business Management Section */}
+                    {hasBusiness && (
+                      <>
+                        <div className="px-3 pt-3 pb-1">
+                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">My Business</div>
+                        </div>
+                        <DropdownMenuItem asChild className="px-3 py-2 hover:bg-white/5">
+                          <Link href="/dashboard/business" className="flex items-center space-x-2 text-sm">
+                            <Building2 size={16} className="text-muted-foreground" />
+                            <span>Business Dashboard</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="px-3 py-2 hover:bg-white/5">
+                          <button
+                            onClick={() => handleRedirect(`/businesses/${businessSlug}`)}
+                            className="w-full flex items-center space-x-2 text-sm text-left"
+                          >
+                            <User size={16} className="text-muted-foreground" />
+                            <span>My Business Page</span>
+                          </button>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="px-3 py-2 hover:bg-white/5">
+                          <button 
+                            onClick={() => handleRedirect("/api/stripe/update-business-details")}
+                            className="w-full flex items-center space-x-2 text-sm text-left"
+                          >
+                            <Settings size={16} className="text-muted-foreground" />
+                            <span>Business Details - Stripe</span>
+                          </button>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+
+                    {/* Subscriptions Section */}
+                    {hasSubscriptions && (
+                      <>
+                        <div className="px-3 pt-3 pb-1">
+                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">My Subscriptions</div>
+                        </div>
+                        <DropdownMenuItem asChild className="px-3 py-2 hover:bg-white/5">
+                          <Link href="/dashboard/subscriptions" className="flex items-center space-x-2 text-sm">
+                            <CreditCard size={16} className="text-muted-foreground" />
+                            <span>My Subscriptions</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild className="px-3 py-2 hover:bg-white/5">
+                          <button 
+                            onClick={() => handleRedirect("/api/stripe/update-payment-details")}
+                            className="w-full flex items-center space-x-2 text-sm text-left"
+                          >
+                            <Settings size={16} className="text-muted-foreground" />
+                            <span>Payment Details - Stripe</span>
+                          </button>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+
+                    {/* Logout Section */}
+                    <div className="border-t border-white/10 mt-2 pt-2">
+                      <DropdownMenuItem 
+                        onClick={handleLogout}
+                        className="px-3 py-2 hover:bg-red-500/10 text-red-400 hover:text-red-300"
+                      >
+                        <div className="flex items-center space-x-2 text-sm">
+                          <LogOut size={16} />
+                          <span>Logout</span>
+                        </div>
+                      </DropdownMenuItem>
+                    </div>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+              
+              {!loading && !user && (
+                <Link href="/login">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="border-white/20 text-white hover:bg-white/10 hover:border-white/30 transition-all duration-200"
+                  >
+                    Login / Sign Up
+                  </Button>
+                </Link>
+              )}
+            </div>
           </nav>
 
           {/* Mobile Header */}
@@ -452,7 +550,7 @@ const Navbar = () => {
                         className="w-full flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors text-left"
                       >
                         <Settings size={18} className="text-muted-foreground" />
-                        <span className="font-medium text-sm">Business Details</span>
+                        <span className="font-medium text-sm">Business Details - Stripe</span>
                       </button>
                     </div>
                   </div>
@@ -482,7 +580,7 @@ const Navbar = () => {
                         className="w-full flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors text-left"
                       >
                         <Settings size={18} className="text-muted-foreground" />
-                        <span className="font-medium text-sm">Payment Details</span>
+                        <span className="font-medium text-sm">Payment Details - Stripe</span>
                       </button>
                     </div>
                   </div>
