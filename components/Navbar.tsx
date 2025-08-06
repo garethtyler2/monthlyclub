@@ -277,21 +277,48 @@ const Navbar = () => {
                 {user && (
                   <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-brand-purple/10 to-brand-blue/10 border border-white/10">
                     <div className="flex items-center space-x-3 mb-2">
-                      <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue w-10 h-10">
-                        {businessImageUrl ? (
-                          <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
-                        ) : (
-                          <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
-                        )}
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-white truncate text-sm">
-                          {businessName ?? user?.email?.replace(/@.*/, '@...')}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {businessName ? 'Business Owner' : 'Account'}
-                        </p>
-                      </div>
+                      {businessName ? (
+                        <Link
+                          href="/dashboard/business"
+                          onClick={closeMenu}
+                          className="flex items-center space-x-3 flex-1 min-w-0 group"
+                          tabIndex={0}
+                        >
+                          <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue w-10 h-10">
+                            {businessImageUrl ? (
+                              <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
+                            ) : (
+                              <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
+                            )}
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-white truncate text-sm group-hover:underline">
+                              {businessName ?? user?.email?.replace(/@.*/, '@...')}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Business Owner
+                            </p>
+                          </div>
+                        </Link>
+                      ) : (
+                        <>
+                          <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue w-10 h-10">
+                            {businessImageUrl ? (
+                              <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
+                            ) : (
+                              <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
+                            )}
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-white truncate text-sm">
+                              {user?.email?.replace(/@.*/, '@...')}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Account
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </div>
                     
                     {/* Quick Actions */}
@@ -477,7 +504,7 @@ const Navbar = () => {
                   ) : (
                     <Link
                       href="/login"
-                      className="flex items-center justify-center space-x-2 w-full px-3 py-2.5 bg-gradient-to-r from-brand-purple to-brand-blue text-white font-medium rounded-lg hover:opacity-90 transition-opacity"
+                      className="flex items-center justify-center space-x-2 w-full px-3 py-2.5  text-white font-medium rounded-lg hover:opacity-90 transition-opacity"
                       onClick={closeMenu}
                     >
                       <User size={18} />

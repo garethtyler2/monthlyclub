@@ -10,7 +10,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import { Pencil, Plus, Info, Trash2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Pencil, 
+  Plus, 
+  Info, 
+  Trash2, 
+  Users, 
+  Building2, 
+  CreditCard, 
+  Sparkles,
+  TrendingUp,
+  Settings,
+  AlertTriangle,
+  CheckCircle,
+  ArrowRight,
+  PoundSterling
+} from 'lucide-react';
+import { Label } from '@/components/ui/label';
 
 interface ProductWithSubscribers {
   id: string;
@@ -119,7 +136,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
       console.error("Failed to update product:", error);
       return;
     }
-    window.location.reload();
+
     // Re-fetch the products to show updated values
     setLoading(true);
     const { data: productData, error: productError } = await supabase
@@ -230,6 +247,18 @@ export default function BusinessProductManager({ businessId }: { businessId: str
     closeDeleteModal();
   };
 
+  const getProductGradient = (index: number) => {
+    const gradients = [
+      "from-blue-500/10 to-indigo-500/10 border-blue-500/20",
+      "from-purple-500/10 to-violet-500/10 border-purple-500/20",
+      "from-green-500/10 to-emerald-500/10 border-green-500/20",
+      "from-orange-500/10 to-red-500/10 border-orange-500/20",
+      "from-pink-500/10 to-rose-500/10 border-pink-500/20",
+      "from-teal-500/10 to-cyan-500/10 border-teal-500/20",
+    ];
+    return gradients[index % gradients.length];
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -255,20 +284,12 @@ export default function BusinessProductManager({ businessId }: { businessId: str
             .eq("product_id", product.id)
             .eq("status", "active");
 
-          if (countError) {
-            console.error(`Error fetching subscriptions for product ${product.id}:`, countError);
-          } else {
-            console.log(`Subscription count for product ${product.id}:`, count);
-          }
-
           return {
             ...product,
             subscriberCount: countError ? 0 : count || 0,
           };
         })
       );
-
-      console.log("Final enriched products:", enrichedProducts);
 
       setProducts(enrichedProducts);
       setLoading(false);
@@ -277,235 +298,228 @@ export default function BusinessProductManager({ businessId }: { businessId: str
     fetchProducts();
   }, [businessId]);
 
+  const totalSubscribers = products.reduce((sum, product) => sum + product.subscriberCount, 0);
+  const totalRevenue = products.reduce((sum, product) => {
+    if (product.is_credit_builder) return sum;
+    return sum + (product.price * product.subscriberCount);
+  }, 0);
+
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Your Products</h2>
-        <Button onClick={openAddModal} className="hero-button-primary">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-semibold text-white mb-1">Your Products</h2>
+          <p className="text-sm text-muted-foreground">Manage your subscription products and credit builders</p>
+        </div>
+        <Button 
+          onClick={openAddModal} 
+          className="bg-gradient-to-r from-brand-purple to-brand-blue hover:from-brand-purple/90 hover:to-brand-blue/90 text-white"
+        >
           <Plus className="w-4 h-4 mr-2" />
           Add Product
         </Button>
       </div>
 
+
       {loading ? (
-        <p className="text-sm text-muted-foreground text-center">Loading products...</p>
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+        </div>
       ) : (
         <>
-          {/* Mobile Card View */}
-          <div className="block md:hidden space-y-4">
-            {products.map((product) => (
+          {/* Products Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {products.map((product, index) => (
               <Card
                 key={product.id}
-                className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border border-brand-blue/20 bg-gradient-to-br from-brand-blue/10 to-transparent shadow-md"
+                className={`bg-gradient-to-br border-none transition-all duration-300 hover:scale-[1.02] group ${getProductGradient(index)}`}
               >
                 <CardContent className="p-6">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex-1 mr-3">
-                      <div className="flex items-center gap-2 mb-1">
+                  {/* Product Header */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-white/10 rounded-lg">
                         {product.is_credit_builder ? (
-                          <span className="bg-gradient-to-r from-blue-500 to-emerald-900 text-white px-3 py-1 rounded-full font-semibold text-lg leading-tight">
-                            {product.name}
-                          </span>
+                          <CreditCard className="w-5 h-5 text-blue-400" />
                         ) : (
-                          <h3 className="font-semibold text-lg text-foreground leading-tight">
-                            {product.name}
-                          </h3>
+                          <Building2 className="w-5 h-5 text-green-400" />
+                        )}
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-white capitalize">{product.name}</h3>
+                        {product.is_credit_builder && (
+                          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs mt-1">
+                            <Sparkles className="w-3 h-3 mr-1" />
+                            Credit Builder
+                          </Badge>
                         )}
                       </div>
                     </div>
-                    <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      {product.is_credit_builder ? "Flexible" : `£${product.price.toFixed(2)}`}
+                    
+                    <div className="flex items-center space-x-2">
+                      <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Active
+                      </Badge>
                     </div>
                   </div>
-                  <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
+
+                  {/* Product Description */}
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
                     {product.description}
                   </p>
-                  <div className="flex flex-col gap-2 pt-3 border-t border-border">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-muted-foreground">
-                          {product.is_credit_builder ? 'Credit Builders' : 'Subscribers'}
-                        </span>
-                        <div className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-                          {product.subscriberCount}
-                        </div>
+
+                  {/* Pricing */}
+                  <div className="mb-4">
+                    {product.is_credit_builder ? (
+                      <div className="flex items-center space-x-2">
+                        <PoundSterling className="w-4 h-4 text-blue-400" />
+                        <span className="text-lg font-bold text-blue-300">Flexible Pricing</span>
                       </div>
-                                              <div className="flex gap-2">
-                          {!product.is_credit_builder && (
-                            <Button size="sm" variant="outline" onClick={() => openEditModal(product)}>
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                          )}
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button 
-                                size="sm" 
-                                variant="outline" 
-                                className="text-red-600 hover:text-red-700"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>
-                                  {product.subscriberCount > 0 ? "Cannot Delete Product" : "Delete Product"}
-                                </AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  {product.subscriberCount > 0 ? (
-                                    <div>
-                                      <p>You cannot delete "{product.name}" because it has active {product.is_credit_builder ? 'credit builders' : 'subscribers'}.</p>
-                                      <p className="mt-2 text-sm text-gray-600">
-                                        Please either remove all users from this product or ask your users to cancel their subscriptions before this product can be deleted.
-                                      </p>
-                                    </div>
-                                  ) : (
-                                    <p>Are you sure you want to delete "{product.name}"? </p>
-                                  )}
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                {product.subscriberCount === 0 && (
-                                  <AlertDialogAction onClick={() => openDeleteModal(product)} className="bg-red-600 hover:bg-red-700">
-                                    Delete
-                                  </AlertDialogAction>
-                                )}
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <PoundSterling className="w-4 h-4 text-green-400" />
+                        <span className="text-lg font-bold text-green-300">£{product.price.toFixed(2)}/month</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Stats */}
+                  <div className="flex items-center justify-between mb-4 p-3 bg-white/5 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <Users className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">
+                        {product.is_credit_builder ? 'Credit Builders' : 'Subscribers'}
+                      </span>
                     </div>
-                    <Button size="sm" variant="secondary" className="w-full" onClick={() => window.location.href = `/dashboard/products/${product.id}/manage-users`}>
+                    <div className="text-lg font-bold text-white">
+                      {product.subscriberCount}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex space-x-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1 border-white/20 text-white hover:bg-white/10"
+                      onClick={() => window.location.href = `/dashboard/products/${product.id}/manage-users`}
+                    >
+                      <Users className="w-4 h-4 mr-2" />
                       Manage Users
                     </Button>
+                    
+                    {!product.is_credit_builder && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-white/20 text-white hover:bg-white/10"
+                        onClick={() => openEditModal(product)}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                    )}
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="border-red-500/20 text-red-400 hover:bg-red-500/10"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-slate-800 border-white/10">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="text-white">
+                            {product.subscriberCount > 0 ? "Cannot Delete Product" : "Delete Product"}
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="text-muted-foreground">
+                            {product.subscriberCount > 0 ? (
+                              <div className="space-y-2">
+                                <p>You cannot delete "{product.name}" because it has active {product.is_credit_builder ? 'credit builders' : 'subscribers'}.</p>
+                                <div className="flex items-center space-x-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+                                  <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                                  <p className="text-sm text-yellow-300">
+                                    Please remove all users or ask them to cancel their subscriptions first.
+                                  </p>
+                                </div>
+                              </div>
+                            ) : (
+                              <p>Are you sure you want to delete "{product.name}"? This action cannot be undone.</p>
+                            )}
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="border-white/20 text-white">Cancel</AlertDialogCancel>
+                          {product.subscriberCount === 0 && (
+                            <AlertDialogAction 
+                              onClick={() => openDeleteModal(product)} 
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              Delete Product
+                            </AlertDialogAction>
+                          )}
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </CardContent>
               </Card>
             ))}
           </div>
 
-          {/* Desktop Table View */}
-          <div className="hidden md:block">
-            <div className="bg-white/5 rounded-xl shadow-lg overflow-hidden border border-white/10">
-              <div className="overflow-x-auto">
-                <table className="w-full text-white text-sm">
-                  <thead className="bg-gradient-to-r from-brand-purple/10 to-transparent border-b border-brand-purple/20 text-white">
-                    <tr>
-                      <th className="px-4 py-3">Actions</th>
-                      <th className="px-4 py-3 text-left font-semibold">Title</th>
-                      <th className="px-4 py-3 text-left font-semibold">Description</th>
-                      <th className="px-4 py-3 text-right font-semibold">Price</th>
-                      <th className="px-4 py-3 text-right font-semibold">Subscribers</th>
-                      <th className="px-4 py-3 text-center font-semibold">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-gradient-to-r from-brand-purple/5 to-transparent divide-y divide-brand-purple/10">
-                    {products.map((product) => (
-                      <tr key={product.id} className="hover:bg-brand-purple/10 transition-colors duration-200">
-                        <td className="px-4 py-3 text-center">
-                          <div className="flex gap-2 justify-center">
-                            {!product.is_credit_builder && (
-                              <Button size="sm" variant="outline" onClick={() => openEditModal(product)}>
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                            )}
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  className="text-red-600 hover:text-red-700"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>
-                                    {product.subscriberCount > 0 ? "Cannot Delete Product" : "Delete Product"}
-                                  </AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    {product.subscriberCount > 0 ? (
-                                      <div>
-                                        <p>You cannot delete "{product.name}" because it has active {product.is_credit_builder ? 'credit builders' : 'subscribers'}.</p>
-                                        <p className="mt-2 text-sm text-gray-600">
-                                          Please either remove all users from this product or ask your users to cancel their subscriptions before this product can be deleted.
-                                        </p>
-                                      </div>
-                                    ) : (
-                                      <p>Are you sure you want to delete "{product.name}"? </p>
-                                    )}
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  {product.subscriberCount === 0 && (
-                                    <AlertDialogAction onClick={() => openDeleteModal(product)} className="bg-red-600 hover:bg-red-700">
-                                      Delete
-                                    </AlertDialogAction>
-                                  )}
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 font-medium">
-                          <div className="flex items-center gap-2">
-                            {product.name}
-                            
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">{product.description}</td>
-                        <td className="px-4 py-3 text-right">
-                          {product.is_credit_builder ? "Flexible" : `£${product.price.toFixed(2)}`}
-                        </td>
-                        <td className="px-4 py-3 text-right">
-                          {product.subscriberCount} {product.is_credit_builder ? 'builders' : 'subscribers'}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="flex gap-2 justify-center">
-                            <Button size="sm" variant="secondary" onClick={() => window.location.href = `/dashboard/products/${product.id}/manage-users`}>
-                              Manage Users
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+          {/* Empty State */}
+          {products.length === 0 && (
+            <Card className="bg-white/5 border-white/10">
+              <CardContent className="p-8 text-center">
+                <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-white mb-2">No Products Yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Create your first product to start accepting subscriptions and building your business.
+                </p>
+                <Button 
+                  onClick={openAddModal}
+                  className="bg-gradient-to-r from-brand-purple to-brand-blue hover:from-brand-purple/90 hover:to-brand-blue/90 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Your First Product
+                </Button>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Edit Modal */}
           <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="bg-slate-800 border-white/10 sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Edit Product</DialogTitle>
+                <DialogTitle className="text-white">Edit Product</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-medium text-white">Name</label>
+                  <Label htmlFor="name" className="text-sm font-medium text-white">Name</Label>
                   <Input
                     id="name"
                     value={editForm.name || ''}
                     onChange={(e) => updateEditForm('name', e.target.value)}
                     placeholder="Product name"
+                    className="bg-white/5 border-white/10 text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="description" className="text-sm font-medium text-white">Description</label>
+                  <Label htmlFor="description" className="text-sm font-medium text-white">Description</Label>
                   <Textarea
                     id="description"
                     value={editForm.description || ''}
                     onChange={(e) => updateEditForm('description', e.target.value)}
                     placeholder="Product description"
-                    className="min-h-[100px]"
+                    className="min-h-[100px] bg-white/5 border-white/10 text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="price" className="text-sm font-medium text-white">Price (£)</label>
+                  <Label htmlFor="price" className="text-sm font-medium text-white">Price (£)</Label>
                   <Input
                     id="price"
                     type="number"
@@ -513,14 +527,16 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                     value={editForm.price || ''}
                     onChange={(e) => updateEditForm('price', parseFloat(e.target.value))}
                     placeholder="0.00"
+                    className="bg-white/5 border-white/10 text-white"
                   />
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={closeEditModal}>
-                  Cancel
-                </Button>
-                <Button className="hero-button-primary" onClick={saveChanges}>
+
+                <Button 
+                  onClick={saveChanges}
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                >
                   Save Changes
                 </Button>
               </DialogFooter>
@@ -529,35 +545,36 @@ export default function BusinessProductManager({ businessId }: { businessId: str
 
           {/* Add New Product Modal */}
           <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="bg-slate-800 border-white/10 sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Add New Product</DialogTitle>
+                <DialogTitle className="text-white">Add New Product</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="space-y-2">
-                  <label htmlFor="add-name" className="text-sm font-medium text-white">Name</label>
+                  <Label htmlFor="add-name" className="text-sm font-medium text-white">Name</Label>
                   <Input
                     id="add-name"
                     value={addForm.name || ''}
                     onChange={(e) => updateAddForm('name', e.target.value)}
                     placeholder="Product name"
                     disabled={addForm.is_credit_builder}
+                    className="bg-white/5 border-white/10 text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="add-description" className="text-sm font-medium text-white">Description</label>
+                  <Label htmlFor="add-description" className="text-sm font-medium text-white">Description</Label>
                   <Textarea
                     id="add-description"
                     value={addForm.description || ''}
                     onChange={(e) => updateAddForm('description', e.target.value)}
                     placeholder="Product description"
-                    className="min-h-[100px]"
+                    className="min-h-[100px] bg-white/5 border-white/10 text-white"
                     disabled={addForm.is_credit_builder}
                   />
                 </div>
                 {!addForm.is_credit_builder && (
                   <div className="space-y-2">
-                    <label htmlFor="add-price" className="text-sm font-medium text-white">Price (£)</label>
+                    <Label htmlFor="add-price" className="text-sm font-medium text-white">Price (£)</Label>
                     <Input
                       id="add-price"
                       type="number"
@@ -565,29 +582,30 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                       value={addForm.price || ''}
                       onChange={(e) => updateAddForm('price', parseFloat(e.target.value))}
                       placeholder="0.00"
+                      className="bg-white/5 border-white/10 text-white"
                     />
                   </div>
                 )}
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 p-3 bg-white/5 rounded-lg">
                   <Checkbox
                     id="add-credit-builder"
                     checked={addForm.is_credit_builder || false}
                     onCheckedChange={(checked) => updateAddForm("is_credit_builder", checked)}
                     className="text-white"
                   />
-                  <label htmlFor="add-credit-builder" className="text-sm text-white">
+                  <Label htmlFor="add-credit-builder" className="text-sm text-white">
                     Enable Credit Builder Mode
-                  </label>
+                  </Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="ghost" size="sm" className="p-1 h-auto">
-                        <Info className="w-4 h-4 text-gray-400" />
+                      <Button variant="ghost" size="sm" className="p-1 h-auto text-muted-foreground hover:text-white">
+                        <Info className="w-4 h-4" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-80">
+                    <PopoverContent className="w-80 bg-slate-800 border-white/10">
                       <div className="space-y-2">
-                        <h4 className="font-medium">Credit Builder</h4>
-                        <p className="text-sm text-gray-600">
+                        <h4 className="font-medium text-white">Credit Builder</h4>
+                        <p className="text-sm text-muted-foreground">
                           Allow customers to build up credit over time that they can use on any of your services. 
                           Customers choose how much they want to add each month, and you can charge against their balance.
                         </p>
@@ -597,10 +615,12 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={closeAddModal}>
-                  Cancel
-                </Button>
-                <Button className="hero-button-primary" onClick={saveNewProduct}>
+
+                <Button 
+                  onClick={saveNewProduct}
+                  className="bg-gradient-to-r from-brand-purple to-brand-blue hover:from-brand-purple/90 hover:to-brand-blue/90 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
                   Add Product
                 </Button>
               </DialogFooter>
@@ -609,16 +629,19 @@ export default function BusinessProductManager({ businessId }: { businessId: str
 
           {/* Delete Confirmation Modal */}
           <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-            <AlertDialogContent>
+            <AlertDialogContent className="bg-slate-800 border-white/10">
               <AlertDialogHeader>
-                <AlertDialogTitle>Confirm Deletion</AlertDialogTitle>
-                <AlertDialogDescription>
+                <AlertDialogTitle className="text-white">Confirm Deletion</AlertDialogTitle>
+                <AlertDialogDescription className="text-muted-foreground">
                   Please confirm you want to delete "{productToDelete?.name}". This will remove it from your business page and cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel onClick={closeDeleteModal}>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={deleteProduct} className="bg-red-600 hover:bg-red-700">
+                <AlertDialogCancel onClick={closeDeleteModal} className="border-white/20 text-white">Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={deleteProduct} 
+                  className="bg-red-600 hover:bg-red-700 text-white"
+                >
                   Delete Product
                 </AlertDialogAction>
               </AlertDialogFooter>
