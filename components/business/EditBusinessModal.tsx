@@ -39,7 +39,7 @@ export function EditBusinessModal({ business }: { business: any }) {
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [editSlug]);
+  }, [editSlug, business.slug, business.id]);
 
   const handleUpdateBusiness = async () => {
     const { data: existing } = await supabase

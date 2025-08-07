@@ -70,8 +70,8 @@ export default function CancelSubscriptionModal({
                         type: 'subscription_cancelled',
                         data: {
                             userEmail: userData.email,
-                            productName: subscriptionData.products.name,
-                            businessName: subscriptionData.businesses.name
+                            productName: subscriptionData.products[0]?.name || 'Unknown Product',
+                            businessName: subscriptionData.businesses[0]?.name || 'Unknown Business'
                         }
                     })
                 });
