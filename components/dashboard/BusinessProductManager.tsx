@@ -104,10 +104,10 @@ export default function BusinessProductManager({ businessId }: { businessId: str
     setAddForm(prev => {
       const updated = { ...prev, [field]: value };
       
-      // If credit builder is enabled, set default values
+      // If balance builder is enabled, set default values
       if (field === 'is_credit_builder' && value === true) {
-        updated.name = "Credit Builder";
-        updated.description = "Build up credit over time to use on any of our services. Choose how much you'd like to add each month.";
+        updated.name = "Balance Builder";
+        updated.description = "Build up a balance over time to use on any of our services. Choose how much you'd like to add each month.";
         updated.price = 0; // Will be set by user
         updated.product_type = 'credit_builder';
       } else if (field === 'is_credit_builder' && value === false) {
@@ -310,7 +310,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-white mb-1">Your Products</h2>
-          <p className="text-sm text-muted-foreground">Manage your subscription products and credit builders</p>
+          <p className="text-sm text-muted-foreground">Manage your products</p>
         </div>
         <Button 
           onClick={openAddModal} 
@@ -385,7 +385,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                     <div className="flex items-center space-x-2">
                       <Users className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">
-                        {product.is_credit_builder ? 'Credit Builders' : 'Subscribers'}
+                        {product.is_credit_builder ? 'Builders' : 'Subscribers'}
                       </span>
                     </div>
                     <div className="text-lg font-bold text-white">
@@ -434,7 +434,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                           <AlertDialogDescription className="text-muted-foreground">
                             {product.subscriberCount > 0 ? (
                               <div className="space-y-2">
-                                <p>You cannot delete "{product.name}" because it has active {product.is_credit_builder ? 'credit builders' : 'subscribers'}.</p>
+                                <p>You cannot delete "{product.name}" because it has active {product.is_credit_builder ? 'builders' : 'subscribers'}.</p>
                                 <div className="flex items-center space-x-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
                                   <AlertTriangle className="w-4 h-4 text-yellow-400" />
                                   <p className="text-sm text-yellow-300">
@@ -589,7 +589,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                     className="text-white"
                   />
                   <Label htmlFor="add-credit-builder" className="text-sm text-white">
-                    Enable Credit Builder Mode
+                    Enable Builder Mode
                   </Label>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -599,9 +599,9 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                     </PopoverTrigger>
                     <PopoverContent className="w-80 bg-slate-800 border-white/10">
                       <div className="space-y-2">
-                        <h4 className="font-medium text-white">Credit Builder</h4>
+                        <h4 className="font-medium text-white">Balance Builder</h4>
                         <p className="text-sm text-muted-foreground">
-                          Allow customers to build up credit over time that they can use on any of your services. 
+                          Allow customers to build up a balance over time that they can use for future services. 
                           Customers choose how much they want to add each month, and you can charge against their balance.
                         </p>
                       </div>

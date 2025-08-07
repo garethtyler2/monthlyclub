@@ -78,7 +78,7 @@ export default function SubscriptionSuccessPage() {
         return;
       }
 
-      // Use the amount from scheduled payment for credit builder products, otherwise use product price
+      // Use the amount from scheduled payment for balance builder products, otherwise use product price
       const displayPrice = product.is_credit_builder ? (scheduled.amount / 100) : (product.price ?? 0);
       
       setScheduledInfo({

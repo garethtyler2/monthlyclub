@@ -14,7 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Trash, Info } from "lucide-react";
+import { Trash, Info, TrendingUp } from "lucide-react";
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
 
 const gradientStyles = [
@@ -99,8 +99,8 @@ export default function ConfirmBusinessPage() {
           if (isCreditBuilder) {
             return {
               ...p,
-              name: "Credit Builder",
-              description: "Build up credit over time to use on any of our services. Choose how much you'd like to add each month.",
+              name: "Balance Builder",
+              description: "Build up a balance over time to use on any of our services. Choose how much you'd like to add each month.",
               price: 0,
               product_type: 'credit_builder',
               is_credit_builder: true
@@ -303,7 +303,7 @@ export default function ConfirmBusinessPage() {
                           className="text-white"
                         />
                         <label htmlFor={`credit-builder-${product.id}`} className="text-sm text-white">
-                          Enable Credit Builder Mode
+                          Enable Builder Mode
                         </label>
                         <Popover>
                           <PopoverTrigger asChild>
@@ -313,9 +313,9 @@ export default function ConfirmBusinessPage() {
                           </PopoverTrigger>
                           <PopoverContent className="w-80">
                             <div className="space-y-2">
-                              <h4 className="font-medium">Credit Builder</h4>
-                              <p className="text-sm text-gray-600">
-                                Allow customers to build up credit over time that they can use on any of your services. 
+                              <h4 className="font-medium">Balance Builder</h4>
+                              <p className="text-sm text-muted-foreground">
+                                Allow customers to build up a balance over time that they can use for future services.
                                 Customers choose how much they want to add each month, and you can charge against their balance.
                               </p>
                             </div>
@@ -388,9 +388,10 @@ export default function ConfirmBusinessPage() {
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-lg font-semibold">{product.name}</h3>
                         {product.is_credit_builder && (
-                          <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full">
-                            Credit Builder
-                          </span>
+                          <div className="flex items-center space-x-2">
+                            <TrendingUp className="w-4 h-4 text-blue-400" />
+                            <span className="text-sm text-blue-400">Balance Builder</span>
+                          </div>
                         )}
                       </div>
                       <p className="text-sm opacity-90 mb-3">{product.description}</p>
@@ -408,7 +409,7 @@ export default function ConfirmBusinessPage() {
                           className="hero-button-primary mt-4"
                           onClick={() => setClickedProductId(product.id)}
                         >
-                          {product.is_credit_builder ? "Start Building Credit" : "Subscribe"}
+                          {product.is_credit_builder ? "Start Building" : "Subscribe"}
                         </Button>
                         {clickedProductId === product.id && (
                           <p className="mt-2 text-sm text-green-400 text-center animate-bounce">

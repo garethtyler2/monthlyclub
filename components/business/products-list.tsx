@@ -166,7 +166,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                       {product.is_credit_builder && (
                         <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs mt-1">
                           <Sparkles className="w-3 h-3 mr-1" />
-                          Credit Builder
+                          Balance Builder
                         </Badge>
                       )}
                     </div>
@@ -209,7 +209,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                     {product.is_credit_builder ? (
                       <>
                         <TrendingUp className="w-4 h-4 mr-2" />
-                        Start Building Credit
+                        Start Building
                       </>
                     ) : (
                       <>
@@ -236,7 +236,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                     {product.is_credit_builder && (
                       <div className="space-y-2">
                         <Label htmlFor="creditAmount" className="text-sm font-medium text-white">
-                          Monthly Credit Amount
+                          Monthly Amount
                         </Label>
                         <div className="relative">
                           <PoundSterling className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -252,7 +252,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                           />
                         </div>
                         <p className="text-xs text-muted-foreground">
-                          Choose how much credit you'd like to add each month
+                          Choose how much to add to your balance builder fund each month
                         </p>
                       </div>
                     )}

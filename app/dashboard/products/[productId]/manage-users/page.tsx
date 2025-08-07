@@ -151,7 +151,7 @@ export default function ManageUsersPage() {
         setTransactions(groupedPayments);
       }
 
-      // Fetch credit data if this is a credit builder product
+      // Fetch credit data if this is a balance builder product
       if (product?.is_credit_builder) {
         const { data: creditData, error: creditError } = await supabase
           .from('user_credits')
@@ -251,7 +251,7 @@ export default function ManageUsersPage() {
         return;
       }
 
-      // Update user credit balance
+              // Update user balance builder fund
       const { error: creditError } = await supabase
         .from('user_credits')
         .update({
@@ -263,10 +263,10 @@ export default function ManageUsersPage() {
         .eq('business_id', product.business_id);
 
       if (creditError) {
-        console.error('Error updating credit balance:', creditError);
+                  console.error('Error updating balance builder fund:', creditError);
         const { toast } = await import('sonner');
         toast.error("Error", {
-          description: "Failed to update customer's credit balance. Please try again.",
+                      description: "Failed to update customer's balance builder fund. Please try again.",
         });
         setIsCharging(false);
         return;
@@ -322,7 +322,7 @@ export default function ManageUsersPage() {
 
       const { toast } = await import('sonner');
       toast.success("Credit Charged", {
-        description: `Successfully charged £${chargeAmount} from customer's credit balance.`,
+                  description: `Successfully charged £${chargeAmount} from customer's balance builder fund.`,
       });
 
       setTimeout(() => {
@@ -506,7 +506,7 @@ export default function ManageUsersPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Credit</p>
+                      <p className="text-sm text-muted-foreground">Total Balance</p>
                       <p className="text-2xl font-bold text-green-400">
                         £{(Object.values(userCredits).reduce((sum, credit) => sum + credit.balance, 0) / 100).toFixed(2)}
                       </p>
@@ -520,7 +520,7 @@ export default function ManageUsersPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Earned</p>
+                      <p className="text-sm text-muted-foreground">Total Paid In</p>
                       <p className="text-2xl font-bold text-blue-400">
                         £{(Object.values(userCredits).reduce((sum, credit) => sum + credit.total_earned, 0) / 100).toFixed(2)}
                       </p>
@@ -534,7 +534,7 @@ export default function ManageUsersPage() {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Spent</p>
+                      <p className="text-sm text-muted-foreground">Total Charged</p>
                       <p className="text-2xl font-bold text-orange-400">
                         £{(Object.values(userCredits).reduce((sum, credit) => sum + credit.total_spent, 0) / 100).toFixed(2)}
                       </p>
@@ -619,7 +619,7 @@ export default function ManageUsersPage() {
                         <div className="mt-4 p-3 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-lg">
                           <div className="flex items-center justify-between mb-1">
                             <span className="text-xs font-medium text-green-300 uppercase tracking-wide">
-                              Available Credit
+                              Balance Builder Fund
                             </span>
                             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                           </div>
@@ -652,7 +652,7 @@ export default function ManageUsersPage() {
                           }}
                         >
                           <Plus className="w-4 h-4 mr-2" />
-                          Charge Credit
+                          Charge Balance
                         </Button>
                       )}
                       
@@ -782,7 +782,7 @@ export default function ManageUsersPage() {
                                   <p className="text-muted-foreground">
                                     {txn.type === 'payment' 
                                       ? txn.status === 'failed' ? 'Payment Failed' : 'Payment'
-                                      : txn.type === 'credit_earned' ? 'Credit Added' : txn.description
+                                      : txn.type === 'credit_earned' ? 'Balance Added' : txn.description
                                     }
                                   </p>
                                 </div>
@@ -833,7 +833,7 @@ export default function ManageUsersPage() {
       <Dialog open={showChargeModal} onOpenChange={setShowChargeModal}>
         <DialogContent className="bg-slate-800 border-white/10">
           <DialogHeader>
-            <DialogTitle className="text-white">Charge User Credit</DialogTitle>
+            <DialogTitle className="text-white">Charge User Balance</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>

@@ -113,7 +113,7 @@ function SubscriptionConfirmPageInner() {
       return;
     }
 
-    // 5. Initialize user credit record if this is a credit builder product
+    // 5. Initialize user credit record if this is a balance builder product
     if (product.is_credit_builder) {
       const { error: creditError } = await supabase
         .from("user_credits")

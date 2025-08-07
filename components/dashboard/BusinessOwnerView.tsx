@@ -104,7 +104,7 @@ export function BusinessOwnerView({ businessId }: BusinessOwnerViewProps) {
               <DollarSign className="w-5 h-5 text-green-400" />
             </div>
             <div className="text-xs font-medium text-green-300 uppercase tracking-wide">
-              Total Earned
+              Total Paid In
             </div>
           </div>
           <div className="mb-2">

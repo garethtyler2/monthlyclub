@@ -155,7 +155,7 @@ export async function GET() {
         console.error("Failed to log successful payment:", insertSuccessError);
       }
 
-      // Add credit for credit builder products
+      // Add credit for balance builderproducts
       if (product.is_credit_builder) {
         // First get current credit balance
         const { data: currentCredit, error: fetchError } = await supabase

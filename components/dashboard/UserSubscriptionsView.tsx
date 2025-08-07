@@ -173,7 +173,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
     return `${dayNum}${ordinal} ${monthName}`;
   }
 
-  const getCreditBalance = (businessId: string) => {
+  const getBalanceBuilderFund = (businessId: string) => {
     const credit = userCredits.find(c => c.business_id === businessId);
     return credit ? credit.balance / 100 : 0; // Convert from pence to pounds
   };
@@ -223,7 +223,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
               if (!product) return null;
 
               const subscriptionPayments = payments.filter(p => p.subscription_id === sub.id);
-              const creditBalance = getCreditBalance(product.business?.id || '');
+              const balanceBuilderFund = getBalanceBuilderFund(product.business?.id || '');
               const businessCreditTransactions = getCreditTransactions(product.business?.id || '', sub.id);
 
               return (
@@ -282,28 +282,24 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                       )}
                     </div>
 
-                    {/* Credit Balance for Credit Builders */}
+                    {/* Credit Balance for Balance Builders */}
                     {product.is_credit_builder && (
-                      <div className="mb-4 p-3 bg-gradient-to-r from-blue-500/10 to-emerald-500/10 border border-blue-500/20 rounded-lg">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-medium text-blue-300 uppercase tracking-wide">
-                            Available Credit
-                          </span>
-                          <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                        </div>
-                        <div className="text-lg font-bold text-blue-200">
-                          £{creditBalance.toFixed(2)}
-                        </div>
-                        <div className="text-xs text-blue-400/70 mt-1 space-y-0.5">
-                          <div className="flex justify-between">
-                            <span>Paid In:</span>
-                            <span>£{(userCredits.find(c => c.business_id === product.business?.id)?.total_earned || 0) / 100}</span>
+                      <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <TrendingUp className="w-4 h-4 text-blue-400" />
+                            <span className="text-sm font-medium text-blue-400">Balance Builder Fund</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span>Spent:</span>
-                            <span>£{(userCredits.find(c => c.business_id === product.business?.id)?.total_spent || 0) / 100}</span>
-                          </div>
+                          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs">
+                            Available
+                          </Badge>
                         </div>
+                                                 <div className="text-2xl font-bold text-blue-300">
+                           £{(userCredits.find(c => c.business_id === product.business?.id)?.balance || 0) / 100}
+                         </div>
+                        <p className="text-xs text-blue-300/70 mt-1">
+                          Available to use for future services
+                        </p>
                       </div>
                     )}
 
@@ -835,7 +831,7 @@ function ChangeAmountModal({
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Enter the new amount you'd like to contribute each month to your credit builder.
+                  Enter the new amount you'd like to contribute each month to your builder fund.
                 </p>
               </div>
             </div>

@@ -119,7 +119,7 @@ export async function POST(req: Request) {
     }
 
     // Insert into scheduled_payments
-    // Fetch product price and check if it's a credit builder
+    // Fetch product price and check if it's a balance builder
     const { data: product, error: productError } = await supabase
       .from("products")
       .select("price, business_id, is_credit_builder")
@@ -163,7 +163,7 @@ export async function POST(req: Request) {
       return new NextResponse("Database Error", { status: 500 });
     }
 
-    // Initialize user credit record if this is a credit builder product
+    // Initialize user credit record if this is a balance builder product
     if (product.is_credit_builder) {
       const { error: creditError } = await supabase
         .from("user_credits")
