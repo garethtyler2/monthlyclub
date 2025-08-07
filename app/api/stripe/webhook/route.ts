@@ -122,7 +122,7 @@ export async function POST(req: Request) {
     // Fetch product price and check if it's a balance builder
     const { data: product, error: productError } = await supabase
       .from("products")
-      .select("price, business_id, is_credit_builder")
+      .select("price, business_id, is_credit_builder, name")
       .eq("id", productId)
       .single();
       if (productError || !product) {
@@ -185,6 +185,51 @@ export async function POST(req: Request) {
       }
     }
 
+    // Send subscription confirmation email
+    try {
+      const { data: businessData } = await supabase
+        .from("businesses")
+        .select("name")
+        .eq("id", businessId)
+        .single();
+
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'subscription_confirmation',
+          data: {
+            userEmail: userProfile?.email || '',
+            businessName: businessData?.name || 'Unknown Business',
+            productName: product.name || 'Unknown Product',
+            amount: amount,
+            paymentDay: parseInt(paymentDay),
+            subscriptionId: purchase.id
+          }
+        })
+      });
+
+      // Send new subscriber notification to business
+      if (businessData) {
+        await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'new_subscriber',
+            data: {
+              businessEmail: userProfile?.email || '', // This should be the business owner's email
+              businessName: businessData.name,
+              subscriberEmail: userProfile?.email || '',
+              productName: product.name || 'Unknown Product',
+              subscriptionId: purchase.id
+            }
+          })
+        });
+      }
+    } catch (emailError) {
+      console.error('Failed to send subscription emails:', emailError);
+    }
+
     return new NextResponse("Success", { status: 200 });
   }
 
@@ -192,7 +237,79 @@ export async function POST(req: Request) {
     const failedIntent = event.data.object as Stripe.PaymentIntent;
     console.warn("Payment failed:", failedIntent.id, failedIntent.last_payment_error?.message);
 
-    // Optional: Log to Supabase or notify stakeholders
+    // Get payment details and send failure notifications
+    try {
+      const { data: paymentData } = await supabase
+        .from("payments")
+        .select(`
+          user_id,
+          product_id,
+          business_id,
+          amount,
+          products(name),
+          businesses(name, user_id)
+        `)
+        .eq("stripe_payment_intent_id", failedIntent.id)
+        .single();
+
+      if (paymentData) {
+        // Get user email
+        const { data: userData } = await supabase
+          .from("user_profiles")
+          .select("email")
+          .eq("id", paymentData.user_id)
+          .single();
+
+        // Get business owner email
+        const { data: businessOwnerData } = await supabase
+          .from("user_profiles")
+          .select("email")
+          .eq("id", paymentData.businesses[0]?.user_id)
+          .single();
+
+        // Send payment failure notification to user
+        if (userData?.email) {
+          await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'payment_notification',
+              data: {
+                userEmail: userData.email,
+                businessName: paymentData.businesses[0]?.name || 'Unknown Business',
+                productName: paymentData.products[0]?.name || 'Unknown Product',
+                amount: paymentData.amount,
+                status: 'failed',
+                failureReason: failedIntent.last_payment_error?.message || 'Payment failed',
+                paymentDate: new Date().toLocaleDateString()
+              }
+            })
+          });
+        }
+
+        // Send payment failure notification to business
+        if (businessOwnerData?.email) {
+          await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'payment_failure',
+              data: {
+                businessEmail: businessOwnerData.email,
+                businessName: paymentData.businesses[0]?.name || 'Unknown Business',
+                customerEmail: userData?.email || 'Unknown',
+                productName: paymentData.products[0]?.name || 'Unknown Product',
+                amount: paymentData.amount,
+                failureReason: failedIntent.last_payment_error?.message || 'Payment failed'
+              }
+            })
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to send payment failure notifications:', error);
+    }
+
     return new NextResponse("Payment failure logged", { status: 200 });
   }
 

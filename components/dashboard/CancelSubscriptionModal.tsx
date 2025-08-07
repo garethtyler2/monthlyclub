@@ -29,6 +29,19 @@ export default function CancelSubscriptionModal({
     const handleCancel = async () => {
     setLoading(true);
 
+    // Get subscription details before cancelling
+    const { data: subscriptionData } = await supabase
+        .from("subscriptions")
+        .select(`
+            id,
+            user_id,
+            product_id,
+            products(name, business_id),
+            businesses(name)
+        `)
+        .eq("id", subscriptionId)
+        .single();
+
     const { error: subError } = await supabase
         .from("subscriptions")
         .update({ status: "cancelled", cancel_at: new Date().toISOString() })
@@ -38,6 +51,35 @@ export default function CancelSubscriptionModal({
         .from("scheduled_payments")
         .update({ status: "cancelled", cancel_at: new Date().toISOString()  })
         .eq("purchase_id", subscriptionId);
+
+    // Send cancellation email
+    if (!subError && !schedError && subscriptionData) {
+        try {
+            // Get user email
+            const { data: userData } = await supabase
+                .from("user_profiles")
+                .select("email")
+                .eq("id", subscriptionData.user_id)
+                .single();
+
+            if (userData?.email) {
+                await fetch('/api/email/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        type: 'subscription_cancelled',
+                        data: {
+                            userEmail: userData.email,
+                            productName: subscriptionData.products.name,
+                            businessName: subscriptionData.businesses.name
+                        }
+                    })
+                });
+            }
+        } catch (emailError) {
+            console.error('Failed to send cancellation email:', emailError);
+        }
+    }
 
     setLoading(false);
 

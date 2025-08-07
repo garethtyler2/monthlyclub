@@ -24,13 +24,33 @@ export default function CompletionPage() {
 
       const { data, error } = await supabase
         .from("businesses")
-        .select("slug")
+        .select("id, slug, name")
         .eq("user_id", user.id)
         .single()
 
       if (error || !data?.slug) return
 
       await supabase.from("businesses").update({ status: "active" }).eq("user_id", user.id);
+
+      // Send business activated notification to owner
+      try {
+        if (data) {
+          await fetch('/api/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'business_activated',
+              data: { 
+                businessName: data.name, 
+                businessId: data.id, 
+                ownerEmail: user.email 
+              }
+            })
+          });
+        }
+      } catch (emailError) {
+        console.error('Failed to send business activated email:', emailError);
+      }
 
       setSlug(data.slug)
     }

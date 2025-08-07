@@ -63,12 +63,39 @@ export default function LoginPageContent() {
     e.preventDefault();
     setLoading(true);
     setStatusMessage(null);
-    const { error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ email, password });
     setLoading(false);
     if (error) {
       setStatusMessage(error.message);
     } else {
       setStatusMessage("Signup successful! Please check your email to confirm your account.");
+      
+      // Send welcome email and owner notification
+      if (data.user) {
+        try {
+          // Send welcome email to user
+          await fetch('/api/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'welcome_email',
+              data: { userEmail: email, userName: email.split('@')[0] }
+            })
+          });
+
+          // Send notification to owner
+          await fetch('/api/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'new_user_signup',
+              data: { userEmail: email, userId: data.user.id }
+            })
+          });
+        } catch (emailError) {
+          console.error('Failed to send emails:', emailError);
+        }
+      }
     }
   };
 

@@ -88,6 +88,57 @@ export default function SubscriptionSuccessPage() {
         preferredPaymentDay: scheduled.scheduled_for,
         price: displayPrice,
       });
+
+      // Send subscription confirmation email
+      try {
+        const { data: subscriptionData } = await supabase
+          .from("subscriptions")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("product_id", scheduled.product_id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
+
+        if (subscriptionData) {
+          await fetch('/api/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'subscription_confirmation',
+              data: {
+                userEmail: user.email || '',
+                businessName: product.business?.name || 'Unknown Business',
+                productName: product.name || 'Unknown Product',
+                amount: scheduled.amount,
+                paymentDay: scheduled.scheduled_for,
+                subscriptionId: subscriptionData.id
+              }
+            })
+          });
+
+          // Send new subscriber notification to business
+          if (product.business?.name) {
+            await fetch('/api/email/send', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'new_subscriber',
+                data: {
+                  businessEmail: user.email || '', // This should be the business owner's email
+                  businessName: product.business.name,
+                  subscriberEmail: user.email || '',
+                  productName: product.name || 'Unknown Product',
+                  subscriptionId: subscriptionData.id
+                }
+              })
+            });
+          }
+        }
+      } catch (emailError) {
+        console.error('Failed to send subscription emails:', emailError);
+      }
+
       setLoading(false);
     }
 

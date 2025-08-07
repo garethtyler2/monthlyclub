@@ -59,6 +59,8 @@ export async function GET() {
   let skippedCount = 0;
   let skipReasons: string[] = [];
   let succeededCount = 0;
+  let failedCount = 0;
+  let errors: string[] = [];
 
   for (const record of scheduled) {
     try {
@@ -278,7 +280,33 @@ export async function GET() {
   });
   if (logInsertError) {
     console.error("Failed to insert billing log:", logInsertError);
-    }
+  }
+
+  // Send email report
+  try {
+    await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'cron_report',
+        data: {
+          report: {
+            totalProcessed: scheduled?.length || 0,
+            succeededCount,
+            failedCount: skippedCount,
+            totalAmount,
+            totalFees,
+            skippedCount,
+            skipReasons,
+            errors: []
+          }
+        }
+      })
+    });
+  } catch (emailError) {
+    console.error('Failed to send cron report email:', emailError);
+  }
+
   console.log(`Cron run summary: ${succeededCount} succeeded, ${skippedCount} skipped.`);
   return new NextResponse("Cron run complete", { status: 200 });
 }
