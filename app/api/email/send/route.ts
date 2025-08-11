@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { EmailService } from "@/lib/email";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(req: Request) {
   try {
@@ -35,9 +36,74 @@ export async function POST(req: Request) {
         await EmailService.sendSubscriptionCancelledEmail(data.userEmail, data.productName, data.businessName);
         break;
       
-      case 'new_subscriber':
-        await EmailService.sendNewSubscriberNotification(data);
-        break;
+      case 'new_subscriber': {
+        // If businessEmail is not provided, derive the business owner's email from productId or businessId
+        let businessEmail = data.businessEmail as string | undefined;
+        let businessName = data.businessName as string | undefined;
+        const subscriberEmail = data.subscriberEmail as string | undefined;
+        const productName = data.productName as string | undefined;
+        const subscriptionId = data.subscriptionId as string | undefined;
+
+        if (!businessEmail) {
+          const supabase = await createClient();
+
+          // Prefer businessId, otherwise compute via productId
+          let ownerUserId: string | undefined;
+          if (data.businessId) {
+            const { data: biz } = await supabase
+              .from('businesses')
+              .select('id, name, user_id')
+              .eq('id', data.businessId)
+              .single();
+            if (biz) {
+              businessName = businessName || biz.name;
+              ownerUserId = biz.user_id;
+            }
+          } else if (data.productId) {
+            const { data: prod } = await supabase
+              .from('products')
+              .select('id, name, business_id, businesses:business_id(name, user_id)')
+              .eq('id', data.productId)
+              .single();
+            if (prod && (prod as any).businesses) {
+              const biz = (prod as any).businesses as { name?: string; user_id?: string };
+              businessName = businessName || biz.name;
+              ownerUserId = biz.user_id;
+            }
+          }
+
+          if (ownerUserId) {
+            const { data: owner } = await supabase
+              .from('user_profiles')
+              .select('email')
+              .eq('id', ownerUserId)
+              .single();
+            businessEmail = owner?.email || businessEmail;
+          }
+        }
+
+        if (businessEmail) {
+          await EmailService.sendNewSubscriberNotification({
+            businessEmail,
+            businessName: businessName || 'Business',
+            subscriberEmail: subscriberEmail || 'unknown@unknown',
+            productName: productName || 'Product',
+            subscriptionId: subscriptionId || 'unknown',
+          });
+
+          // Send a copy to platform owner for monitoring
+          await EmailService.sendNewSubscriberNotification({
+            businessEmail: EmailService["OWNER_EMAIL" as keyof typeof EmailService] as unknown as string || 'gareth@monthlyclubhq.com',
+            businessName: businessName || 'Business',
+            subscriberEmail: subscriberEmail || 'unknown@unknown',
+            productName: productName || 'Product',
+            subscriptionId: subscriptionId || 'unknown',
+          });
+          return NextResponse.json({ success: true });
+        }
+
+        return NextResponse.json({ error: 'Owner email not found' }, { status: 400 });
+      }
       
       case 'payment_failure':
         await EmailService.sendPaymentFailureNotification(data);
