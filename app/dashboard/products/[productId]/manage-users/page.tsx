@@ -26,7 +26,6 @@ import {
   Minus,
   ArrowLeft,
   Filter,
-  MoreVertical,
   Download,
   RefreshCw
 } from 'lucide-react';
@@ -86,17 +85,24 @@ export default function ManageUsersPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [userCredits, setUserCredits] = useState<{ [key: string]: UserCredit }>({});
   const [creditTransactions, setCreditTransactions] = useState<{ [key: string]: CreditTransaction[] }>({});
+  const [serviceEventsByUser, setServiceEventsByUser] = useState<{ [key: string]: Array<{ id: string; served_at: string; notes: string | null; amount_charged: number | null; source: string }> }>({});
   const [showChargeModal, setShowChargeModal] = useState(false);
   const [selectedUserForCharge, setSelectedUserForCharge] = useState<string | null>(null);
   const [chargeAmount, setChargeAmount] = useState('');
   const [chargeDescription, setChargeDescription] = useState('');
   const [isCharging, setIsCharging] = useState(false);
   const [showSuccessAnimation, setShowSuccessAnimation] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [showLogModal, setShowLogModal] = useState(false);
+  const [selectedUserForLog, setSelectedUserForLog] = useState<string | null>(null);
+  const [logNotes, setLogNotes] = useState('');
+  const [isLogging, setIsLogging] = useState(false);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [sortBy, setSortBy] = useState<'date' | 'name' | 'balance'>('date');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'cancelled'>('all');
   const isMobile = useIsMobile();
   const pageSize = isMobile ? 6 : 12;
+  const [lastVisitByUser, setLastVisitByUser] = useState<{ [userId: string]: string | null }>({});
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   const fetchSubscribers = useCallback(async () => {
     setLoading(true);
@@ -188,6 +194,39 @@ export default function ManageUsersPage() {
           }
         }
       }
+
+      // Fetch last recorded visit for each user for this product
+      try {
+        // Fetch full service events for history
+        const { data: eventData, error: eventError } = await supabase
+          .from('service_events')
+          .select('id, user_id, served_at, notes, amount_charged, source')
+          .eq('product_id', productId as string)
+          .in('user_id', userIds)
+          .order('served_at', { ascending: false });
+
+        if (!eventError && eventData) {
+          const latestByUser: { [key: string]: string } = {};
+          const grouped: { [key: string]: Array<{ id: string; served_at: string; notes: string | null; amount_charged: number | null; source: string }> } = {};
+          for (const e of eventData) {
+            if (!latestByUser[e.user_id]) {
+              latestByUser[e.user_id] = e.served_at;
+            }
+            if (!grouped[e.user_id]) grouped[e.user_id] = [];
+            grouped[e.user_id].push({
+              id: e.id,
+              served_at: e.served_at,
+              notes: e.notes ?? null,
+              amount_charged: (e as any).amount_charged ?? null,
+              source: (e as any).source ?? 'manual',
+            });
+          }
+          setLastVisitByUser(latestByUser);
+          setServiceEventsByUser(grouped);
+        }
+      } catch (e) {
+        console.error('Error fetching service events:', e);
+      }
     }
 
     setLoading(false);
@@ -275,7 +314,7 @@ export default function ManageUsersPage() {
       // Get the user's subscription for this product
       const { data: userSubscription, error: subError } = await supabase
         .from('subscriptions')
-        .select('id')
+        .select('id, user_id')
         .eq('user_id', selectedUserForCharge)
         .eq('product_id', productId)
         .eq('status', 'active')
@@ -328,6 +367,28 @@ export default function ManageUsersPage() {
       setTimeout(() => {
         setShowSuccessAnimation(false);
       }, 2000);
+
+      // Also log a service visit for this charge
+      try {
+        const { data: authData } = await supabase.auth.getUser();
+        await supabase.from('service_events').insert({
+          business_id: product.business_id,
+          product_id: productId,
+          subscription_id: userSubscription.id,
+          user_id: userSubscription.user_id || selectedUserForCharge,
+          amount_charged: amount,
+          notes: chargeDescription || 'Charged from balance',
+          source: 'credit_charge',
+          created_by: authData?.user?.id || null,
+        });
+        // Refresh last visit times
+        setLastVisitByUser((prev) => ({
+          ...prev,
+          [selectedUserForCharge!]: new Date().toISOString(),
+        }));
+      } catch (e) {
+        console.warn('Failed to log service visit for credit charge:', e);
+      }
     } catch (error) {
       console.error('Error charging credit:', error);
       const { toast } = await import('sonner');
@@ -336,6 +397,49 @@ export default function ManageUsersPage() {
       });
     } finally {
       setIsCharging(false);
+    }
+  };
+
+  const handleLogVisit = async () => {
+    if (!selectedUserForLog || !product) return;
+    setIsLogging(true);
+    try {
+      const { data: authData } = await supabase.auth.getUser();
+      // Find the user's subscription for this product to link if available
+      const { data: userSubscription } = await supabase
+        .from('subscriptions')
+        .select('id')
+        .eq('user_id', selectedUserForLog)
+        .eq('product_id', productId)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      await supabase.from('service_events').insert({
+        business_id: product.business_id,
+        product_id: productId,
+        subscription_id: userSubscription?.id ?? null,
+        user_id: selectedUserForLog,
+        notes: logNotes || null,
+        source: 'manual',
+        created_by: authData?.user?.id || null,
+      });
+
+      setShowLogModal(false);
+      setLogNotes('');
+      setSelectedUserForLog(null);
+      setLastVisitByUser((prev) => ({
+        ...prev,
+        [selectedUserForLog]: new Date().toISOString(),
+      }));
+
+      const { toast } = await import('sonner');
+      toast.success('Visit Recorded', { description: 'The service has been logged for this customer.' });
+    } catch (error) {
+      console.error('Error logging visit:', error);
+      const { toast } = await import('sonner');
+      toast.error('Error', { description: 'Failed to record the visit. Please try again.' });
+    } finally {
+      setIsLogging(false);
     }
   };
 
@@ -554,113 +658,35 @@ export default function ManageUsersPage() {
           </div>
         ) : (
           <>
-            <div className={`grid gap-4 ${
-              viewMode === 'grid' 
-                ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
-                : 'grid-cols-1'
-            }`}>
+            <div className={`grid gap-2 grid-cols-1`}>
               {filteredAndSortedSubscriptions.map((sub) => (
-                <Card key={sub.id} className="bg-white/5 border-white/10 hover:bg-white/10 transition-all duration-200 group">
-                  <CardContent className="p-4">
-                    {/* User Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-white" />
+                <Card key={sub.id} className="bg-white/5 border-white/10 hover:bg-white/10 transition-all duration-200">
+                  <CardContent className="p-3">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="w-9 h-9 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                          <User className="w-4 h-4 text-white" />
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="min-w-0">
                           <p className="font-medium text-white truncate">
                             {sub.user_profiles?.email ?? 'Unknown'}
                           </p>
-                          <div className="flex items-center space-x-2 mt-1">
-                            {getStatusIcon(sub.status)}
-                            <Badge className={`text-xs ${getStatusColor(sub.status)}`}>
-                              {sub.status}
-                            </Badge>
-                          </div>
+                          {product?.is_credit_builder && userCredits[sub.user_id] && (
+                            <div className="text-xs text-green-300/80">
+                              Balance £{(userCredits[sub.user_id].balance / 100).toFixed(2)}
+                            </div>
+                          )}
                         </div>
                       </div>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </Button>
-                    </div>
 
-                    {/* User Details */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center space-x-1 text-muted-foreground">
-                          <Calendar className="w-3 h-3" />
-                          <span>Started</span>
-                        </div>
-                        <span className="text-white">
-                          {new Date(sub.start_date).toLocaleDateString()}
-                        </span>
-                      </div>
-                      
-                      {sub.customer_reference && (
-                        <div className="flex items-center justify-between text-sm">
-                          <div className="flex items-center space-x-1 text-muted-foreground">
-                            <Hash className="w-3 h-3" />
-                            <span>Reference</span>
-                          </div>
-                          <span className="text-white font-mono text-xs">
-                            {sub.customer_reference}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Credit Balance */}
-                      {product?.is_credit_builder && userCredits[sub.user_id] && (
-                        <div className="mt-4 p-3 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-lg">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs font-medium text-green-300 uppercase tracking-wide">
-                              Balance Builder Fund
-                            </span>
-                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                          </div>
-                          <div className="text-lg font-bold text-green-200">
-                            £{(userCredits[sub.user_id].balance / 100).toFixed(2)}
-                          </div>
-                          <div className="text-xs text-green-400/70 mt-1 space-y-0.5">
-                            <div className="flex justify-between">
-                              <span>Paid In:</span>
-                              <span>£{(userCredits[sub.user_id].total_earned / 100).toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>Spent:</span>
-                              <span>£{(userCredits[sub.user_id].total_spent / 100).toFixed(2)}</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-col space-y-2 mt-4">
-                      {product?.is_credit_builder && userCredits[sub.user_id] && userCredits[sub.user_id].balance > 0 && (
+                      <div className="flex items-center gap-2 justify-end">
+                        <Badge className={`text-[10px] ${getStatusColor(sub.status)}`}>
+                          {sub.status}
+                        </Badge>
                         <Button
-                          size="sm"
-                          className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
-                          onClick={() => {
-                            setSelectedUserForCharge(sub.user_id);
-                            setShowChargeModal(true);
-                          }}
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          Charge Balance
-                        </Button>
-                      )}
-                      
-                      <div className="flex space-x-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex-1 border-white/20 text-white hover:bg-white/10"
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-white"
                           onClick={() =>
                             setExpandedUserTransactions(
                               expandedUserTransactions === sub.user_id ? null : sub.user_id
@@ -668,57 +694,38 @@ export default function ManageUsersPage() {
                           }
                         >
                           {expandedUserTransactions === sub.user_id ? (
-                            <>
-                              <ChevronUp className="w-4 h-4 mr-1" />
-                              Hide
-                            </>
+                            <ChevronUp className="w-4 h-4" />
                           ) : (
-                            <>
-                              <ChevronDown className="w-4 h-4 mr-1" />
-                              Transactions
-                            </>
+                            <ChevronDown className="w-4 h-4" />
                           )}
                         </Button>
-                        
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              className="flex-1"
-                              onClick={() => setSelectedSubId(sub.id)}
-                            >
-                              <XCircle className="w-4 h-4 mr-1" />
-                              Cancel
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="bg-slate-800 border-white/10">
-                            <DialogHeader>
-                              <DialogTitle className="text-white">Confirm Cancellation</DialogTitle>
-                            </DialogHeader>
-                            <p className="text-sm text-muted-foreground">
-                              Are you sure you want to cancel this subscription? This action cannot be undone.
-                            </p>
-                            <DialogFooter className="mt-4">
-                              <Button variant="destructive" onClick={handleCancelSubscription} disabled={isCancelling}>
-                                {isCancelling ? 'Cancelling...' : 'Confirm Cancel'}
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
+                        {/* Actions now shown inside expanded panel below */}
                       </div>
                     </div>
 
-                    {/* Expanded Transactions */}
+                    {/* Expanded Actions + History */}
                     {expandedUserTransactions === sub.user_id && (
-                      <div className="mt-4 pt-4 border-t border-white/10">
-                        <h4 className="text-sm font-medium text-white mb-3">Recent Transactions</h4>
+                      <div className="mt-3 pt-3 border-t border-white/10">
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          <Button size="sm" className="bg-white/10 text-white" onClick={() => { setSelectedUserForLog(sub.user_id); setShowLogModal(true); }}>
+                            Log Visit
+                          </Button>
+                          {product?.is_credit_builder && (
+                            <Button size="sm" className="bg-gradient-to-r from-green-500 to-emerald-500 hover:bg-green-700 text-white" onClick={() => { setSelectedUserForCharge(sub.user_id); setShowChargeModal(true); }}>
+                              Charge
+                            </Button>
+                          )}
+                          <Button size="sm" variant="destructive" onClick={() => { setSelectedSubId(sub.id); setShowCancelDialog(true); }}>
+                            Cancel
+                          </Button>
+                        </div>
+                        <h4 className="text-sm font-medium text-white mb-2">Recent History</h4>
                         <div className="space-y-2 max-h-48 overflow-y-auto">
                           {(() => {
                             const allTransactions: Array<{
                               id: string;
                               date: Date;
-                              type: 'payment' | 'credit_earned' | 'credit_spent';
+                              type: 'payment' | 'credit_earned' | 'credit_spent' | 'serviced';
                               amount: number;
                               description: string;
                               status?: string;
@@ -752,6 +759,19 @@ export default function ManageUsersPage() {
                               });
                             }
 
+                            // Service events
+                            if (serviceEventsByUser[sub.user_id]) {
+                              serviceEventsByUser[sub.user_id].forEach(ev => {
+                                allTransactions.push({
+                                  id: `served-${ev.id}`,
+                                  date: new Date(ev.served_at),
+                                  type: 'serviced',
+                                  amount: Math.abs(ev.amount_charged || 0),
+                                  description: ev.notes || (ev.source === 'credit_charge' ? 'Service delivered (charged from balance)' : 'Service delivered'),
+                                });
+                              });
+                            }
+
                             allTransactions.sort((a, b) => b.date.getTime() - a.date.getTime());
 
                             if (allTransactions.length === 0) {
@@ -781,18 +801,26 @@ export default function ManageUsersPage() {
                                   </p>
                                   <p className="text-muted-foreground">
                                     {txn.type === 'payment' 
-                                      ? txn.status === 'failed' ? 'Payment Failed' : 'Payment'
-                                      : txn.type === 'credit_earned' ? 'Balance Added' : txn.description
+                                      ? (txn.status === 'failed' ? 'Payment Failed' : 'Paid In')
+                                      : txn.type === 'credit_earned' 
+                                        ? 'Paid In' 
+                                        : txn.type === 'credit_spent' 
+                                          ? `Charged — ${txn.description}`
+                                          : (txn.description || 'Serviced')
                                     }
                                   </p>
                                 </div>
                                 <div className={`font-semibold ${
-                                  txn.type === 'payment' 
-                                    ? txn.status === 'failed' ? 'text-red-400' : 'text-blue-400'
-                                    : txn.type === 'credit_earned' ? 'text-green-400' : 'text-orange-400'
+                                  txn.type === 'payment'
+                                    ? (txn.status === 'failed' ? 'text-red-400' : 'text-blue-400')
+                                    : txn.type === 'credit_earned'
+                                      ? 'text-green-400'
+                                      : txn.type === 'credit_spent'
+                                        ? 'text-orange-400'
+                                        : 'text-purple-400'
                                 }`}>
                                   {txn.type === 'credit_earned' ? '+' : txn.type === 'credit_spent' ? '−' : ''}
-                                  £{(txn.amount / 100).toFixed(2)}
+                                  {txn.type === 'serviced' && txn.amount === 0 ? '' : `£${(txn.amount / 100).toFixed(2)}`}
                                 </div>
                               </div>
                             ));
@@ -873,9 +901,58 @@ export default function ManageUsersPage() {
             <Button 
               onClick={handleChargeCredit} 
               disabled={isCharging || !chargeAmount || !chargeDescription}
-              className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+              className="bg-gradient-to-r mb-2 from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
             >
               {isCharging ? 'Charging...' : 'Charge Credit'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Subscription Dialog */}
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent className="bg-slate-800 border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-white">Confirm Cancellation</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Are you sure you want to cancel this subscription? This action cannot be undone.
+          </p>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setShowCancelDialog(false)} className="border-white/20 text-white">
+              Keep Subscription
+            </Button>
+            <Button variant="destructive" onClick={handleCancelSubscription} disabled={isCancelling}>
+              {isCancelling ? 'Cancelling...' : 'Confirm Cancel'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Log Visit Modal */}
+      <Dialog open={showLogModal} onOpenChange={setShowLogModal}>
+        <DialogContent className="bg-slate-800 border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-white">Log Visit</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-white">Notes (optional)</label>
+              <Input
+                type="text"
+                value={logNotes}
+                onChange={(e) => setLogNotes(e.target.value)}
+                placeholder="e.g., Haircut completed, Botox treatment"
+                className="bg-white/5 border-white/10 text-white"
+              />
+            </div>
+          </div>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setShowLogModal(false)} className="border-white/20 text-white">
+              Cancel
+            </Button>
+            <Button onClick={handleLogVisit} disabled={isLogging || !selectedUserForLog} className="bg-gradient-to-r mb-2 from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 text-white">
+              {isLogging ? 'Saving...' : 'Log Visit'}
             </Button>
           </DialogFooter>
         </DialogContent>

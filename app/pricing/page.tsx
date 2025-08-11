@@ -29,6 +29,10 @@ export const metadata: Metadata = {
   },
 };
 
+const amounts = [10, 50, 100];
+
+const formatGBP = (value: number) => `£${value.toFixed(2)}`;
+
 const PricingPage = () => {
   return (
     <>
@@ -82,6 +86,144 @@ const PricingPage = () => {
               </ul>
             </CardContent>
           </Card>
+        </div>
+      </section>
+
+      {/* Examples: Standard Subscriptions */}
+      <section className="py-12 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-2">Example Payouts</h2>
+          <p className="text-center text-muted-foreground mb-8">How a single payment breaks down with our fees</p>
+
+          {/* Desktop/table */}
+          <div className="overflow-x-auto hidden md:block">
+            <table className="w-full text-sm md:text-base border-separate border-spacing-y-0 rounded-lg overflow-hidden">
+              <thead>
+                <tr className="text-left text-muted-foreground bg-white/10">
+                  <th className="px-5 py-3">Customer pays</th>
+                  <th className="px-5 py-3">Stripe fee (1.5% + 20p)</th>
+                  <th className="px-5 py-3">MonthlyClub fee (1.5%)</th>
+                  <th className="px-5 py-3">You receive</th>
+                </tr>
+              </thead>
+              <tbody>
+                {amounts.map((amount, idx) => {
+                  const stripeFee = amount * 0.015 + 0.20;
+                  const mcFee = amount * 0.015;
+                  const youGet = amount - stripeFee - mcFee;
+                  return (
+                    <tr key={amount} className={`${idx % 2 === 0 ? 'bg-white/5' : 'bg-white/10'} hover:bg-white/15 transition`}> 
+                      <td className="px-5 py-3 font-medium text-white">{formatGBP(amount)}</td>
+                      <td className="px-5 py-3">{formatGBP(stripeFee)}</td>
+                      <td className="px-5 py-3">{formatGBP(mcFee)}</td>
+                      <td className="px-5 py-3 font-semibold text-emerald-400">{formatGBP(youGet)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile/cards */}
+          <div className="grid gap-3 md:hidden">
+            {amounts.map((amount, idx) => {
+              const stripeFee = amount * 0.015 + 0.20;
+              const mcFee = amount * 0.015;
+              const youGet = amount - stripeFee - mcFee;
+              return (
+                <div key={`m-${amount}`} className={`rounded-lg p-4 ${idx % 2 === 0 ? 'bg-white/5' : 'bg-white/10'}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Customer pays</span>
+                    <span className="font-semibold text-white">{formatGBP(amount)}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-sm text-muted-foreground">Stripe fee</span>
+                    <span>{formatGBP(stripeFee)}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-sm text-muted-foreground">MonthlyClub fee</span>
+                    <span>{formatGBP(mcFee)}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+                    <span className="text-sm text-muted-foreground">You receive</span>
+                    <span className="font-semibold text-emerald-400">{formatGBP(youGet)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Examples: Balance Builder */}
+      <section className="py-8 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h3 className="text-2xl md:text-3xl font-bold text-foreground text-center mb-2">Balance Builder Examples</h3>
+          <p className="text-center text-muted-foreground mb-8">Customers get every penny added to their balance; you see fees on payout</p>
+
+          {/* Desktop/table */}
+          <div className="overflow-x-auto hidden md:block">
+            <table className="w-full text-sm md:text-base border-separate border-spacing-y-0 rounded-lg overflow-hidden">
+              <thead>
+                <tr className="text-left text-muted-foreground bg-white/10">
+                  <th className="px-5 py-3">Customer pays</th>
+                  <th className="px-5 py-3">Added to customer balance</th>
+                  <th className="px-5 py-3">Stripe fee (1.5% + 20p)</th>
+                  <th className="px-5 py-3">MonthlyClub fee (1.5%)</th>
+                  <th className="px-5 py-3">You receive</th>
+                </tr>
+              </thead>
+              <tbody>
+                {amounts.map((amount, idx) => {
+                  const stripeFee = amount * 0.015 + 0.20;
+                  const mcFee = amount * 0.015;
+                  const youGet = amount - stripeFee - mcFee;
+                  return (
+                    <tr key={`bb-${amount}`} className={`${idx % 2 === 0 ? 'bg-white/5' : 'bg-white/10'} hover:bg-white/15 transition`}>
+                      <td className="px-5 py-3 font-medium text-white">{formatGBP(amount)}</td>
+                      <td className="px-5 py-3 font-medium">{formatGBP(amount)}</td>
+                      <td className="px-5 py-3">{formatGBP(stripeFee)}</td>
+                      <td className="px-5 py-3">{formatGBP(mcFee)}</td>
+                      <td className="px-5 py-3 font-semibold text-emerald-400">{formatGBP(youGet)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile/cards */}
+          <div className="grid gap-3 md:hidden">
+            {amounts.map((amount, idx) => {
+              const stripeFee = amount * 0.015 + 0.20;
+              const mcFee = amount * 0.015;
+              const youGet = amount - stripeFee - mcFee;
+              return (
+                <div key={`mbb-${amount}`} className={`rounded-lg p-4 ${idx % 2 === 0 ? 'bg-white/5' : 'bg-white/10'}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Customer pays</span>
+                    <span className="font-semibold text-white">{formatGBP(amount)}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-sm text-muted-foreground">Added to balance</span>
+                    <span className="font-medium">{formatGBP(amount)}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-sm text-muted-foreground">Stripe fee</span>
+                    <span>{formatGBP(stripeFee)}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-sm text-muted-foreground">MonthlyClub fee</span>
+                    <span>{formatGBP(mcFee)}</span>
+                  </div>
+                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/10">
+                    <span className="text-sm text-muted-foreground">You receive</span>
+                    <span className="font-semibold text-emerald-400">{formatGBP(youGet)}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 

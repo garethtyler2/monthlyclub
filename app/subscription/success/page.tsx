@@ -117,23 +117,7 @@ export default function SubscriptionSuccessPage() {
             })
           });
 
-          // Send new subscriber notification to business
-          if (product.business?.name) {
-            await fetch('/api/email/send', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                type: 'new_subscriber',
-                data: {
-                  businessEmail: user.email || '', // This should be the business owner's email
-                  businessName: product.business.name,
-                  subscriberEmail: user.email || '',
-                  productName: product.name || 'Unknown Product',
-                  subscriptionId: subscriptionData.id
-                }
-              })
-            });
-          }
+          // Business notification is sent server-side via webhook to avoid exposing owner emails and duplicate sends
         }
       } catch (emailError) {
         console.error('Failed to send subscription emails:', emailError);
