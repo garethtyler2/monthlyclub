@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Settings, LogOut, Plus, Home, BookOpen, Zap, DollarSign, Building2, CreditCard } from "lucide-react";
+import { Menu, X, User, Settings, LogOut, Plus, Home, BookOpen, Zap, DollarSign, Building2, CreditCard, Newspaper, ImagePlus } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
 import {
@@ -14,6 +14,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { useIsMobile } from "@/hooks/use-mobile";
+import CreatePostModal from "@/components/business/CreatePostModal";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -22,12 +23,16 @@ const Navbar = () => {
   const [hasBusiness, setHasBusiness] = useState(false);
   const [hasSubscriptions, setHasSubscriptions] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
+  const [businessId, setBusinessId] = useState<string | null>(null);
   const [businessSlug, setBusinessSlug] = useState<string | null>(null);
   const [businessName, setBusinessName] = useState<string | null>(null);
   const [businessImageUrl, setBusinessImageUrl] = useState<string | null>(null);
   const [businessStatus, setBusinessStatus] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  
+  // Create Post Modal
+  const [showCreatePost, setShowCreatePost] = useState(false);
   
   useEffect(() => {
     // Detect touch device
@@ -50,6 +55,7 @@ const Navbar = () => {
         if (businessData) {
           setHasBusiness(true);
         }
+        setBusinessId(businessData?.id ?? null);
         setBusinessSlug(businessData?.slug ?? null);
         setBusinessName(businessData?.name ?? null);
         setBusinessImageUrl(businessData?.image_url ?? null);
@@ -149,6 +155,15 @@ const Navbar = () => {
                 Guides
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-brand-purple to-brand-blue transition-all duration-200 group-hover:w-full"></span>
               </Link>
+              {hasSubscriptions && (
+                <Link 
+                  href="/feed" 
+                  className="text-sm font-medium text-muted-foreground hover:text-white transition-colors duration-200 relative group"
+                >
+                  Feed
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-brand-purple to-brand-blue transition-all duration-200 group-hover:w-full"></span>
+                </Link>
+              )}
             </div>
 
             <div className="flex items-center space-x-3">
@@ -168,6 +183,16 @@ const Navbar = () => {
                     Finish Setup
                   </button>
                 ))}
+
+              {/* Desktop Create Post as its own nav item */}
+              {user && businessId && (
+                <button
+                  onClick={() => setShowCreatePost(true)}
+                  className="px-4 py-2 bg-gradient-to-r from-brand-purple to-brand-blue text-white text-sm font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Create Post
+                </button>
+              )}
 
               {user && (
                 <DropdownMenu>
@@ -449,53 +474,6 @@ const Navbar = () => {
                   </div>
                 )}
 
-                {/* Main Navigation */}
-                <div className="space-y-0.5 mb-4">
-                  <Link
-                    href="/"
-                    className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
-                    onClick={closeMenu}
-                  >
-                    <Home size={18} className="text-muted-foreground" />
-                    <span className="font-medium text-sm">Home</span>
-                  </Link>
-                  
-                  <Link
-                    href="/how-it-works"
-                    className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
-                    onClick={closeMenu}
-                  >
-                    <Zap size={18} className="text-muted-foreground" />
-                    <span className="font-medium text-sm">How It Works</span>
-                  </Link>
-                  
-                  <Link
-                    href="/pricing"
-                    className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
-                    onClick={closeMenu}
-                  >
-                    <DollarSign size={18} className="text-muted-foreground" />
-                    <span className="font-medium text-sm">Pricing</span>
-                  </Link>
-                  
-                  <Link
-                    href="/features"
-                    className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
-                    onClick={closeMenu}
-                  >
-                    <Zap size={18} className="text-muted-foreground" />
-                    <span className="font-medium text-sm">Features</span>
-                  </Link>
-                  
-                  <Link
-                    href="/guides"
-                    className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
-                    onClick={closeMenu}
-                  >
-                    <BookOpen size={18} className="text-muted-foreground" />
-                    <span className="font-medium text-sm">Guides</span>
-                  </Link>
-                </div>
 
                 {/* Create Business Section - Show for logged out users or users without business */}
                 {(!user || (!hasBusiness && businessStatus === null)) && (
@@ -511,6 +489,34 @@ const Navbar = () => {
                         <Plus size={16} />
                         <span>Create Business</span>
                       </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Create Post + Feed (above Business section) */}
+                {user && (
+                  <div className="mb-4">
+                    <div className="space-y-0.5">
+                      {businessId && (
+                        <button
+                          onClick={() => {
+                            setShowCreatePost(true);
+                            closeMenu();
+                          }}
+                          className="w-full flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors text-left"
+                        >
+                          <ImagePlus size={18} className="text-muted-foreground" />
+                          <span className="font-medium text-sm">Create Post</span>
+                        </button>
+                      )}
+                      <Link
+                        href="/feed"
+                        className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                        onClick={closeMenu}
+                      >
+                        <Newspaper size={18} className="text-muted-foreground" />
+                        <span className="font-medium text-sm">Feed</span>
+                      </Link>
                     </div>
                   </div>
                 )}
@@ -615,8 +621,21 @@ const Navbar = () => {
           </div>
         )}
       </header>
+      {businessId && (
+        <CreatePostModal
+          businessId={businessId}
+          open={showCreatePost}
+          onOpenChange={setShowCreatePost}
+        />
+      )}
     </>
   );
 };
 
 export default Navbar;
+
+// Inline modal so it can open from menu
+// Render at root of component to avoid menu overlay issues
+// We keep this at the bottom to not interfere with layout
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+;(function ModalMount() {})
