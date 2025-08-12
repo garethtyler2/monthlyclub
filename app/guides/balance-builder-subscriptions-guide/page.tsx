@@ -47,8 +47,13 @@ export default function BalanceBuilderGuide() {
           name="description"
           content="Learn what Balance Builder (prepaid service credit) is, who it suits, how to price it, how to position it without implying credit reporting, plus examples by niche."
         />
+        <meta name="robots" content="index,follow" />
         <link rel="canonical" href="https://www.monthlyclubhq.com/guides/balance-builder-subscriptions-guide" />
         <meta name="keywords" content={`${primaryKeyword}, prepaid service credit, build service credit, subscription wallet`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Balance Builder Subscriptions: How and When to Use Them" />
+        <meta name="twitter:description" content="Prepaid service credit plans: set amounts, messaging, examples by niche, and simple compliance notes." />
+        <meta name="twitter:image" content="https://www.monthlyclubhq.com/images/MonthlyClubHomepageImage.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -75,24 +80,36 @@ export default function BalanceBuilderGuide() {
             }),
           }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://www.monthlyclubhq.com/" },
+                { "@type": "ListItem", position: 2, name: "Guides", item: "https://www.monthlyclubhq.com/guides" },
+                { "@type": "ListItem", position: 3, name: "Balance Builder Subscriptions" },
+              ],
+            }),
+          }}
+        />
       </Head>
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="py-14 md:py-20 bg-gradient-to-b from-brand-purple/10 to-transparent">
+        <section className="py-16 md:py-24 bg-gradient-to-b from-brand-indigo/10 to-transparent">
           <div className="container mx-auto px-6 max-w-5xl">
-            <nav className="mb-6 text-sm">
+            <nav className="mb-5 text-sm">
               <Link href="/guides" className="text-brand-purple hover:underline">← Back to Guides</Link>
             </nav>
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-3">
               Balance Builder Subscriptions: How and When to Use Them
             </h1>
             <p className="text-base md:text-lg text-muted-foreground max-w-3xl">
-              Balance Builder lets customers <strong>prepay into a wallet</strong> that they can use later for services. It’s ideal when visits vary or customers want to
-              spread the cost. This guide shows how to price, position and launch it correctly.
+              Balance Builder lets customers prepay into a wallet they can use later for services — ideal when visits vary. This guide shows how to price, position and launch it correctly.
             </p>
-            {/* Mobile TOC */}
-            <details className="md:hidden mt-6 rounded-lg border border-white/10 p-3 bg-white/5">
+            <details className="md:hidden mt-5 rounded-lg border border-white/10 p-3 bg-white/5">
               <summary className="cursor-pointer text-sm font-medium">Table of contents</summary>
               <ul className="mt-3 space-y-2 text-sm">
                 {toc.map((item) => (
@@ -105,10 +122,11 @@ export default function BalanceBuilderGuide() {
           </div>
         </section>
 
-        {/* Content + Desktop TOC */}
-        <section className="py-10">
-          <div className="container mx-auto px-6 max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-10">
-            <article className="prose prose-gray max-w-none dark:prose-invert">
+        {/* Content */}
+        <section className="py-12 md:py-16">
+          <div className="container mx-auto px-6 max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-12">
+
+              <article className="prose prose-base md:prose-lg max-w-none dark:prose-invert space-y-8 md:space-y-10">
               <h2 id="what">What is Balance Builder?</h2>
               <p>
                 A Balance Builder plan collects a <strong>fixed monthly contribution</strong> (e.g., £20/£40/£60). These contributions build up as
@@ -149,7 +167,7 @@ export default function BalanceBuilderGuide() {
                   <thead className="bg-white/5">
                     <tr>
                       <th className="px-3 py-2 text-left">Niche</th>
-                      <th className="px-3 py-2 text-left">Suggested tiers</th>
+                      <th className="px-3 py-2 text-left">Examples</th>
                       <th className="px-3 py-2 text-left">Typical use of credit</th>
                     </tr>
                   </thead>
@@ -178,25 +196,25 @@ export default function BalanceBuilderGuide() {
                 </table>
               </div>
 
-              <h2 id="compliance">Simple compliance notes</h2>
+              <h2 id="tips">Tips for a smooth launch</h2>
               <ul>
-                <li>Be explicit that this is <strong>prepaid store credit</strong> for your services and <strong>not consumer credit</strong>.</li>
-                <li>State refund, expiry and cancellation rules clearly in your terms.</li>
-                <li>Avoid words like “finance,” “loan,” “credit score,” or “reporting.”</li>
+                <li>Highlight that customers can use their balance flexibly for any of your services.</li>
+                <li>Show example goals (e.g., "Save up for a deluxe treatment or use for regular visits").</li>
+                <li>Use clear, friendly language like "wallet," "service credit," or "prepaid balance."</li>
               </ul>
 
               <h2>Next steps</h2>
               <ul>
-                <li>Decide your three contribution tiers and example goals.</li>
-                <li>Update plan copy with wallet language and a credit‑to‑service table.</li>
-                <li>Announce via a business post with a limited‑time bonus credit.</li>
+                <li>Pick your three contribution tiers and set example goals for each.</li>
+                <li>Update your plan copy to explain how the balance works and what it can be redeemed for.</li>
+                <li>Announce your new Balance Builder with a business post—consider offering a bonus for early signups.</li>
               </ul>
 
               <div className="mt-8">
-                <Link href="/create-a-business/step-one" className="hero-button-primary inline-block px-4 py-2 rounded-lg">Set up Balance Builder</Link>
+                <Link href="/create-a-business/step-one" className="hero-button-primary">Set up Balance Builder</Link>
               </div>
-            </article>
-
+              </article>
+     
             <aside className="hidden lg:block">
               <div className="sticky top-28 rounded-lg border border-white/10 p-4 bg-white/5">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">On this page</p>

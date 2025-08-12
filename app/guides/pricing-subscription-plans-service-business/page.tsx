@@ -46,11 +46,17 @@ export default function PricingSubscriptionPlansGuide() {
           name="description"
           content="A complete guide to subscription pricing for service businesses: models, value metrics, trials vs. discounts, payment day strategy, and example pricing tables."
         />
+        <meta name="robots" content="index,follow" />
         <link
           rel="canonical"
           href="https://www.monthlyclubhq.com/guides/pricing-subscription-plans-service-business"
         />
         <meta name="keywords" content={`${primaryKeyword}, subscription pricing models, tiered pricing, usage pricing, pricing tables by niche`} />
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Pricing Your Subscription Plans for Service Businesses" />
+        <meta name="twitter:description" content="Learn pricing models, anchoring, payment day strategy and see example tables by niche." />
+        <meta name="twitter:image" content="https://www.monthlyclubhq.com/images/MonthlyClubHomepageImage.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -90,23 +96,37 @@ export default function PricingSubscriptionPlansGuide() {
             }),
           }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://www.monthlyclubhq.com/" },
+                { "@type": "ListItem", position: 2, name: "Guides", item: "https://www.monthlyclubhq.com/guides" },
+                { "@type": "ListItem", position: 3, name: "Pricing Your Subscription Plans" },
+              ],
+            }),
+          }}
+        />
       </Head>
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="py-14 md:py-20 bg-gradient-to-b from-brand-purple/10 to-transparent">
+        <section className="py-16 md:py-24 bg-gradient-to-b from-brand-purple/10 to-transparent">
           <div className="container mx-auto px-6 max-w-5xl">
-            <nav className="mb-6 text-sm">
+            <nav className="mb-5 text-sm">
               <Link href="/guides" className="text-brand-purple hover:underline">← Back to Guides</Link>
             </nav>
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-3">
               Pricing Your Subscription Plans for Service Businesses
             </h1>
             <p className="text-base md:text-lg text-muted-foreground max-w-3xl">
-              A practical handbook for {primaryKeyword}: models, anchoring, promos and payment-day strategy — plus ready-to-use example pricing tables by niche.
+              A practical handbook for {primaryKeyword}: models, anchoring, promos and payment‑day strategy — plus ready‑to‑use pricing tables by niche.
             </p>
             {/* Mobile TOC */}
-            <details className="md:hidden mt-6 rounded-lg border border-white/10 p-3 bg-white/5">
+            <details className="md:hidden mt-5 rounded-lg border border-white/10 p-3 bg-white/5">
               <summary className="cursor-pointer text-sm font-medium">Table of contents</summary>
               <ul className="mt-3 space-y-2 text-sm">
                 {toc.map((item) => (
@@ -119,10 +139,11 @@ export default function PricingSubscriptionPlansGuide() {
           </div>
         </section>
 
-        {/* Content + Desktop TOC */}
-        <section className="py-10">
-          <div className="container mx-auto px-6 max-w-6xl grid grid-cols-1 md:grid-cols-[1fr] lg:grid-cols-[1fr_280px] gap-10">
-            <article className="prose prose-gray max-w-none dark:prose-invert">
+        {/* Content */}
+        <section className="py-12 md:py-16">
+          <div className="container mx-auto px-6 max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-12">
+
+              <article className="prose prose-base md:prose-lg max-w-none dark:prose-invert space-y-8 md:space-y-10">
               <h2 id="pricing-models">Common pricing models</h2>
               <p>
                 The most common models for service subscriptions are flat, tiered, and usage-linked. For local services, we recommend starting with a
@@ -203,9 +224,10 @@ export default function PricingSubscriptionPlansGuide() {
               </ul>
 
               <div className="mt-8">
-                <Link href="/create-a-business/step-one" className="hero-button-primary inline-block px-4 py-2 rounded-lg">Create your plan</Link>
+                <Link href="/create-a-business/step-one" className="hero-button-primary">Create your plan</Link>
               </div>
-            </article>
+              </article>
+
 
             {/* Desktop sticky TOC */}
             <aside className="hidden lg:block">
@@ -214,9 +236,7 @@ export default function PricingSubscriptionPlansGuide() {
                 <ul className="space-y-2 text-sm">
                   {toc.map((item) => (
                     <li key={item.id}>
-                      <a href={`#${item.id}`} className="text-brand-purple hover:underline">
-                        {item.label}
-                      </a>
+                      <a href={`#${item.id}`} className="text-brand-purple hover:underline">{item.label}</a>
                     </li>
                   ))}
                 </ul>

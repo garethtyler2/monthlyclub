@@ -34,7 +34,7 @@ const TopicCard: React.FC<TopicCardProps> = ({ id, title, description, icon, sub
           {subtopics.map((subtopic) => (
             <AccordionItem key={subtopic.id} value={subtopic.id} className="border-b-0 last:border-0">
               <AccordionTrigger className="py-3 hover:no-underline">
-                <div className="flex items-center justify-start w-full font-medium">
+                <div className="flex items-center text-sm sm:text-base justify-start w-full font-medium">
                   <span>{subtopic.title}</span>
                 </div>
               </AccordionTrigger>

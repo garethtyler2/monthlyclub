@@ -45,8 +45,13 @@ export default function SubscriptionLaunchChecklistGuide() {
           name="description"
           content="Step-by-step checklist to launch a subscription business: validate, create plans, Stripe tests, warm-up posts, and launch templates."
         />
+        <meta name="robots" content="index,follow" />
         <link rel="canonical" href="https://www.monthlyclubhq.com/guides/subscription-launch-checklist" />
         <meta name="keywords" content={`${primaryKeyword}, subscription launch, first subscribers, launch templates`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Subscription Launch Checklist: From Idea to First 10 Subscribers" />
+        <meta name="twitter:description" content="Validate, create plans, test Stripe, warm up with posts, and copy the exact launch templates." />
+        <meta name="twitter:image" content="https://www.monthlyclubhq.com/images/MonthlyClubHomepageImage.png" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -73,23 +78,36 @@ export default function SubscriptionLaunchChecklistGuide() {
             }),
           }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://www.monthlyclubhq.com/" },
+                { "@type": "ListItem", position: 2, name: "Guides", item: "https://www.monthlyclubhq.com/guides" },
+                { "@type": "ListItem", position: 3, name: "Subscription Launch Checklist" },
+              ],
+            }),
+          }}
+        />
       </Head>
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="py-14 md:py-20 bg-gradient-to-b from-brand-blue/10 to-transparent">
+        <section className="py-16 md:py-24 bg-gradient-to-b from-brand-blue/10 to-transparent">
           <div className="container mx-auto px-6 max-w-5xl">
-            <nav className="mb-6 text-sm">
+            <nav className="mb-5 text-sm">
               <Link href="/guides" className="text-brand-purple hover:underline">← Back to Guides</Link>
             </nav>
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-3">
               Subscription Launch Checklist: From Idea to First 10 Subscribers
             </h1>
             <p className="text-base md:text-lg text-muted-foreground max-w-3xl">
               Use this {primaryKeyword} to validate your offer, create your plans, run test charges in Stripe, warm up your audience with posts, and copy the exact launch templates.
             </p>
-            {/* Mobile TOC */}
-            <details className="md:hidden mt-6 rounded-lg border border-white/10 p-3 bg-white/5">
+            <details className="md:hidden mt-5 rounded-lg border border-white/10 p-3 bg-white/5">
               <summary className="cursor-pointer text-sm font-medium">Table of contents</summary>
               <ul className="mt-3 space-y-2 text-sm">
                 {toc.map((item) => (
@@ -102,10 +120,11 @@ export default function SubscriptionLaunchChecklistGuide() {
           </div>
         </section>
 
-        {/* Content + Desktop TOC */}
-        <section className="py-10">
-          <div className="container mx-auto px-6 max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-10">
-            <article className="prose prose-gray max-w-none dark:prose-invert">
+        {/* Content */}
+        <section className="py-12 md:py-16">
+          <div className="container mx-auto px-6 max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-12">
+
+              <article className="prose prose-base md:prose-lg max-w-none dark:prose-invert space-y-8 md:space-y-10">
               <h2 id="validate">Validate the offer and audience</h2>
               <ul>
                 <li>Write your one‑sentence value prop and 3 plan names with prices.</li>
@@ -158,10 +177,10 @@ Founding offer this month only → [plan link]`}
               </ul>
 
               <div className="mt-8">
-                <Link href="/create-a-business/step-one" className="hero-button-primary inline-block px-4 py-2 rounded-lg">Create your plans</Link>
+                <Link href="/create-a-business/step-one" className="hero-button-primary">Create your plans</Link>
               </div>
-            </article>
-
+              </article>
+  
             <aside className="hidden lg:block">
               <div className="sticky top-28 rounded-lg border border-white/10 p-4 bg-white/5">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">On this page</p>

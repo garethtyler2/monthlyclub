@@ -35,7 +35,7 @@ const TopicGrid = () => {
           { id: "hairdresser-subscriptions", title: "Hairdresser Subscriptions", description: "See how stylists turn cuts into contracts." },
           { id: "cleaning-subscription-model", title: "Cleaning Subscription Models", description: "Recurring revenue ideas for cleaners." },
           { id: "service-subscription-examples", title: "Service Subscription Examples", description: "Real examples of Monthly Club users." },
-          { id: "subscription-ideas", title: "Subscription Ideas for Businesses", description: "Inspiration from five unique industries." },
+          { id: "subscription-ideas-for-service-businesses", title: "Subscription Ideas for Service Businesses", description: "Inspiration from five unique industries." },
           { id: "marketing-subscription-services", title: "Marketing Subscription Services", description: "Promote your plans to local customers." },
         ]}
         color="bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900"
