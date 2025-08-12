@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Shield, Clipboard, Brain, Target, BarChart } from "lucide-react";
+import { Activity, Shield, Clipboard, Brain, Target, BarChart, Newspaper } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -29,6 +29,14 @@ const featureItems = [
     className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
     delay: 100,
     link: "/guides/automate-payments-stripe"
+  },
+  {
+    icon: Newspaper,
+    title: "Subscriber-only Posts",
+    description: "Publish updates, photos and links to your paying subscribers with a built-in feed.",
+    className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
+    delay: 150,
+    link: "/feed"
   },
   {
     icon: BarChart,

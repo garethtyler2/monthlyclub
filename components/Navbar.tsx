@@ -485,6 +485,42 @@ const Navbar = () => {
                 )}
 
 
+                {/* Primary links for logged-out users */}
+                {!user && (
+                  <div className="mb-4">
+                    <div className="space-y-0.5">
+                      <Link
+                        href="/how-it-works"
+                        className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                        onClick={closeMenu}
+                      >
+                        <span className="font-medium text-sm">How It Works</span>
+                      </Link>
+                      <Link
+                        href="/pricing"
+                        className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                        onClick={closeMenu}
+                      >
+                        <span className="font-medium text-sm">Pricing</span>
+                      </Link>
+                      <Link
+                        href="/features"
+                        className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                        onClick={closeMenu}
+                      >
+                        <span className="font-medium text-sm">Features</span>
+                      </Link>
+                      <Link
+                        href="/guides"
+                        className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                        onClick={closeMenu}
+                      >
+                        <span className="font-medium text-sm">Guides</span>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
                 {/* Create Business Section - Show for logged out users or users without business */}
                 {(!user || (!hasBusiness && businessStatus === null)) && (
                   <div className="mb-4">

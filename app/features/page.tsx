@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Zap, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Script from "next/script";
+import HomepageFeatures from "@/components/Homepage/Features";
 
 export const metadata: Metadata = {
   title: "Features | Tools Built to Power Your Subscription Club",
@@ -48,6 +49,9 @@ const FeaturesPage = () => {
             </p>
           </div>
         </section>
+
+        {/* Tiles: same feature items as homepage */}
+        <HomepageFeatures />
 
         {/* Feature Grid */}
         <section className="py-16 px-4 bg-background">
