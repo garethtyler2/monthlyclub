@@ -65,6 +65,14 @@ export default async function BusinessPage(
   const currentUserId = session.data?.session?.user?.id;
   const isOwner = business?.user_id === currentUserId;
 
+  // Fetch latest posts for this business
+  const { data: posts } = await supabase
+    .from("business_posts")
+    .select("id, created_at, title, content, link_url, image_url")
+    .eq("business_id", business.id)
+    .order("created_at", { ascending: false })
+    .limit(10);
+
   return (
     <div className="relative py-10 overflow-hidden text-white">
       {/* Background gradients */}
@@ -101,6 +109,37 @@ export default async function BusinessPage(
             {console.log("Fetched products:", products)}
             <ProductsListWrapper products={products} userSubscriptions={subscriptions ?? []} isOwner={isOwner} />
           </>
+        )}
+
+        {/* Posts */}
+        {posts && posts.length > 0 && (
+          <div className="mt-12 space-y-4">
+            <h3 className="text-xl font-semibold">Latest posts</h3>
+            {posts.map((post) => (
+              <article key={post.id} className="rounded-xl border border-white/10 p-4 bg-background/60">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-muted-foreground">
+                    {new Date(post.created_at).toLocaleString()}
+                  </span>
+                </div>
+                <h4 className="text-lg font-semibold mb-2">{post.title}</h4>
+                {post.content && (
+                  <p className="text-sm text-muted-foreground mb-3 whitespace-pre-wrap">{post.content}</p>
+                )}
+                {post.image_url && (
+                  <div className="mb-3">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={post.image_url} alt="post image" className="rounded-lg w-full object-cover" />
+                  </div>
+                )}
+                {post.link_url && (
+                  <a href={post.link_url} target="_blank" rel="noreferrer" className="text-sm text-blue-400 hover:underline">
+                    {post.link_url}
+                  </a>
+                )}
+              </article>
+            ))}
+          </div>
         )}
       </div>
     </div>

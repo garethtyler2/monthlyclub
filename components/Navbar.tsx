@@ -258,6 +258,16 @@ const Navbar = () => {
                       </div>
                     )}
 
+                    {/* Top-level My Posts (desktop dropdown) */}
+                    {hasBusiness && (
+                      <DropdownMenuItem asChild className="px-3 py-2 hover:bg-white/5">
+                        <Link href="/dashboard/business/posts" className="flex items-center space-x-2 text-sm">
+                          <Newspaper size={16} className="text-muted-foreground" />
+                          <span>My Posts</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+
                     {/* Business Management Section */}
                     {hasBusiness && (
                       <>
@@ -493,10 +503,20 @@ const Navbar = () => {
                   </div>
                 )}
 
-                {/* Create Post + Feed (above Business section) */}
+                {/* My Posts + Create Post + Feed (above Business section) */}
                 {user && (
                   <div className="mb-4">
                     <div className="space-y-0.5">
+                      {hasBusiness && (
+                        <Link
+                          href="/dashboard/business/posts"
+                          className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                          onClick={closeMenu}
+                        >
+                          <Newspaper size={18} className="text-muted-foreground" />
+                          <span className="font-medium text-sm">My Posts</span>
+                        </Link>
+                      )}
                       {businessId && (
                         <button
                           onClick={() => {
@@ -634,8 +654,3 @@ const Navbar = () => {
 
 export default Navbar;
 
-// Inline modal so it can open from menu
-// Render at root of component to avoid menu overlay issues
-// We keep this at the bottom to not interfere with layout
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-;(function ModalMount() {})
