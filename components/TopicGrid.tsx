@@ -14,6 +14,9 @@ const TopicGrid = () => {
         icon={<Briefcase className="h-6 w-6 text-brand-purple" />}
         subtopics={[
           { id: "what-is-a-service-subscription", title: "What is a Service Subscription?", description: "Understand the core concept and why it works." },
+          { id: "pricing-subscription-plans-service-business", title: "Pricing Your Subscription Plans", description: "Models, anchors, payment days, and example pricing tables." },
+          { id: "subscription-launch-checklist", title: "Subscription Launch Checklist", description: "From idea to your first 10 subscribers." },
+          { id: "balance-builder-subscriptions-guide", title: "Balance Builder (Prepaid Credit)", description: "When to use it, how to price it, and how to message it." },
           { id: "create-subscription-plan", title: "Create a Subscription Plan", description: "Step-by-step guide to setting up your first plan." },
           { id: "recurring-revenue-benefits", title: "Benefits of Recurring Revenue", description: "Discover the business value of predictable income." },
           { id: "how-monthly-club-helps", title: "How Monthly Club Helps", description: "See how we remove the admin and tech headaches." },
