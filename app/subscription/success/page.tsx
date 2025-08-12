@@ -101,23 +101,7 @@ export default function SubscriptionSuccessPage() {
           .single();
 
         if (subscriptionData) {
-          await fetch('/api/email/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              type: 'subscription_confirmation',
-              data: {
-                userEmail: user.email || '',
-                businessName: product.business?.name || 'Unknown Business',
-                productName: product.name || 'Unknown Product',
-                amount: scheduled.amount,
-                paymentDay: scheduled.scheduled_for,
-                subscriptionId: subscriptionData.id
-              }
-            })
-          });
-
-          // Business notification is sent server-side via webhook to avoid exposing owner emails and duplicate sends
+          // Email notifications are sent server-side via webhook to avoid duplicates and ensure delivery
         }
       } catch (emailError) {
         console.error('Failed to send subscription emails:', emailError);

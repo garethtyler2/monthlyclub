@@ -52,8 +52,6 @@ const PricingPage = () => {
           </p>
         </div>
       </section>
-
-      {/* Pricing Breakdown */}
       <section className="py-4 px-4">
         <div className="max-w-3xl mx-auto grid gap-6">
           <Card className="shadow-primary">
@@ -88,6 +86,147 @@ const PricingPage = () => {
           </Card>
         </div>
       </section>
+      {/* Comparison Section (moved below Pay-As-You-Go visually on mobile via order) */}
+      <section className="py-12 px-4 order-3 md:order-none">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-2">How We Compare</h2>
+          <p className="text-center text-muted-foreground mb-8">Fees and feature highlights vs alternatives</p>
+
+          {/* Desktop/table */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-sm md:text-base border-separate border-spacing-y-0 rounded-lg overflow-hidden">
+              <thead>
+                <tr className="text-left text-muted-foreground bg-white/10">
+                  <th className="px-5 py-3">Category</th>
+                  <th className="px-5 py-3">MonthlyClub</th>
+                  <th className="px-5 py-3">Patreon</th>
+                  <th className="px-5 py-3">Direct Debit (example)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  {
+                    label: 'Fees (example)\u00b9',
+                    mc: '1.5% (MC) + 1.5% + 20p (Stripe card)',
+                    patreon: '5%–12% platform fee + payment processing',
+                    dd: '1% + 20p (Stripe Bacs) cap ~£4 + MC 1.5% (if used)',
+                  },
+                  {
+                    label: 'Payout speed',
+                    mc: 'Stripe payout schedule (typically 3–7 days)',
+                    patreon: 'Monthly cycles; creator payout schedule',
+                    dd: 'Slower settlement (e.g., 3–6 business days typical)',
+                  },
+                  {
+                    label: 'Own customer relationship',
+                    mc: 'Yes (your brand + dashboard)',
+                    patreon: 'Shared (Patreon account + creator page)',
+                    dd: 'Yes',
+                  },
+                  {
+                    label: 'Recurring subscriptions',
+                    mc: 'Yes (products, schedules)',
+                    patreon: 'Yes (tiers/memberships)',
+                    dd: 'Yes',
+                  },
+                  {
+                    label: 'Balance Builder (stored credit)',
+                    mc: 'Built-in (customer gets full balance)',
+                    patreon: 'Not designed for stored credit',
+                    dd: 'Not standard',
+                  },
+                  {
+                    label: 'Branding & site control',
+                    mc: 'Your storefront + copy',
+                    patreon: 'Hosted creator page with Patreon UI',
+                    dd: 'Yours (implementation needed)',
+                  },
+                  {
+                    label: 'Content/community tools',
+                    mc: 'Basic announcements (roadmap)',
+                    patreon: 'Rich: posts, media, memberships, messaging',
+                    dd: 'N/A',
+                  },
+                  {
+                    label: 'Dunning/retries',
+                    mc: 'Stripe retries + dashboard visibility',
+                    patreon: 'Handled within Patreon billing',
+                    dd: 'Depends on provider',
+                  },
+                ].map((row, idx) => (
+                  <tr key={row.label} className={`${idx % 2 === 0 ? 'bg-white/5' : 'bg-white/10'}`}>
+                    <td className="px-5 py-3 font-medium text-white">{row.label}</td>
+                    <td className="px-5 py-3">{row.mc}</td>
+                    <td className="px-5 py-3">{row.patreon}</td>
+                    <td className="px-5 py-3">{row.dd}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile/cards */}
+          <div className="grid gap-4 md:hidden">
+            {[
+              {
+                label: 'Fees (example)\u00b9',
+                mc: '1.5% (MC) + 1.5% + 20p (Stripe card)',
+                patreon: '5%–12% platform fee + processing',
+                dd: '1% + 20p (Bacs) cap ~£4 + MC 1.5%',
+              },
+              {
+                label: 'Payout speed',
+                mc: 'Stripe payout schedule',
+                patreon: 'Monthly cycles',
+                dd: '3–6 business days typical',
+              },
+              {
+                label: 'Own relationship',
+                mc: 'Yes',
+                patreon: 'Shared',
+                dd: 'Yes',
+              },
+              {
+                label: 'Balance Builder',
+                mc: 'Built-in',
+                patreon: 'Not designed for credit',
+                dd: 'Not standard',
+              },
+              {
+                label: 'Community tools',
+                mc: 'Basic (roadmap)',
+                patreon: 'Rich posts/messaging',
+                dd: 'N/A',
+              },
+            ].map((row, idx) => (
+              <div key={`m-comp-${idx}`} className={`rounded-lg p-4 ${idx % 2 === 0 ? 'bg-white/5' : 'bg-white/10'}`}>
+                <div className="text-white font-semibold mb-3">{row.label}</div>
+                <div className="grid grid-cols-1 gap-2 text-sm">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="text-muted-foreground">MonthlyClub</span>
+                    <span className="text-right max-w-[60%] leading-5">{row.mc}</span>
+                  </div>
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="text-muted-foreground">Patreon</span>
+                    <span className="text-right max-w-[60%] leading-5">{row.patreon}</span>
+                  </div>
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="text-muted-foreground">Direct Debit</span>
+                    <span className="text-right max-w-[60%] leading-5">{row.dd}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-xs text-muted-foreground mt-4">
+            1: Fees vary by country, payment method, and provider plan. Examples shown use UK Stripe card pricing (1.5% + 20p) and Stripe Bacs Direct Debit (1% + 20p, cap ~£4). Patreon platform fee varies by plan (5%–12%) + separate processing fees. Always check vendor pricing pages.
+          </p>
+        </div>
+      </section>
+
+      {/* Pricing Breakdown */}
+
 
       {/* Examples: Standard Subscriptions */}
       <section className="py-12 px-4">
