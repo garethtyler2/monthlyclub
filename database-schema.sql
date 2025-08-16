@@ -2,7 +2,6 @@
 -- Table order and constraints may not be valid for execution.
 
 CREATE TABLE public.billing_run_details (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
   run_date date NOT NULL,
   business_id uuid,
   user_id uuid,
@@ -13,54 +12,54 @@ CREATE TABLE public.billing_run_details (
   stripe_payment_intent_id text,
   status text,
   reason text,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
   created_at timestamp without time zone DEFAULT now(),
   batch_id uuid,
   currency text NOT NULL DEFAULT 'gbp'::text,
   CONSTRAINT billing_run_details_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.business_posts (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
   business_id uuid NOT NULL,
   title text NOT NULL,
   content text,
   link_url text CHECK (link_url IS NULL OR link_url ~ '^https?://'::text),
   image_url text,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
   published boolean NOT NULL DEFAULT true,
   CONSTRAINT business_posts_pkey PRIMARY KEY (id),
   CONSTRAINT business_posts_business_id_fkey FOREIGN KEY (business_id) REFERENCES public.businesses(id)
 );
 CREATE TABLE public.businesses (
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  stripe_account_id text,
+  stripe_verification_prompt_dismissed boolean DEFAULT false,
+  business_type text,
+  slug text UNIQUE,
+  status text DEFAULT 'draft'::text,
+  is_vip boolean DEFAULT false,
   user_id uuid UNIQUE,
   name text NOT NULL,
   description text,
   image_url text,
   service_type text,
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   created_at timestamp without time zone DEFAULT now(),
-  stripe_account_id text,
-  slug text UNIQUE,
-  stripe_verification_prompt_dismissed boolean DEFAULT false,
-  business_type text,
-  status text DEFAULT 'draft'::text,
-  is_vip boolean DEFAULT false,
   currency text NOT NULL DEFAULT 'gbp'::text,
   CONSTRAINT businesses_pkey PRIMARY KEY (id),
   CONSTRAINT businesses_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
 CREATE TABLE public.conversations (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
   participant1_id uuid NOT NULL,
   participant2_id uuid NOT NULL,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
   last_message_at timestamp with time zone DEFAULT now(),
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT conversations_pkey PRIMARY KEY (id),
-  CONSTRAINT conversations_participant2_id_fkey FOREIGN KEY (participant2_id) REFERENCES public.user_profiles(id),
-  CONSTRAINT conversations_participant1_id_fkey FOREIGN KEY (participant1_id) REFERENCES public.user_profiles(id)
+  CONSTRAINT conversations_participant1_id_fkey FOREIGN KEY (participant1_id) REFERENCES public.user_profiles(id),
+  CONSTRAINT conversations_participant2_id_fkey FOREIGN KEY (participant2_id) REFERENCES public.user_profiles(id)
 );
 CREATE TABLE public.credit_transactions (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id uuid,
   business_id uuid,
   amount integer NOT NULL,
@@ -68,21 +67,15 @@ CREATE TABLE public.credit_transactions (
   description text,
   related_subscription_id uuid,
   related_payment_id uuid,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT credit_transactions_pkey PRIMARY KEY (id),
-  CONSTRAINT credit_transactions_business_id_fkey FOREIGN KEY (business_id) REFERENCES public.businesses(id),
   CONSTRAINT credit_transactions_related_subscription_id_fkey FOREIGN KEY (related_subscription_id) REFERENCES public.subscriptions(id),
+  CONSTRAINT credit_transactions_related_payment_id_fkey FOREIGN KEY (related_payment_id) REFERENCES public.payments(id),
   CONSTRAINT credit_transactions_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
-  CONSTRAINT credit_transactions_related_payment_id_fkey FOREIGN KEY (related_payment_id) REFERENCES public.payments(id)
+  CONSTRAINT credit_transactions_business_id_fkey FOREIGN KEY (business_id) REFERENCES public.businesses(id)
 );
 CREATE TABLE public.daily_billing_logs (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  run_date date NOT NULL DEFAULT CURRENT_DATE,
-  run_time timestamp with time zone NOT NULL DEFAULT now(),
-  payments_found integer NOT NULL,
-  payments_succeeded integer NOT NULL,
-  notes text,
-  created_at timestamp with time zone NOT NULL DEFAULT now(),
   total_payments integer,
   total_succeeded integer,
   total_failed integer,
@@ -91,16 +84,23 @@ CREATE TABLE public.daily_billing_logs (
   run_started_at timestamp without time zone,
   run_ended_at timestamp without time zone,
   batch_id uuid DEFAULT gen_random_uuid(),
+  payments_found integer NOT NULL,
+  payments_succeeded integer NOT NULL,
+  notes text,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  run_date date NOT NULL DEFAULT CURRENT_DATE,
+  run_time timestamp with time zone NOT NULL DEFAULT now(),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT daily_billing_logs_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.messages (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
   conversation_id uuid NOT NULL,
   sender_id uuid NOT NULL,
   content text,
-  message_type text NOT NULL DEFAULT 'text'::text CHECK (message_type = ANY (ARRAY['text'::text, 'image'::text])),
   image_url text,
   read_at timestamp with time zone,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  message_type text NOT NULL DEFAULT 'text'::text CHECK (message_type = ANY (ARRAY['text'::text, 'image'::text])),
   created_at timestamp with time zone DEFAULT now(),
   image_filename text,
   image_size integer,
@@ -110,122 +110,122 @@ CREATE TABLE public.messages (
   CONSTRAINT messages_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.user_profiles(id)
 );
 CREATE TABLE public.payments (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  subscription_id uuid NOT NULL,
-  stripe_payment_intent_id text,
-  amount integer NOT NULL,
-  status text NOT NULL,
-  paid_at timestamp with time zone,
-  created_at timestamp with time zone DEFAULT now(),
+  business_id uuid,
   currency text,
   product_id uuid,
   user_id uuid,
-  business_id uuid,
+  amount integer NOT NULL,
+  status text NOT NULL,
+  paid_at timestamp with time zone,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  created_at timestamp with time zone DEFAULT now(),
+  subscription_id uuid NOT NULL,
+  stripe_payment_intent_id text,
   CONSTRAINT payments_pkey PRIMARY KEY (id),
   CONSTRAINT payments_subscription_id_fkey FOREIGN KEY (subscription_id) REFERENCES public.subscriptions(id)
 );
 CREATE TABLE public.products (
-  id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  status text,
+  product_type text DEFAULT 'subscription'::text,
+  is_credit_builder boolean DEFAULT false,
   business_id uuid,
   name text,
   description text,
   price numeric,
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   created_at timestamp without time zone DEFAULT now(),
-  product_type text DEFAULT 'subscription'::text,
-  is_credit_builder boolean DEFAULT false,
-  status text,
   currency text,
   CONSTRAINT products_pkey PRIMARY KEY (id),
   CONSTRAINT products_business_id_fkey FOREIGN KEY (business_id) REFERENCES public.businesses(id)
 );
 CREATE TABLE public.scheduled_payments (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  customer_reference text,
+  amount bigint NOT NULL DEFAULT 0,
+  cancel_at timestamp without time zone,
   purchase_id uuid,
   user_id uuid,
   product_id uuid,
   business_id uuid,
-  scheduled_for integer NOT NULL,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
   status text NOT NULL DEFAULT 'pending'::text,
   attempt_count integer DEFAULT 0,
   created_at timestamp with time zone DEFAULT now(),
-  customer_reference text,
-  amount bigint NOT NULL DEFAULT 0,
-  cancel_at timestamp without time zone,
+  scheduled_for integer NOT NULL,
   currency text NOT NULL DEFAULT 'gbp'::text,
   CONSTRAINT scheduled_payments_pkey PRIMARY KEY (id),
-  CONSTRAINT scheduled_payments_purchase_id_fkey FOREIGN KEY (purchase_id) REFERENCES public.subscriptions(id),
   CONSTRAINT scheduled_payments_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id),
+  CONSTRAINT scheduled_payments_business_id_fkey FOREIGN KEY (business_id) REFERENCES public.businesses(id),
   CONSTRAINT scheduled_payments_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
-  CONSTRAINT scheduled_payments_business_id_fkey FOREIGN KEY (business_id) REFERENCES public.businesses(id)
+  CONSTRAINT scheduled_payments_purchase_id_fkey FOREIGN KEY (purchase_id) REFERENCES public.subscriptions(id)
 );
 CREATE TABLE public.service_events (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
   business_id uuid NOT NULL,
   product_id uuid NOT NULL,
   subscription_id uuid,
   user_id uuid NOT NULL,
-  served_at timestamp with time zone NOT NULL DEFAULT now(),
   amount_charged integer,
   notes text,
-  source text NOT NULL DEFAULT 'manual'::text CHECK (source = ANY (ARRAY['manual'::text, 'credit_charge'::text, 'other'::text])),
   created_by uuid NOT NULL,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  served_at timestamp with time zone NOT NULL DEFAULT now(),
+  source text NOT NULL DEFAULT 'manual'::text CHECK (source = ANY (ARRAY['manual'::text, 'credit_charge'::text, 'other'::text])),
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT service_events_pkey PRIMARY KEY (id),
-  CONSTRAINT service_events_business_id_fkey FOREIGN KEY (business_id) REFERENCES public.businesses(id),
   CONSTRAINT service_events_subscription_id_fkey FOREIGN KEY (subscription_id) REFERENCES public.subscriptions(id),
-  CONSTRAINT service_events_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
+  CONSTRAINT service_events_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id),
+  CONSTRAINT service_events_business_id_fkey FOREIGN KEY (business_id) REFERENCES public.businesses(id),
   CONSTRAINT service_events_created_by_fkey FOREIGN KEY (created_by) REFERENCES auth.users(id),
-  CONSTRAINT service_events_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id)
+  CONSTRAINT service_events_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
 CREATE TABLE public.service_types (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   label text NOT NULL,
-  is_custom boolean NOT NULL DEFAULT false,
   created_by_user_id uuid,
+  is_custom boolean NOT NULL DEFAULT false,
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT service_types_pkey PRIMARY KEY (id)
 );
 CREATE TABLE public.stripe_customers (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL,
   stripe_customer_id text NOT NULL UNIQUE,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()),
   CONSTRAINT stripe_customers_pkey PRIMARY KEY (id),
   CONSTRAINT stripe_customers_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id)
 );
 CREATE TABLE public.subscriptions (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
-  product_id uuid NOT NULL,
-  status text NOT NULL DEFAULT 'active'::text,
-  start_date timestamp with time zone DEFAULT now(),
-  cancel_at timestamp with time zone,
-  created_at timestamp with time zone DEFAULT now(),
   customer_reference text,
   email text,
+  user_id uuid NOT NULL,
+  product_id uuid NOT NULL,
+  cancel_at timestamp with time zone,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  status text NOT NULL DEFAULT 'active'::text,
+  start_date timestamp with time zone DEFAULT now(),
+  created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT subscriptions_pkey PRIMARY KEY (id),
+  CONSTRAINT purchases_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id),
   CONSTRAINT purchases_user_id_fkey FOREIGN KEY (user_id) REFERENCES auth.users(id),
-  CONSTRAINT fk_subscriptions_user_id FOREIGN KEY (user_id) REFERENCES public.user_profiles(id),
-  CONSTRAINT purchases_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id)
+  CONSTRAINT fk_subscriptions_user_id FOREIGN KEY (user_id) REFERENCES public.user_profiles(id)
 );
 CREATE TABLE public.user_connections (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id uuid NOT NULL,
   connected_user_id uuid NOT NULL,
   connection_type text NOT NULL CHECK (connection_type = ANY (ARRAY['business_customer'::text, 'customer_business'::text])),
   business_id uuid,
   product_id uuid,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT user_connections_pkey PRIMARY KEY (id),
   CONSTRAINT user_connections_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.user_profiles(id),
-  CONSTRAINT user_connections_connected_user_id_fkey FOREIGN KEY (connected_user_id) REFERENCES public.user_profiles(id),
+  CONSTRAINT user_connections_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id),
   CONSTRAINT user_connections_business_id_fkey FOREIGN KEY (business_id) REFERENCES public.businesses(id),
-  CONSTRAINT user_connections_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id)
+  CONSTRAINT user_connections_connected_user_id_fkey FOREIGN KEY (connected_user_id) REFERENCES public.user_profiles(id)
 );
 CREATE TABLE public.user_credits (
-  id uuid NOT NULL DEFAULT gen_random_uuid(),
   user_id uuid,
   business_id uuid,
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
   balance integer NOT NULL DEFAULT 0,
   total_earned integer NOT NULL DEFAULT 0,
   total_spent integer NOT NULL DEFAULT 0,

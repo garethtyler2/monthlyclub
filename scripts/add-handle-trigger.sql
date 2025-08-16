@@ -60,16 +60,47 @@ END $$;
 -- This will create the user_profile record automatically
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  table_exists BOOLEAN;
 BEGIN
+  -- Check if the table exists before trying to insert
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'user_profiles'
+  ) INTO table_exists;
+  
+  IF NOT table_exists THEN
+    RAISE LOG 'user_profiles table does not exist, skipping profile creation for user %', NEW.id;
+    RETURN NEW;
+  END IF;
+  
+  -- Try to insert the profile
   INSERT INTO public.user_profiles (id, email, created_at)
   VALUES (NEW.id, NEW.email, NEW.created_at);
+  
+  RAISE LOG 'Successfully created user_profile for user %', NEW.id;
   RETURN NEW;
+  
+EXCEPTION
+  WHEN OTHERS THEN
+    -- Log the error but don't fail the signup
+    RAISE LOG 'Failed to create user_profile for user %: % (SQLSTATE: %)', NEW.id, SQLERRM, SQLSTATE;
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Create the trigger on auth.users (only if it doesn't exist)
 DO $$
 BEGIN
+  -- First check if the user_profiles table exists
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.tables 
+    WHERE table_schema = 'public' AND table_name = 'user_profiles'
+  ) THEN
+    RAISE EXCEPTION 'user_profiles table does not exist in public schema. Please create it first.';
+  END IF;
+  
+  -- Then check if the trigger exists
   IF NOT EXISTS (
     SELECT 1 FROM information_schema.triggers 
     WHERE trigger_name = 'on_auth_user_created'

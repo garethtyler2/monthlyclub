@@ -10,7 +10,8 @@
     "generate-handles": "npx tsx scripts/generate-handles.ts",
     "populate-connections": "npx tsx scripts/populate-connections.ts",
     "add-handle-trigger": "echo 'Run this SQL in your Supabase SQL editor: scripts/add-handle-trigger.sql'",
-    "test-handles": "npx tsx scripts/test-handle-generation.ts"
+    "test-handles": "npx tsx scripts/test-handle-generation.ts",
+    "check-tables": "npx tsx scripts/check-database-tables.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
