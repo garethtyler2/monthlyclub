@@ -55,7 +55,7 @@ async function populateUserConnections() {
     let connectionsCreated = 0;
     let connectionsSkipped = 0;
     
-    for (const sub of subscriptions) {
+    for (const sub of subscriptions as any[]) {
       const customerUserId = sub.user_id;
       const businessUserId = sub.products.businesses.user_id;
       

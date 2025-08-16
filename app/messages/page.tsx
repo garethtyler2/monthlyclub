@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { Conversation, Message, UserConnection } from '@/types/messaging';
@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, Send, Image as ImageIcon, Plus, X, MessageCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
-export default function MessagesPage() {
+function MessagesPageContent() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [connections, setConnections] = useState<UserConnection[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
@@ -671,5 +671,17 @@ export default function MessagesPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <MessagesPageContent />
+    </Suspense>
   );
 }
