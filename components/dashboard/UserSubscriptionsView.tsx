@@ -26,7 +26,8 @@ import {
   ArrowRight,
   Settings,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  MessageCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -369,6 +370,19 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                           Change Amount
                         </Button>
                       )}
+                      
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-green-500/20 text-green-400 hover:bg-green-500/10"
+                        onClick={() => {
+                          // Navigate to messages page with this business
+                          window.location.href = `/messages?business=${product.business?.id}`;
+                        }}
+                      >
+                        <MessageCircle className="w-4 h-4 mr-2" />
+                        Message Business
+                      </Button>
                       
                       <Button
                         size="sm"

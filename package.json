@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-handles": "npx tsx scripts/generate-handles.ts",
+    "populate-connections": "npx tsx scripts/populate-connections.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
@@ -50,6 +52,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.2.1",
     "embla-carousel-react": "^8.6.0",
     "flowbite": "^3.1.2",
     "framer-motion": "^12.16.0",

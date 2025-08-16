@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Settings, LogOut, Plus, Home, BookOpen, Zap, DollarSign, Building2, CreditCard, Newspaper, ImagePlus } from "lucide-react";
+import { Menu, X, User, Settings, LogOut, Plus, Home, BookOpen, Zap, DollarSign, Building2, CreditCard, Newspaper, ImagePlus, MessageCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
 import {
@@ -267,6 +267,14 @@ const Navbar = () => {
                         </Link>
                       </DropdownMenuItem>
                     )}
+
+                    {/* Messages */}
+                    <DropdownMenuItem asChild className="px-3 py-2 hover:bg-white/5">
+                      <Link href="/messages" className="flex items-center space-x-2 text-sm">
+                        <MessageCircle size={16} className="text-muted-foreground" />
+                        <span>Messages</span>
+                      </Link>
+                    </DropdownMenuItem>
 
                     {/* Business Management Section */}
                     {hasBusiness && (
@@ -572,6 +580,14 @@ const Navbar = () => {
                       >
                         <Newspaper size={18} className="text-muted-foreground" />
                         <span className="font-medium text-sm">Feed</span>
+                      </Link>
+                      <Link
+                        href="/messages"
+                        className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                        onClick={closeMenu}
+                      >
+                        <MessageCircle size={18} className="text-muted-foreground" />
+                        <span className="font-medium text-sm">Messages</span>
                       </Link>
                     </div>
                   </div>

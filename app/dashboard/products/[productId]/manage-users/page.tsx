@@ -27,7 +27,8 @@ import {
   ArrowLeft,
   Filter,
   Download,
-  RefreshCw
+  RefreshCw,
+  MessageCircle
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -709,6 +710,13 @@ export default function ManageUsersPage() {
                         <div className="flex flex-wrap gap-2 mb-3">
                           <Button size="sm" className="bg-white/10 text-white" onClick={() => { setSelectedUserForLog(sub.user_id); setShowLogModal(true); }}>
                             Log Visit
+                          </Button>
+                          <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-white" onClick={() => {
+                            // Navigate to messages page with this customer
+                            window.location.href = `/messages?customer=${sub.user_id}`;
+                          }}>
+                            <MessageCircle className="w-4 h-4 mr-2" />
+                            Message Customer
                           </Button>
                           {product?.is_credit_builder && (
                             <Button size="sm" className="bg-gradient-to-r from-green-500 to-emerald-500 hover:bg-green-700 text-white" onClick={() => { setSelectedUserForCharge(sub.user_id); setShowChargeModal(true); }}>
