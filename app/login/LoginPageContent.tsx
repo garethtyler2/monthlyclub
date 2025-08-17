@@ -63,15 +63,34 @@ export default function LoginPageContent() {
     e.preventDefault();
     setLoading(true);
     setStatusMessage(null);
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    setLoading(false);
-    if (error) {
-      setStatusMessage(error.message);
-    } else {
-      setStatusMessage("Signup successful! Please check your email to confirm your account.");
+    
+    try {
+      const { data, error } = await supabase.auth.signUp({ email, password });
       
-      // Send welcome email and owner notification
+      if (error) {
+        setStatusMessage(error.message);
+        return;
+      }
+      
       if (data.user) {
+        // Manually create user profile
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .insert({
+            id: data.user.id,
+            email: data.user.email,
+            created_at: data.user.created_at
+          });
+        
+        if (profileError) {
+          console.error('Failed to create user profile:', profileError);
+          setStatusMessage("Account created but profile setup failed. Please contact support.");
+          return;
+        }
+        
+        setStatusMessage("Signup successful! Please check your email to confirm your account.");
+        
+        // Send welcome email and owner notification
         try {
           // Send welcome email to user
           await fetch('/api/email/send', {
@@ -96,6 +115,11 @@ export default function LoginPageContent() {
           console.error('Failed to send emails:', emailError);
         }
       }
+    } catch (error) {
+      console.error('Signup error:', error);
+      setStatusMessage("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
