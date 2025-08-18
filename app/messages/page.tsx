@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Search, Send, Image as ImageIcon, Plus, X, MessageCircle } from 'lucide-react';
+import { Check, CheckCheck } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 function MessagesPageContent() {
@@ -49,7 +50,17 @@ function MessagesPageContent() {
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    
+    // Refresh conversations when page gains focus (user returns from another tab/window)
+    const handleFocus = () => {
+      fetchConversations();
+    };
+    window.addEventListener('focus', handleFocus);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   useEffect(() => {
@@ -63,6 +74,15 @@ function MessagesPageContent() {
           (payload) => {
             console.log('New message received:', payload.new);
             setMessages(prev => [...prev, payload.new as Message]);
+            // Refresh conversations to update unread counts
+            fetchConversations();
+          }
+        )
+        .on('postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'messages', filter: `conversation_id=eq.${selectedConversation.id}` },
+          (payload) => {
+            const updated = payload.new as Message;
+            setMessages(prev => prev.map(m => m.id === updated.id ? { ...m, read_at: (updated as any).read_at } : m));
           }
         )
         .subscribe();
@@ -72,6 +92,38 @@ function MessagesPageContent() {
       };
     }
   }, [selectedConversation]);
+
+  // Set up global real-time subscription for new messages
+  useEffect(() => {
+    if (currentUser) {
+      const subscription = supabase
+        .channel('global_messages')
+        .on('postgres_changes', 
+          { event: 'INSERT', schema: 'public', table: 'messages' },
+          (payload) => {
+            console.log('New message received globally:', payload.new);
+            // Refresh conversations to update unread counts
+            fetchConversations();
+          }
+        )
+        .on('postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'messages' },
+          (payload) => {
+            console.log('Message updated globally:', payload.new);
+            // Update local message state if we're viewing this conversation
+            if (selectedConversation) {
+              const updated = payload.new as Message;
+              setMessages(prev => prev.map(m => m.id === updated.id ? { ...m, read_at: (updated as any).read_at } : m));
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [currentUser, selectedConversation]);
 
   useEffect(() => {
     // Handle URL parameters for starting conversations
@@ -125,12 +177,18 @@ function MessagesPageContent() {
   };
 
   const fetchMessages = async (conversationId: string) => {
+    console.log('fetchMessages called with conversationId:', conversationId);
     try {
       const response = await fetch(`/api/messaging/messages?conversation_id=${conversationId}`);
       const data = await response.json();
       if (response.ok) {
         console.log('Fetched messages:', data.messages);
         setMessages(data.messages);
+        // Refresh conversations to update unread counts
+        console.log('Refreshing conversations after fetching messages');
+        fetchConversations();
+        // Notify navbar to refresh unread count
+        window.dispatchEvent(new CustomEvent('messagesRead'));
       }
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -234,6 +292,8 @@ function MessagesPageContent() {
           fileInputRef.current.value = '';
         }
         await fetchConversations(); // Refresh conversations to update last message
+        // Notify navbar to refresh unread count
+        window.dispatchEvent(new CustomEvent('messagesRead'));
       }
     } catch (error) {
       console.error('Error sending message:', error);
@@ -270,6 +330,9 @@ function MessagesPageContent() {
         
         setShowNewChat(false);
         await fetchConversations();
+        
+        // Notify navbar to refresh unread count
+        window.dispatchEvent(new CustomEvent('messagesRead'));
         
         // Clear URL parameters after starting conversation
         const url = new URL(window.location.href);
@@ -567,13 +630,36 @@ function MessagesPageContent() {
                       ) : (
                         <p className="text-sm leading-relaxed">{message.content}</p>
                       )}
-                      <p className={`text-xs mt-2 ${
+                      
+                      {/* Message footer with timestamp and read receipt */}
+                      <div className={`flex items-center justify-end gap-2 mt-2 ${
                         message.sender_id === currentUser?.id 
                           ? 'text-blue-100' 
                           : 'text-gray-500'
                       }`}>
-                        {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-                      </p>
+                        <span className="text-xs">
+                          {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
+                        </span>
+                        {message.sender_id === currentUser?.id && (
+                          <span className="inline-flex items-center transition-all duration-200">
+                            {message.read_at ? (
+                              <>
+                                <span title="Read">
+                                  <CheckCheck className="h-3.5 w-3.5 text-blue-200" />
+                                </span>
+                                <span className="sr-only">Read</span>
+                              </>
+                            ) : (
+                              <>
+                                <span title="Delivered">
+                                  <Check className="h-3.5 w-3.5 text-blue-200" />
+                                </span>
+                                <span className="sr-only">Delivered</span>
+                              </>
+                            )}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}

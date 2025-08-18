@@ -44,7 +44,7 @@ export default async function BusinessPostsPage() {
           View my business page
         </Link>
       </div>
-      <MyPostsList businessId={business.id} />
+      <MyPostsList businessId={business.id} businessSlug={business.slug} />
     </section>
   );
 }

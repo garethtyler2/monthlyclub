@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BusinessOwnerView } from "@/components/dashboard/BusinessOwnerView";
 import BusinessProductManager from "@/components/dashboard/BusinessProductManager";
+import { ShareButton } from "@/components/shared/ShareButton";
 
 export default function BusinessDashboardPage() {
   const [user, setUser] = useState<any>(null);
@@ -102,7 +103,7 @@ export default function BusinessDashboardPage() {
       {/* Header */}
       <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-white/10">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col flex-row items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center space-x-3">
               
               <div className="hidden sm:block w-px h-6 bg-white/20" />
@@ -114,16 +115,24 @@ export default function BusinessDashboardPage() {
               </div>
             </div>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-2 w-full sm:w-auto">
               {businessSlug && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.open(`/businesses/${businessSlug}`, '_blank')}
-                  className="border-white/20 text-white hover:bg-white/10"
-                >
-                  View Business Page
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open(`/businesses/${businessSlug}`, '_blank')}
+                    className="border-white/20 text-white hover:bg-white/10 w-full sm:w-auto"
+                  >
+                    View Business Page
+                  </Button>
+                  <ShareButton
+                    url={`${window.location.origin}/businesses/${businessSlug}`}
+                    variant="outline"
+                    size="sm"
+                    className="border-white/20 text-white hover:bg-white/10 w-full sm:w-auto"
+                  />
+                </>
               )}
             </div>
           </div>

@@ -190,7 +190,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                   {product.is_credit_builder ? (
                     <div className="flex items-center space-x-2">
                       <PoundSterling className="w-4 h-4 text-blue-400" />
-                      <span className="text-lg font-bold text-blue-300">Choose your own monthly amount</span>
+                      <span className="text-lg font-bold text-blue-300">Choose your amount</span>
                     </div>
                   ) : (
                     <div className="flex items-center space-x-2">

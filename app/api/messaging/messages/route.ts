@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 
 export async function GET(request: Request) {
   try {
@@ -48,12 +48,45 @@ export async function GET(request: Request) {
     }
     
     // Mark messages as read
-    await supabase
+    const otherParticipantId = conversation.participant1_id === user.id 
+      ? conversation.participant2_id 
+      : conversation.participant1_id;
+    
+    console.log('Marking messages as read:', {
+      conversationId,
+      currentUserId: user.id,
+      otherParticipantId,
+      participant1: conversation.participant1_id,
+      participant2: conversation.participant2_id
+    });
+    
+    // First, let's see what messages exist and their current read_at status
+    const { data: existingMessages, error: fetchError } = await supabase
+      .from('messages')
+      .select('id, sender_id, read_at, content')
+      .eq('conversation_id', conversationId)
+      .eq('sender_id', otherParticipantId);
+    
+    if (fetchError) {
+      console.error('Error fetching existing messages:', fetchError);
+    } else {
+      console.log('Existing messages to mark as read:', existingMessages);
+    }
+    
+    // Use service role client to bypass RLS for updating read_at
+    const serviceClient = createServiceRoleClient();
+    const { data: updateResult, error: updateError } = await serviceClient
       .from('messages')
       .update({ read_at: new Date().toISOString() })
       .eq('conversation_id', conversationId)
-      .eq('sender_id', conversation.participant1_id === user.id ? conversation.participant2_id : conversation.participant1_id)
+      .eq('sender_id', otherParticipantId)
       .is('read_at', null);
+    
+    if (updateError) {
+      console.error('Error marking messages as read:', updateError);
+    } else {
+      console.log('Messages marked as read:', updateResult);
+    }
     
     // Update conversation last_message_at
     await supabase

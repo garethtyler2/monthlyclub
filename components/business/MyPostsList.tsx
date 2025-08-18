@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import EmptyPostsCta from "@/components/business/EmptyPostsCta";
+import { ShareButton } from "@/components/shared/ShareButton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +25,7 @@ type Post = {
   image_url: string | null;
 };
 
-export default function MyPostsList({ businessId }: { businessId: string }) {
+export default function MyPostsList({ businessId, businessSlug }: { businessId: string; businessSlug: string }) {
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -76,18 +77,26 @@ export default function MyPostsList({ businessId }: { businessId: string }) {
         <article key={post.id} className="rounded-xl border border-white/10 p-4 bg-background/60">
           <div className="flex items-start justify-between mb-2">
             <h4 className="text-lg font-semibold mr-4">{post.title}</h4>
-            <Button
-              variant="outline"
-              className="text-red-400 border-red-400/30 hover:bg-red-500/10 hover:text-red-300"
-              size="sm"
-              disabled={deletingId === post.id}
-              onClick={() => {
-                setSelectedPostId(post.id);
-                setConfirmOpen(true);
-              }}
-            >
-              Delete
-            </Button>
+            <div className="flex items-center space-x-2">
+              <ShareButton
+                url={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.monthlyclubhq.com'}/businesses/${businessSlug}`}
+                variant="outline"
+                size="sm"
+                className="text-blue-400 border-blue-400/30 hover:bg-blue-500/10 hover:text-blue-300"
+              />
+              <Button
+                variant="outline"
+                className="text-red-400 border-red-400/30 hover:bg-red-500/10 hover:text-red-300"
+                size="sm"
+                disabled={deletingId === post.id}
+                onClick={() => {
+                  setSelectedPostId(post.id);
+                  setConfirmOpen(true);
+                }}
+              >
+                Delete
+              </Button>
+            </div>
           </div>
           {post.content && (
             <p className="text-sm text-muted-foreground mb-3 whitespace-pre-wrap">{post.content}</p>

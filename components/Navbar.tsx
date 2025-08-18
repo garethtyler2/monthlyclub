@@ -30,6 +30,7 @@ const Navbar = () => {
   const [businessStatus, setBusinessStatus] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   
   // Create Post Modal
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -75,6 +76,28 @@ const Navbar = () => {
     getUser();
   }, []);
 
+  // Fetch unread message count when user changes
+  useEffect(() => {
+    if (user) {
+      fetchUnreadMessageCount();
+      // Set up interval to refresh unread count every 30 seconds
+      const interval = setInterval(fetchUnreadMessageCount, 30000);
+      
+      // Listen for messages being read
+      const handleMessagesRead = () => {
+        fetchUnreadMessageCount();
+      };
+      window.addEventListener('messagesRead', handleMessagesRead);
+      
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('messagesRead', handleMessagesRead);
+      };
+    } else {
+      setUnreadMessageCount(0);
+    }
+  }, [user]);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -96,6 +119,22 @@ const Navbar = () => {
   };
 
   const closeMenu = () => setIsMenuOpen(false);
+
+  // Fetch unread message count
+  const fetchUnreadMessageCount = async () => {
+    if (!user) return;
+    
+    try {
+      const response = await fetch('/api/messaging/conversations');
+      if (response.ok) {
+        const data = await response.json();
+        const totalUnread = data.conversations.reduce((sum: number, conv: any) => sum + (conv.unread_count || 0), 0);
+        setUnreadMessageCount(totalUnread);
+      }
+    } catch (error) {
+      console.error('Error fetching unread message count:', error);
+    }
+  };
 
   // Prevent body scrolling when menu is open
   useEffect(() => {
@@ -271,7 +310,12 @@ const Navbar = () => {
                     {/* Messages */}
                     <DropdownMenuItem asChild className="px-3 py-2 hover:bg-white/5">
                       <Link href="/messages" className="flex items-center space-x-2 text-sm">
-                        <MessageCircle size={16} className="text-muted-foreground" />
+                        <div className="relative">
+                          <MessageCircle size={16} className="text-muted-foreground" />
+                          {unreadMessageCount > 0 && (
+                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></div>
+                          )}
+                        </div>
                         <span>Messages</span>
                       </Link>
                     </DropdownMenuItem>
@@ -586,7 +630,12 @@ const Navbar = () => {
                         className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
                         onClick={closeMenu}
                       >
-                        <MessageCircle size={18} className="text-muted-foreground" />
+                        <div className="relative">
+                          <MessageCircle size={18} className="text-muted-foreground" />
+                          {unreadMessageCount > 0 && (
+                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></div>
+                          )}
+                        </div>
                         <span className="font-medium text-sm">Messages</span>
                       </Link>
                     </div>

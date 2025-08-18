@@ -9,6 +9,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ProductsListWrapper from "@/components/business/ProductsListWrapper";
 import { EditBusinessModal } from "@/components/business/EditBusinessModal";
+import { ShareButton } from "@/components/shared/ShareButton";
 
 const gradientStyles = [
   "from-brand-blue/10 to-transparent border-brand-blue/20",
@@ -100,8 +101,18 @@ export default async function BusinessPage(
           </div>
         )}
         {business?.description && (
-          <p className="text-center text-muted-foreground mb-10">{business.description}</p>
+          <p className="text-center text-muted-foreground mb-6">{business.description}</p>
         )}
+        
+        {/* Share Button */}
+        <div className="flex justify-center mb-10">
+          <ShareButton
+            url={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.monthlyclubhq.com'}/businesses/${slug}`}
+            variant="outline"
+            size="default"
+            className="border-white/20 text-white hover:bg-white/10"
+          />
+        </div>
 
         {/* Products */}
         {products && products.length > 0 && (
@@ -121,6 +132,12 @@ export default async function BusinessPage(
                   <span className="text-sm text-muted-foreground">
                     {new Date(post.created_at).toLocaleString()}
                   </span>
+                  <ShareButton
+                    url={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.monthlyclubhq.com'}/businesses/${slug}`}
+                    variant="ghost"
+                    size="sm"
+                    className="text-white/70 hover:text-white hover:bg-white/10"
+                  />
                 </div>
                 <h4 className="text-lg font-semibold mb-2">{post.title}</h4>
                 {post.content && (
