@@ -245,6 +245,79 @@ export async function POST(req: Request) {
     return new NextResponse("Success", { status: 200 });
   }
 
+  if (event.type === "account.updated") {
+    const account = event.data.object as Stripe.Account;
+    console.log("Account updated:", account.id, "Details submitted:", account.details_submitted, "Charges enabled:", account.charges_enabled);
+
+    // Check if this is a business account that has completed onboarding
+    if (account.details_submitted && account.charges_enabled) {
+      try {
+        // Find the business with this Stripe account ID
+        const { data: business, error: businessError } = await supabase
+          .from("businesses")
+          .select("id, name, user_id, status")
+          .eq("stripe_account_id", account.id)
+          .single();
+
+        if (businessError || !business) {
+          console.log("No business found for Stripe account:", account.id);
+          return new NextResponse("Business not found", { status: 200 });
+        }
+
+        // Only update if status is not already 'active'
+        if (business.status !== 'active') {
+          const { error: updateError } = await supabase
+            .from("businesses")
+            .update({ status: "active" })
+            .eq("id", business.id);
+
+          if (updateError) {
+            console.error("Failed to update business status to active:", updateError);
+            return NextResponse.json({ error: "Failed to update business status" }, { status: 500 });
+          }
+
+          console.log("✅ Business status updated to 'active' for:", business.name);
+
+          // Send business activated notification to owner
+          try {
+            const { data: userProfile } = await supabase
+              .from("user_profiles")
+              .select("email")
+              .eq("id", business.user_id)
+              .single();
+
+            if (userProfile?.email) {
+              await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  type: 'business_activated',
+                  data: { 
+                    businessName: business.name, 
+                    businessId: business.id, 
+                    ownerEmail: userProfile.email 
+                  }
+                })
+              });
+              console.log("✅ Business activated email sent to:", userProfile.email);
+            }
+          } catch (emailError) {
+            console.error('Failed to send business activated email:', emailError);
+          }
+        } else {
+          console.log("Business already has 'active' status:", business.name);
+        }
+      } catch (error) {
+        console.error("Error processing account.updated webhook:", error);
+        return NextResponse.json({ error: "Failed to process account update" }, { status: 500 });
+      }
+    } else {
+      console.log("Account not fully onboarded yet. Details submitted:", account.details_submitted, "Charges enabled:", account.charges_enabled);
+    }
+
+    return new NextResponse("Account update processed", { status: 200 });
+  }
+
   if (event.type === "payment_intent.payment_failed") {
     const failedIntent = event.data.object as Stripe.PaymentIntent;
     console.warn("Payment failed:", failedIntent.id, failedIntent.last_payment_error?.message);
