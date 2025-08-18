@@ -792,7 +792,7 @@ function MessagesPageContent() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h2 className="text-lg font-semibold text-white">
+                      <h2 className="text-sm font-semibold text-white">
                         {(() => {
                           const business = getOtherParticipantBusiness(selectedConversation);
                           const otherParticipant = getOtherParticipant(selectedConversation);
@@ -821,7 +821,7 @@ function MessagesPageContent() {
                           return 'Unknown';
                         })()}
                       </h2>
-                      <p className="text-sm text-gray-300">
+                      <p className="text-xs text-gray-300">
                         @{getOtherParticipant(selectedConversation)?.handle || 'unknown'}
                       </p>
                     </div>
