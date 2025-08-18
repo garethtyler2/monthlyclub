@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Search, Send, Image as ImageIcon, Plus, X, MessageCircle } from 'lucide-react';
 import { Check, CheckCheck } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { Textarea } from '@/components/ui/textarea';
 
 function MessagesPageContent() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -27,6 +28,7 @@ function MessagesPageContent() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [textFieldHeight, setTextFieldHeight] = useState(40); // Default height for text field
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
@@ -66,6 +68,7 @@ function MessagesPageContent() {
   useEffect(() => {
     if (selectedConversation) {
       fetchMessages(selectedConversation.id);
+      setTextFieldHeight(40); // Reset text field height for new conversation
       // Set up real-time subscription
       const subscription = supabase
         .channel(`messages:${selectedConversation.id}`)
@@ -229,6 +232,21 @@ function MessagesPageContent() {
     }
   };
 
+  const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setNewMessage(value);
+    
+    // Auto-expand text area
+    const textarea = e.target;
+    textarea.style.height = 'auto';
+    const scrollHeight = textarea.scrollHeight;
+    const maxHeight = window.innerHeight * 0.5; // 50% of screen height
+    const newHeight = Math.min(scrollHeight, maxHeight);
+    
+    setTextFieldHeight(newHeight);
+    textarea.style.height = `${newHeight}px`;
+  };
+
   const uploadImage = async (file: File): Promise<string | null> => {
     try {
       const fileExt = file.name.split('.').pop();
@@ -288,6 +306,7 @@ function MessagesPageContent() {
         setNewMessage('');
         setSelectedImage(null);
         setImagePreview(null);
+        setTextFieldHeight(40); // Reset text field height
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
@@ -625,6 +644,9 @@ function MessagesPageContent() {
                             alt="Message image" 
                             className="max-w-full h-auto rounded-lg"
                           />
+                          {message.content && (
+                            <p className="text-sm leading-relaxed">{message.content}</p>
+                          )}
                           <p className="text-sm opacity-90">📷 Image</p>
                         </div>
                       ) : (
@@ -641,7 +663,7 @@ function MessagesPageContent() {
                           {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
                         </span>
                         {message.sender_id === currentUser?.id && (
-                          <span className="inline-flex items-center transition-all duration-200">
+                          <span className="inline-flex items-center ml-1">
                             {message.read_at ? (
                               <>
                                 <span title="Read">
@@ -700,44 +722,51 @@ function MessagesPageContent() {
 
               {/* Message Input */}
               <div className="border-t border-gray-700 p-4 bg-gray-800 flex-shrink-0">
-                <div className="flex items-center space-x-3">
+                {/* Image and Send buttons row - separate from text input on mobile */}
+                <div className="flex items-center justify-between mb-3">
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploadingImage}
-                    className="p-2 h-10 w-10 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                    className="p-3 h-12 w-12 text-gray-400 hover:text-blue-400 hover:bg-blue-50/10 transition-colors rounded-full"
                   >
-                    <ImageIcon className="h-5 w-5" />
+                    <ImageIcon className="h-6 w-6" />
                   </Button>
                   
-                  <Input
-                    placeholder="Type a message..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                    className="flex-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 transition-colors"
-                    disabled={uploadingImage}
-                  />
-                  
-                  <Button 
-                    onClick={sendMessage} 
+                  <Button
+                    onClick={sendMessage}
                     disabled={(!newMessage.trim() && !selectedImage) || uploadingImage}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                   >
                     {uploadingImage ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                     ) : (
-                      <Send className="h-4 w-4" />
+                      <Send className="h-5 w-5 mr-2" />
                     )}
+                    Send
                   </Button>
+                </div>
+                
+                {/* Text input area */}
+                <div className="relative">
+                  <Textarea
+                    placeholder="Type a message..."
+                    value={newMessage}
+                    onChange={handleTextAreaChange}
+                    onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+                    className="w-full bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 transition-all duration-200 resize-none rounded-xl px-4 py-3 text-base"
+                    style={{ height: `${textFieldHeight}px` }}
+                    disabled={uploadingImage}
+                    rows={1}
+                  />
                   
                   {/* Hidden file input */}
                   <input
-                    ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    ref={fileInputRef}
                     onChange={handleImageSelect}
+                    accept="image/*"
                     className="hidden"
                   />
                 </div>

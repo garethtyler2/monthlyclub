@@ -144,7 +144,7 @@ export async function POST(request: Request) {
       .insert({
         conversation_id,
         sender_id: user.id,
-        content: message_type === 'text' ? content : null,
+        content: (content && String(content).trim().length > 0) ? content : null,
         message_type,
         image_url: message_type === 'image' ? image_url : null
       })
