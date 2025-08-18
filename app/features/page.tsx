@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, Zap, ArrowRight } from "lucide-react";
+import { CheckCircle, Zap, ArrowRight, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import Script from "next/script";
 import HomepageFeatures from "@/components/Homepage/Features";
@@ -72,13 +72,46 @@ const FeaturesPage = () => {
               "Built-in fraud prevention",
               "Analytics dashboard with trends",
               "Mobile-optimized customer flow",
-              "CRM-style member management"
+              "CRM-style member management",
+              "Private customer messaging system"
             ].map((feature, i) => (
               <div key={i} className="flex items-start gap-3">
                 <CheckCircle className="w-5 h-5 mt-1 text-primary" />
                 <span className="text-muted-foreground">{feature}</span>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Private Messaging Feature Highlight */}
+        <section className="py-16 px-4 bg-slate-50/5">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="mb-8">
+              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="h-8 w-8 text-primary" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Messaging for Businesses and Creators
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                DM customers and collaborators, or share posts, media and announcements directly with your audience. Perfect for service businesses and content creators.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+              <div className="bg-background p-6 rounded-lg border">
+                <h3 className="font-semibold text-foreground mb-2">Direct Support & Collabs</h3>
+                <p className="text-muted-foreground text-sm">Handle customer questions or collaborate with other businesses and creators without switching tools.</p>
+              </div>
+              <div className="bg-background p-6 rounded-lg border">
+                <h3 className="font-semibold text-foreground mb-2">Share Content</h3>
+                <p className="text-muted-foreground text-sm">Share posts, images and updates privately to your subscribers or VIPs with read receipts.</p>
+              </div>
+              <div className="bg-background p-6 rounded-lg border">
+                <h3 className="font-semibold text-foreground mb-2">Grow Your Audience</h3>
+                <p className="text-muted-foreground text-sm">Keep fans engaged and customers informed—drive retention and upsells with timely messages.</p>
+              </div>
+            </div>
           </div>
         </section>
 

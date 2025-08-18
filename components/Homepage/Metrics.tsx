@@ -138,7 +138,7 @@ const Metrics = () => {
             </Card>
           ))}
         </div>
-            <Button asChild className="w-1/2 mt-10 hero-button-primary">
+            <Button asChild className="mt-10 hero-button-primary">
             <Link href="create-a-business/step-one">Start Your Business Now!</Link>
           </Button>
       </div>

@@ -3,7 +3,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import React, { useEffect, useState } from 'react';
-import { CheckCircle, Sparkles, CreditCard, TrendingUp, Users, Zap, ArrowRight, Building2, DollarSign, MessageSquareText } from "lucide-react";
+import { CheckCircle, Sparkles, CreditCard, TrendingUp, Users, Zap, ArrowRight, Building2, DollarSign, MessageSquareText, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 
@@ -149,6 +149,14 @@ const Hero = () => {
                 <MessageSquareText className="w-8 h-8 text-purple-400 mx-auto mb-2" />
                 <h3 className="font-semibold text-white text-sm mb-1">Subscriber Feed</h3>
                 <p className="text-xs text-muted-foreground">Post updates, images and links</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
+              <CardContent className="p-4 text-center">
+                <MessageCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                <h3 className="font-semibold text-white text-sm mb-1">Direct Messaging</h3>
+                <p className="text-xs text-muted-foreground">Chat with customers & collaborators</p>
               </CardContent>
             </Card>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Shield, Clipboard, Brain, Target, BarChart, Newspaper } from "lucide-react";
+import { Activity, Shield, Clipboard, Brain, Target, BarChart, Newspaper, MessageCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -70,6 +70,14 @@ const featureItems = [
     delay: 500,
     link: "/guides/service-subscription-examples"
   },
+  {
+    icon: MessageCircle,
+    title: "Messaging & Content Sharing",
+    description: "DM customers and collaborators, or share updates and content directly with your audience.",
+    className: "border-brand-green/20 bg-gradient-to-b from-brand-green/10 to-transparent",
+    delay: 600,
+    link: "/private-messaging"
+  }
 ];
 
 const Features = () => {
