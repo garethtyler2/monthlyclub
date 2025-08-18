@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { EmailService } from '@/lib/email';
 
 export async function GET(request: Request) {
   try {
@@ -155,7 +156,89 @@ export async function POST(request: Request) {
       console.error('Error creating message:', msgError);
       return NextResponse.json({ error: 'Failed to create message' }, { status: 500 });
     }
-    
+
+    // Send email notification to the other participant
+    try {
+      // Get the other participant's details
+      const otherParticipantId = conversation.participant1_id === user.id 
+        ? conversation.participant2_id 
+        : conversation.participant1_id;
+      
+      // Don't send email if it's the same user (shouldn't happen, but safety check)
+      if (otherParticipantId === user.id) {
+        console.log('Skipping email notification - same user');
+        return NextResponse.json({ message: newMessage });
+      }
+      
+      // Get sender and recipient details
+      const { data: senderProfile } = await supabase
+        .from('user_profiles')
+        .select('display_name, handle')
+        .eq('id', user.id)
+        .single();
+      
+      const { data: recipientProfile } = await supabase
+        .from('user_profiles')
+        .select('email, display_name, handle')
+        .eq('id', otherParticipantId)
+        .single();
+
+      if (recipientProfile?.email) {
+        const senderName = senderProfile?.display_name || senderProfile?.handle || 'Someone';
+        const messageContent = message_type === 'text' ? (content || '') : (content || '');
+        
+        // Additional safety checks to prevent spam
+        if (!messageContent.trim() && message_type === 'text') {
+          console.log('Skipping email notification - empty text message');
+          return NextResponse.json({ message: newMessage });
+        }
+        
+        // Try to get business context if this is a business conversation
+        let businessContext: { name: string; slug: string } | undefined = undefined;
+        try {
+          const { data: connection } = await supabase
+            .from('user_connections')
+            .select('business:businesses(name, slug)')
+            .or(`and(user_id.eq.${user.id},connected_user_id.eq.${otherParticipantId}),and(user_id.eq.${otherParticipantId},connected_user_id.eq.${user.id})`)
+            .eq('connection_type', 'customer_business')
+            .single();
+          
+          if (connection?.business && Array.isArray(connection.business) && connection.business.length > 0) {
+            const business = connection.business[0];
+            if (business.name && business.slug) {
+              businessContext = {
+                name: business.name,
+                slug: business.slug
+              };
+            }
+          }
+        } catch (businessError) {
+          // Business context is optional, don't fail if we can't get it
+          console.log('Could not get business context:', businessError);
+        }
+        
+        console.log('Sending email notification to:', recipientProfile.email, 'from:', senderName);
+        
+        // Send email notification asynchronously (don't wait for it)
+        EmailService.sendMessageNotification(
+          recipientProfile.email,
+          senderName,
+          messageContent,
+          message_type as 'text' | 'image',
+          conversation_id,
+          businessContext
+        ).catch(error => {
+          console.error('Failed to send message notification email:', error);
+          // Don't fail the message creation if email fails
+        });
+      } else {
+        console.log('No recipient email found for user:', otherParticipantId);
+      }
+    } catch (emailError) {
+      console.error('Error setting up email notification:', emailError);
+      // Don't fail the message creation if email setup fails
+    }
+
     // Update conversation last_message_at
     await supabase
       .from('conversations')

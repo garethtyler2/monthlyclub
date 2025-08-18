@@ -351,6 +351,67 @@ export class EmailService {
     });
   }
 
+  // Message notifications
+  static async sendMessageNotification(
+    recipientEmail: string,
+    senderName: string,
+    messageContent: string,
+    messageType: 'text' | 'image',
+    conversationId: string,
+    businessContext?: { name: string; slug: string }
+  ) {
+    const isImageMessage = messageType === 'image';
+    const messageSnippet = isImageMessage 
+      ? (messageContent ? `📷 Image with caption: "${messageContent}"` : '📷 Image')
+      : messageContent.length > 100 
+        ? `${messageContent.substring(0, 100)}...` 
+        : messageContent;
+
+    const businessInfo = businessContext 
+      ? `<p style="color: #6b7280; font-size: 14px; margin: 10px 0;">
+           <strong>Business:</strong> ${businessContext.name}
+         </p>`
+      : '';
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #6366f1;">💬 New Message from ${senderName}</h2>
+        <p>Hi there,</p>
+        <p>You have received a new message on MonthlyClub.</p>
+        
+        ${businessInfo}
+        
+        <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #6366f1;">
+          <h3>Message Preview</h3>
+          <p style="font-style: italic; color: #6b7280; margin: 0;">
+            "${messageSnippet}"
+          </p>
+        </div>
+
+        <p style="text-align: center; margin: 30px 0;">
+          <a href="https://monthlyclubhq.com/messages" 
+             style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
+            View Message
+          </a>
+        </p>
+
+        <p style="font-size: 14px; color: #6b7280;">
+          You can visit your 
+          <a href="https://monthlyclubhq.com/messages" style="color: #6366f1;">messages page</a> 
+          to continue the conversation.
+        </p>
+        
+        <p>Best regards,<br>The MonthlyClub Team</p>
+      </div>
+    `;
+
+    return this.sendEmail({
+      to: recipientEmail,
+      subject: `New message from ${senderName} - MonthlyClub`,
+      html,
+    });
+  }
+
   // Helper methods
   private static getOrdinalSuffix(day: number): string {
     if (day > 3 && day < 21) return 'th';

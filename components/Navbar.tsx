@@ -415,7 +415,12 @@ const Navbar = () => {
               className="p-2 rounded-lg hover:bg-white/5 transition-colors"
               aria-label="Toggle Menu"
             >
-              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              <div className="relative">
+                {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                {unreadMessageCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                )}
+              </div>
             </button>
 
             {/* Mobile Logo */}
