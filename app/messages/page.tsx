@@ -29,6 +29,9 @@ function MessagesPageContent() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [textFieldHeight, setTextFieldHeight] = useState(40); // Default height for text field
+  const [handleSearch, setHandleSearch] = useState('');
+  const [handleSearchResults, setHandleSearchResults] = useState<any[]>([]);
+  const [isSearchingHandle, setIsSearchingHandle] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
@@ -232,6 +235,29 @@ function MessagesPageContent() {
     }
   };
 
+  const searchUserByHandle = async (handle: string) => {
+    if (!handle.trim()) {
+      setHandleSearchResults([]);
+      return;
+    }
+
+    setIsSearchingHandle(true);
+    try {
+      const response = await fetch(`/api/messaging/search-users?handle=${encodeURIComponent(handle.trim())}`);
+      if (response.ok) {
+        const data = await response.json();
+        setHandleSearchResults(data.users || []);
+      } else {
+        setHandleSearchResults([]);
+      }
+    } catch (error) {
+      console.error('Error searching for user:', error);
+      setHandleSearchResults([]);
+    } finally {
+      setIsSearchingHandle(false);
+    }
+  };
+
   const handleTextAreaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setNewMessage(value);
@@ -364,6 +390,50 @@ function MessagesPageContent() {
     }
   };
 
+  const startConversationWithUser = async (userId: string, userHandle: string) => {
+    try {
+      // Directly start the conversation without requiring a prior connection
+      const response = await fetch('/api/messaging/conversations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          participant1_id: currentUser?.id,
+          participant2_id: userId,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Fetch the conversation with full participant details
+        const convResponse = await fetch(`/api/messaging/conversations/${data.conversation.id}`);
+        if (convResponse.ok) {
+          const convData = await convResponse.json();
+          setSelectedConversation(convData.conversation);
+        } else {
+          setSelectedConversation(data.conversation);
+        }
+        
+        setShowNewChat(false);
+        setHandleSearch('');
+        setHandleSearchResults([]);
+        await fetchConversations();
+        
+        // Notify navbar to refresh unread count
+        window.dispatchEvent(new CustomEvent('messagesRead'));
+      } else {
+        const err = await response.json().catch(() => ({}));
+        console.error('Failed to create conversation:', err);
+        alert(err?.error || 'Failed to create conversation');
+      }
+    } catch (error) {
+      console.error('Error starting conversation with user:', error);
+      alert('Error starting conversation');
+    }
+  };
+
   const getOtherParticipant = (conversation: Conversation) => {
     if (!conversation || !currentUser) return null;
     // Type assertion to access computed fields from API
@@ -423,14 +493,26 @@ function MessagesPageContent() {
   };
 
   const filteredConnections = connections.filter(connection =>
-    connection.connected_user?.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    connection.connected_user?.handle?.toLowerCase().includes(searchQuery.toLowerCase())
+    (() => {
+      const q = searchQuery.trim().toLowerCase();
+      if (!q) return true;
+      const name = connection.connected_user?.display_name?.toLowerCase() || '';
+      const handle = connection.connected_user?.handle?.toLowerCase() || '';
+      const business = connection.business?.name?.toLowerCase() || '';
+      return name.includes(q) || handle.includes(q) || business.includes(q);
+    })()
   );
 
   const filteredConversations = conversations.filter(conversation => {
-    const otherParticipant = getOtherParticipant(conversation);
-    return otherParticipant?.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-           otherParticipant?.handle?.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return true;
+    const anyConv: any = conversation as any;
+    const otherParticipant = getOtherParticipant(conversation) || anyConv.other_participant || {};
+    const name = (otherParticipant.display_name || '').toLowerCase();
+    const handle = (otherParticipant.handle || '').toLowerCase();
+    const email = (otherParticipant.email || '').toLowerCase();
+    const lastMessage = (anyConv.last_message?.content || '').toLowerCase();
+    return name.includes(q) || handle.includes(q) || email.includes(q) || lastMessage.includes(q);
   });
 
   if (loading) {
@@ -465,6 +547,26 @@ function MessagesPageContent() {
         <div className={`${isMobile && selectedConversation ? 'hidden' : 'flex'} flex-col w-full lg:w-80 bg-gray-800 border-r border-gray-700`}>
           {/* Search */}
           <div className="p-4 border-b border-gray-700 flex-shrink-0">
+            {/* New Chat Button */}
+            <div className="mb-3">
+              <Button
+                onClick={() => setShowNewChat(!showNewChat)}
+                className={`w-full ${showNewChat ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} text-white transition-colors`}
+              >
+                {showNewChat ? (
+                  <>
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Chat
+                  </>
+                )}
+              </Button>
+            </div>
+            
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
@@ -481,30 +583,117 @@ function MessagesPageContent() {
             {showNewChat ? (
               <div className="p-4">
                 <h3 className="text-sm font-medium text-white mb-3">Start a new conversation</h3>
-                <div className="space-y-2">
-                  {filteredConnections.map((connection) => (
-                    <div
-                      key={connection.id}
-                      onClick={() => startNewConversation(connection)}
-                      className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-700 cursor-pointer transition-colors"
-                    >
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src={connection.connected_user?.avatar_url || ''} />
-                        <AvatarFallback className="bg-blue-100 text-blue-600">
-                          {connection.connected_user?.display_name?.[0] || connection.connected_user?.handle?.[0] || '?'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {connection.connected_user?.display_name || connection.connected_user?.handle}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          {connection.business?.name || 'No business'}
-                        </p>
-                      </div>
+                
+                {/* Single Search Bar */}
+                <div className="mb-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      placeholder="Search connections or type a handle (e.g., @username)"
+                      value={handleSearch}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setHandleSearch(value);
+                        if (value.startsWith('@')) {
+                          searchUserByHandle(value.substring(1));
+                        } else if (value) {
+                          searchUserByHandle(value);
+                        } else {
+                          setHandleSearchResults([]);
+                        }
+                      }}
+                      className="pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:bg-gray-600 focus:border-blue-500 transition-colors"
+                    />
+                  </div>
+                  
+                  {/* Handle Search Results */}
+                  {handleSearch && handleSearch.trim() && handleSearchResults.length > 0 && (
+                    <div className="mt-3 space-y-2">
+                      {handleSearchResults.map((user) => (
+                        <div
+                          key={user.id}
+                          onClick={() => startConversationWithUser(user.id, user.handle)}
+                          className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-700 cursor-pointer transition-colors border border-gray-600"
+                        >
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={user.avatar_url || ''} />
+                            <AvatarFallback className="bg-blue-100 text-blue-600">
+                              {user.display_name?.[0] || user.handle?.[0] || '?'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-white truncate">
+                              {user.display_name || user.handle}
+                            </p>
+                            <p className="text-xs text-gray-400 truncate">
+                              @{user.handle}
+                            </p>
+                          </div>
+                          <div className="text-xs text-blue-400 bg-blue-900/20 px-2 py-1 rounded">
+                            New Chat
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  
+                  {/* No Results Message */}
+                  {handleSearch && handleSearch.trim() && !isSearchingHandle && handleSearchResults.length === 0 && (
+                    <div className="mt-3 text-center py-4">
+                      <p className="text-gray-400 text-sm">No user found with that handle</p>
+                      <p className="text-gray-500 text-xs mt-1">Make sure you typed the exact handle</p>
+                    </div>
+                  )}
+                  
+                  {/* Loading State */}
+                  {handleSearch && handleSearch.trim() && isSearchingHandle && (
+                    <div className="mt-3 text-center py-4">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                      <p className="text-gray-400 text-sm mt-2">Searching...</p>
+                    </div>
+                  )}
+                  
+                  {/* Search Instructions */}
+                  {handleSearch && !handleSearch.trim() && (
+                    <div className="mt-3 text-center py-4">
+                      <p className="text-gray-400 text-sm">Type a handle to search for users</p>
+                      <p className="text-gray-500 text-xs mt-1">You can message any user on the platform</p>
+                    </div>
+                  )}
                 </div>
+
+                {/* Connections List - Only show when not searching */}
+                {!handleSearch && (
+                  <div>
+                    <h4 className="text-xs font-medium text-gray-400 uppercase tracking-wider mb-3">
+                      Your Connections
+                    </h4>
+                    <div className="space-y-2">
+                      {filteredConnections.map((connection) => (
+                        <div
+                          key={connection.id}
+                          onClick={() => startNewConversation(connection)}
+                          className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-700 cursor-pointer transition-colors"
+                        >
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={connection.connected_user?.avatar_url || ''} />
+                            <AvatarFallback className="bg-blue-100 text-blue-600">
+                              {connection.connected_user?.display_name?.[0] || connection.connected_user?.handle?.[0] || '?'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-white truncate">
+                              {connection.connected_user?.display_name || connection.connected_user?.handle}
+                            </p>
+                            <p className="text-xs text-gray-400 truncate">
+                              {connection.business?.name || 'No business'}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="p-2">
@@ -614,7 +803,22 @@ function MessagesPageContent() {
                           }
                           
                           // Otherwise show the person's name/email
-                          return otherParticipant?.display_name || otherParticipant?.email || 'Unknown';
+                          const displayName = otherParticipant?.display_name;
+                          const email = otherParticipant?.email;
+                          
+                          if (displayName) {
+                            return displayName;
+                          }
+                          
+                          if (email) {
+                            // Truncate email on small screens
+                            if (isMobile && email.length > 20) {
+                              return email.substring(0, 20) + '...';
+                            }
+                            return email;
+                          }
+                          
+                          return 'Unknown';
                         })()}
                       </h2>
                       <p className="text-sm text-gray-300">
@@ -637,166 +841,178 @@ function MessagesPageContent() {
                         ? 'bg-blue-600 text-white' 
                         : 'bg-gray-800 text-white border border-gray-700 shadow-sm'
                     } rounded-2xl px-4 py-3`}>
-                      {message.image_url ? (
-                        <div className="space-y-2">
-                          <img 
-                            src={message.image_url} 
-                            alt="Message image" 
-                            className="max-w-full h-auto rounded-lg"
-                          />
-                          {message.content && (
-                            <p className="text-sm leading-relaxed">{message.content}</p>
-                          )}
-                          <p className="text-sm opacity-90">📷 Image</p>
-                        </div>
-                      ) : (
-                        <p className="text-sm leading-relaxed">{message.content}</p>
-                      )}
-                      
-                      {/* Message footer with timestamp and read receipt */}
-                      <div className={`flex items-center justify-end gap-2 mt-2 ${
-                        message.sender_id === currentUser?.id 
-                          ? 'text-blue-100' 
-                          : 'text-gray-500'
-                      }`}>
-                        <span className="text-xs">
-                          {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-                        </span>
-                        {message.sender_id === currentUser?.id && (
-                          <span className="inline-flex items-center ml-1">
-                            {message.read_at ? (
-                              <>
-                                <span title="Read">
-                                  <CheckCheck className="h-3.5 w-3.5 text-blue-200" />
-                                </span>
-                                <span className="sr-only">Read</span>
-                              </>
-                            ) : (
-                              <>
-                                <span title="Delivered">
-                                  <Check className="h-3.5 w-3.5 text-blue-200" />
-                                </span>
-                                <span className="sr-only">Delivered</span>
-                              </>
-                            )}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
+                       {message.image_url ? (
+                         <div className="space-y-2">
+                           <img 
+                             src={message.image_url} 
+                             alt="Message image" 
+                             className="max-w-full h-auto rounded-lg"
+                           />
+                           {message.content && (
+                             <p className="text-sm leading-relaxed">{message.content}</p>
+                           )}
+                           <p className="text-sm opacity-90">📷 Image</p>
+                         </div>
+                       ) : (
+                         <p className="text-sm leading-relaxed">{message.content}</p>
+                       )}
+                       
+                       {/* Message footer with timestamp and read receipt */}
+                       <div className={`flex items-center justify-end gap-2 mt-2 ${
+                         message.sender_id === currentUser?.id 
+                           ? 'text-blue-100' 
+                           : 'text-gray-500'
+                       }`}>
+                         <span className="text-xs">
+                           {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
+                         </span>
+                         {message.sender_id === currentUser?.id && (
+                           <span className="inline-flex items-center ml-1">
+                             {message.read_at ? (
+                               <>
+                                 <span title="Read">
+                                   <CheckCheck className="h-3.5 w-3.5 text-blue-200" />
+                                 </span>
+                                 <span className="sr-only">Read</span>
+                               </>
+                             ) : (
+                               <>
+                                 <span title="Delivered">
+                                   <Check className="h-3.5 w-3.5 text-blue-200" />
+                                 </span>
+                                 <span className="sr-only">Delivered</span>
+                               </>
+                             )}
+                           </span>
+                         )}
+                       </div>
+                     </div>
+                   </div>
+                 ))}
+                 <div ref={messagesEndRef} />
+               </div>
 
-              {/* Image Preview */}
-              {imagePreview && (
-                <div className="border-t border-gray-700 p-4 bg-gray-800 flex-shrink-0">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-medium text-white">Image preview</span>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={removeSelectedImage}
-                      className="p-1 h-8 w-8"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <img 
-                      src={imagePreview} 
-                      alt="Preview" 
-                      className="h-16 w-16 object-cover rounded-lg border border-gray-200"
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-300">
-                        {selectedImage?.name || 'Image'}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {selectedImage?.size ? (selectedImage.size / 1024 / 1024).toFixed(2) : '0'} MB
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+               {/* Image Preview */}
+               {imagePreview && (
+                 <div className="border-t border-gray-700 p-4 bg-gray-800 flex-shrink-0">
+                   <div className="flex items-center justify-between mb-3">
+                     <span className="text-sm font-medium text-white">Image preview</span>
+                     <Button 
+                       variant="ghost" 
+                       size="sm" 
+                       onClick={removeSelectedImage}
+                       className="p-1 h-8 w-8"
+                     >
+                       <X className="h-4 w-4" />
+                     </Button>
+                   </div>
+                   <div className="flex items-center space-x-3">
+                     <img 
+                       src={imagePreview} 
+                       alt="Preview" 
+                       className="h-16 w-16 object-cover rounded-lg border border-gray-200"
+                     />
+                     <div className="flex-1">
+                       <p className="text-sm text-gray-300">
+                         {selectedImage?.name || 'Image'}
+                       </p>
+                       <p className="text-xs text-gray-400">
+                         {selectedImage?.size ? (selectedImage.size / 1024 / 1024).toFixed(2) : '0'} MB
+                       </p>
+                     </div>
+                   </div>
+                 </div>
+               )}
 
-              {/* Message Input */}
-              <div className="border-t border-gray-700 p-4 bg-gray-800 flex-shrink-0">
-                {/* Image and Send buttons row - separate from text input on mobile */}
-                <div className="flex items-center justify-between mb-3">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingImage}
-                    className="p-3 h-12 w-12 text-gray-400 hover:text-blue-400 hover:bg-blue-50/10 transition-colors rounded-full"
-                  >
-                    <ImageIcon className="h-6 w-6" />
-                  </Button>
-                  
-                  <Button
-                    onClick={sendMessage}
-                    disabled={(!newMessage.trim() && !selectedImage) || uploadingImage}
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-                  >
-                    {uploadingImage ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    ) : (
-                      <Send className="h-5 w-5 mr-2" />
-                    )}
-                    Send
-                  </Button>
-                </div>
-                
-                {/* Text input area */}
-                <div className="relative">
-                  <Textarea
-                    placeholder="Type a message..."
-                    value={newMessage}
-                    onChange={handleTextAreaChange}
-                    onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
-                    className="w-full bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 transition-all duration-200 resize-none rounded-xl px-4 py-3 text-base"
-                    style={{ height: `${textFieldHeight}px` }}
-                    disabled={uploadingImage}
-                    rows={1}
-                  />
-                  
-                  {/* Hidden file input */}
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageSelect}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-24 h-24 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MessageCircle className="h-12 w-12 text-gray-400" />
-                </div>
-                <h3 className="text-lg font-medium text-white mb-2">Select a conversation</h3>
-                <p className="text-gray-400">Choose a conversation from the sidebar to start messaging</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+               {/* Message Input */}
+               <div className="border-t border-gray-700 p-4 bg-gray-800 flex-shrink-0">
+                 {/* Image and Send buttons row - separate from text input on mobile */}
+                 <div className="flex items-center justify-between mb-3">
+                   <Button
+                     variant="ghost"
+                     size="sm"
+                     onClick={() => fileInputRef.current?.click()}
+                     disabled={uploadingImage}
+                     className="p-3 h-12 w-12 text-gray-400 hover:text-blue-400 hover:bg-blue-50/10 transition-colors rounded-full"
+                   >
+                     <ImageIcon className="h-6 w-6" />
+                   </Button>
+                   
+                   <Button
+                     onClick={sendMessage}
+                     disabled={(!newMessage.trim() && !selectedImage) || uploadingImage}
+                     className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                   >
+                     {uploadingImage ? (
+                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                     ) : (
+                       <Send className="h-5 w-5 mr-2" />
+                     )}
+                     Send
+                   </Button>
+                 </div>
+                 
+                 {/* Text input area */}
+                 <div className="relative">
+                   <Textarea
+                     placeholder="Type a message..."
+                     value={newMessage}
+                     onChange={handleTextAreaChange}
+                     onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+                     className="w-full bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500 transition-all duration-200 resize-none rounded-xl px-4 py-3 text-base"
+                     style={{ height: `${textFieldHeight}px` }}
+                     disabled={uploadingImage}
+                     rows={1}
+                   />
+                   
+                   {/* Hidden file input */}
+                   <input
+                     type="file"
+                     ref={fileInputRef}
+                     onChange={handleImageSelect}
+                     accept="image/*"
+                     className="hidden"
+                   />
+                 </div>
+               </div>
+             </>
+           ) : (
+             <div className="flex-1 flex items-center justify-center">
+               <div className="text-center">
+                 <div className="w-24 h-24 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                   <MessageCircle className="h-12 w-12 text-gray-400" />
+                 </div>
+                 <h3 className="text-lg font-medium text-white mb-2">Select a conversation</h3>
+                 <p className="text-gray-400">Choose a conversation from the sidebar to start messaging</p>
+               </div>
+             </div>
+           )}
+         </div>
+       </div>
+       
+       {/* Mobile Floating Action Button for New Chat */}
+       {isMobile && !showNewChat && !selectedConversation && (
+         <div className="fixed bottom-20 right-4 z-50 lg:hidden">
+           <Button
+             onClick={() => setShowNewChat(true)}
+             className="h-14 w-14 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+           >
+             <Plus className="h-6 w-6" />
+           </Button>
+         </div>
+       )}
+     </div>
+   );
+ }
 
-export default function MessagesPage() {
-  return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    }>
-      <MessagesPageContent />
-    </Suspense>
-  );
-}
+ export default function MessagesPage() {
+   return (
+     <Suspense fallback={
+       <div className="flex items-center justify-center min-h-screen">
+         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+       </div>
+     }>
+       <MessagesPageContent />
+     </Suspense>
+   );
+ }

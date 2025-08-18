@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 
 export async function GET() {
   try {
@@ -100,57 +100,130 @@ export async function POST(request: Request) {
     // Get authenticated user
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
+      console.error('Auth error:', authError);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const { participant2_id } = await request.json();
+    console.log('Creating conversation for user:', user.id);
+    
+    const body = await request.json();
+    console.log('Request body:', body);
+    
+    const { participant2_id } = body;
     
     if (!participant2_id) {
+      console.error('Missing participant2_id in request');
       return NextResponse.json({ error: 'participant2_id is required' }, { status: 400 });
     }
     
-    // Check if users have a connection
-    const { data: connection, error: connError } = await supabase
-      .from('user_connections')
-      .select('*')
-      .or(`and(user_id.eq.${user.id},connected_user_id.eq.${participant2_id}),and(user_id.eq.${participant2_id},connected_user_id.eq.${user.id})`)
-      .limit(1)
+    console.log('Creating conversation between:', user.id, 'and', participant2_id);
+    
+    // Use service role client to bypass RLS for conversation creation
+    const serviceSupabase = createServiceRoleClient();
+    
+    // Check if both user profiles exist
+    const { data: userProfile, error: userProfileError } = await serviceSupabase
+      .from('user_profiles')
+      .select('id')
+      .eq('id', user.id)
       .single();
     
-    if (connError || !connection) {
-      return NextResponse.json({ error: 'Users are not connected' }, { status: 403 });
+    if (userProfileError || !userProfile) {
+      console.error('Current user profile not found:', userProfileError);
+      return NextResponse.json({ error: 'User profile not found' }, { status: 404 });
     }
     
+    const { data: participantProfile, error: participantProfileError } = await serviceSupabase
+      .from('user_profiles')
+      .select('id')
+      .eq('id', participant2_id)
+      .single();
+    
+    if (participantProfileError || !participantProfile) {
+      console.error('Participant profile not found:', participantProfileError);
+      return NextResponse.json({ error: 'Participant profile not found' }, { status: 404 });
+    }
+    
+    console.log('Both user profiles found, proceeding with conversation creation...');
+    
+    // NOTE: We previously required an existing connection. Now we allow starting a conversation
+    // by handle even without a pre-existing connection. If you want to enforce connections later,
+    // add the check back here.
+    
     // Check if conversation already exists
-    const { data: existingConv, error: existingError } = await supabase
+    const { data: existingConv, error: existingError } = await serviceSupabase
       .from('conversations')
       .select('*')
       .or(`and(participant1_id.eq.${user.id},participant2_id.eq.${participant2_id}),and(participant1_id.eq.${participant2_id},participant2_id.eq.${user.id})`)
       .single();
     
-    if (existingConv) {
+    if (existingError) {
+      if (existingError.code === 'PGRST116') {
+        // No conversation found, which is what we want
+        console.log('No existing conversation found, proceeding to create new one...');
+      } else {
+        console.error('Error checking existing conversation:', existingError);
+        return NextResponse.json({ error: 'Failed to check existing conversation' }, { status: 500 });
+      }
+    } else if (existingConv) {
+      console.log('Found existing conversation:', existingConv.id);
       return NextResponse.json({ conversation: existingConv });
     }
     
+    console.log('No existing conversation found, creating new one...');
+    
     // Create new conversation
-    const { data: newConversation, error: createError } = await supabase
+    const conversationData = {
+      participant1_id: user.id,
+      participant2_id: participant2_id
+    };
+    
+    console.log('Attempting to insert conversation with data:', conversationData);
+    
+    const { data: newConversation, error: createError } = await serviceSupabase
       .from('conversations')
-      .insert({
-        participant1_id: user.id,
-        participant2_id: participant2_id
-      })
+      .insert(conversationData)
       .select()
       .single();
     
     if (createError) {
       console.error('Error creating conversation:', createError);
-      return NextResponse.json({ error: 'Failed to create conversation' }, { status: 500 });
+      console.error('Error details:', {
+        code: createError.code,
+        message: createError.message,
+        details: createError.details,
+        hint: createError.hint
+      });
+      return NextResponse.json({ error: 'Failed to create conversation', details: createError.message }, { status: 500 });
     }
     
-    return NextResponse.json({ conversation: newConversation });
+    console.log('Successfully created conversation:', newConversation.id);
+    
+    // Fetch the full conversation with participant details
+    const { data: fullConversation, error: fetchError } = await serviceSupabase
+      .from('conversations')
+      .select(`
+        *,
+        participant1:user_profiles!conversations_participant1_id_fkey (
+          id, email, handle, display_name, avatar_url, created_at
+        ),
+        participant2:user_profiles!conversations_participant2_id_fkey (
+          id, email, handle, display_name, avatar_url, created_at
+        )
+      `)
+      .eq('id', newConversation.id)
+      .single();
+    
+    if (fetchError) {
+      console.error('Error fetching full conversation details:', fetchError);
+      // Return the basic conversation if we can't get full details
+      return NextResponse.json({ conversation: newConversation });
+    }
+    
+    return NextResponse.json({ conversation: fullConversation });
     
   } catch (error) {
-    console.error('Error in create conversation API:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Unexpected error in create conversation API:', error);
+    return NextResponse.json({ error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 }
