@@ -106,14 +106,32 @@ export async function POST(request: Request) {
     
     console.log('Creating conversation for user:', user.id);
     
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch (error) {
+      console.error('Invalid JSON in request body:', error);
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
+    }
+    
     console.log('Request body:', body);
     
-    const { participant2_id } = body;
+    const { participant2_id, initial_message } = body;
     
     if (!participant2_id) {
       console.error('Missing participant2_id in request');
       return NextResponse.json({ error: 'participant2_id is required' }, { status: 400 });
+    }
+
+    if (!initial_message) {
+      console.error('Missing initial_message in request');
+      return NextResponse.json({ error: 'initial_message is required' }, { status: 400 });
+    }
+    
+    // Prevent creating conversation with self
+    if (participant2_id === user.id) {
+      console.error('User attempted to create conversation with self');
+      return NextResponse.json({ error: 'Cannot create conversation with yourself' }, { status: 400 });
     }
     
     console.log('Creating conversation between:', user.id, 'and', participant2_id);

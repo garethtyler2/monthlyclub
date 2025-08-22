@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -149,6 +149,9 @@ export default function CreatePostModal({ businessId, trigger, onCreated, open: 
         <DialogTitle asChild>
           <h2 className="text-xl font-semibold mb-2">New Post</h2>
         </DialogTitle>
+        <DialogDescription className="text-gray-300 mb-4">
+          Create a new post to share updates with your subscribers
+        </DialogDescription>
 
         <div className="space-y-3">
           <div>

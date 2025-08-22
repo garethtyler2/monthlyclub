@@ -6,7 +6,24 @@ const openai = new OpenAI({
 });
 
 export async function POST(req: Request) {
-  const { businessName, paragraph } = await req.json();
+  let businessName: string;
+  let paragraph: string;
+
+  try {
+    const body = await req.json();
+    businessName = body.businessName;
+    paragraph = body.paragraph;
+  } catch (error) {
+    console.error("❌ Invalid JSON in request:", error);
+    return NextResponse.json({ error: "Invalid JSON in request body." }, { status: 400 });
+  }
+
+  // Validate required fields
+  if (!businessName || !paragraph) {
+    return NextResponse.json({ 
+      error: "Missing required fields: businessName and paragraph are required." 
+    }, { status: 400 });
+  }
 
   try {
     const response = await openai.responses.create({

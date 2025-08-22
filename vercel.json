@@ -1,9 +1,10 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
-    {
-      "path": "/api/cron/daily-billing",
-      "schedule": "0 6 * * *"
+  "buildCommand": "npm run test:ci && npm run build",
+  "installCommand": "npm ci",
+  "framework": "nextjs",
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
     }
-  ]
+  }
 }
