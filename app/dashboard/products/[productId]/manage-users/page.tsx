@@ -711,9 +711,56 @@ export default function ManageUsersPage() {
                           <Button size="sm" className="bg-white/10 text-white" onClick={() => { setSelectedUserForLog(sub.user_id); setShowLogModal(true); }}>
                             Log Visit
                           </Button>
-                          <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-white" onClick={() => {
-                            // Navigate to messages page with this customer
-                            window.location.href = `/messages?customer=${sub.user_id}`;
+                          <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-white" onClick={async () => {
+                            try {
+                              // Check if connection exists
+                              const { data: connection } = await supabase
+                                .from('user_connections')
+                                .select('id')
+                                .eq('user_id', sub.user_id)
+                                .eq('business_id', product?.business_id)
+                                .eq('connection_type', 'customer_business')
+                                .single();
+
+                              if (connection) {
+                                // Navigate to messages page with this customer
+                                window.location.href = `/messages?customer=${sub.user_id}`;
+                              } else {
+                                // Get the business owner's user ID
+                                const { data: business } = await supabase
+                                  .from('businesses')
+                                  .select('user_id')
+                                  .eq('id', product?.business_id)
+                                  .single();
+
+                                if (!business) {
+                                  alert('Business information not found. Please try again.');
+                                  return;
+                                }
+
+                                // Create the connection first
+                                const { error: connError } = await supabase
+                                  .from('user_connections')
+                                  .upsert({
+                                    user_id: sub.user_id,
+                                    connected_user_id: business.user_id,
+                                    connection_type: 'customer_business',
+                                    business_id: product?.business_id,
+                                    product_id: productId
+                                  });
+
+                                if (connError) {
+                                  console.error('Error creating connection:', connError);
+                                  alert('Unable to start conversation. Please try again.');
+                                } else {
+                                  // Navigate to messages page
+                                  window.location.href = `/messages?customer=${sub.user_id}`;
+                                }
+                              }
+                            } catch (error) {
+                              console.error('Error starting conversation:', error);
+                              alert('Unable to start conversation. Please try again.');
+                            }
                           }}>
                             <MessageCircle className="w-4 h-4 mr-2" />
                             Message Customer

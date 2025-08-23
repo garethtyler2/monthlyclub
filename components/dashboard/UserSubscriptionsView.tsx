@@ -375,9 +375,56 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                         size="sm"
                         variant="outline"
                         className="border-green-500/20 text-green-400 hover:bg-green-500/10"
-                        onClick={() => {
-                          // Navigate to messages page with this business
-                          window.location.href = `/messages?business=${product.business?.id}`;
+                        onClick={async () => {
+                          try {
+                            // Check if connection exists
+                            const { data: connection } = await supabase
+                              .from('user_connections')
+                              .select('id')
+                              .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
+                              .eq('business_id', product.business?.id)
+                              .eq('connection_type', 'customer_business')
+                              .single();
+
+                            if (connection) {
+                              // Navigate to messages page with this business
+                              window.location.href = `/messages?business=${product.business?.id}`;
+                            } else {
+                              // Get the business owner's user ID
+                              const { data: business } = await supabase
+                                .from('businesses')
+                                .select('user_id')
+                                .eq('id', product.business?.id)
+                                .single();
+
+                              if (!business) {
+                                alert('Business information not found. Please try again.');
+                                return;
+                              }
+
+                              // Create the connection first
+                              const { error: connError } = await supabase
+                                .from('user_connections')
+                                .upsert({
+                                  user_id: (await supabase.auth.getUser()).data.user?.id,
+                                  connected_user_id: business.user_id,
+                                  connection_type: 'customer_business',
+                                  business_id: product.business?.id,
+                                  product_id: product.id
+                                });
+
+                              if (connError) {
+                                console.error('Error creating connection:', connError);
+                                alert('Unable to start conversation. Please try again.');
+                              } else {
+                                // Navigate to messages page
+                                window.location.href = `/messages?business=${product.business?.id}`;
+                              }
+                            }
+                          } catch (error) {
+                            console.error('Error starting conversation:', error);
+                            alert('Unable to start conversation. Please try again.');
+                          }
                         }}
                       >
                         <MessageCircle className="w-4 h-4 mr-2" />

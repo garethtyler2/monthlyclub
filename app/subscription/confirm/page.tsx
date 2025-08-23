@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { Settings, Calendar, CreditCard, CheckCircle } from "lucide-react";
+import { createUserConnectionsForSubscription } from "@/lib/utils";
 
 function formatOrdinal(n: number) {
   const suffixes = ["th", "st", "nd", "rd"];
@@ -135,7 +136,19 @@ function SubscriptionConfirmPageInner() {
       }
     }
 
-    // 6. Redirect to /subscription/success upon success
+    // 6. Create user connections for messaging
+    try {
+      await createUserConnectionsForSubscription(
+        user.id,
+        productId,
+        product.business_id
+      );
+    } catch (error) {
+      console.error("Error creating user connections for messaging:", error);
+      // Don't fail the subscription for this, just log it
+    }
+
+    // 7. Redirect to /subscription/success upon success
     router.push("/subscription/success");
   };
 

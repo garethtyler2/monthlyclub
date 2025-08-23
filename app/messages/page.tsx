@@ -136,17 +136,36 @@ function MessagesPageContent() {
     const businessId = searchParams.get('business');
     const customerId = searchParams.get('customer');
     
-    if (businessId && currentUser && connections.length > 0) {
+    console.log('URL params - businessId:', businessId, 'customerId:', customerId);
+    console.log('Current user:', currentUser);
+    console.log('Connections:', connections);
+    
+    if (businessId && currentUser && connections?.length > 0) {
       // Customer wants to message business owner
       const connection = connections.find(conn => conn.business_id === businessId);
+      console.log('Looking for business connection:', businessId, 'Found:', connection);
       if (connection) {
         startNewConversation(connection);
+      } else {
+        console.log('No connection found for business:', businessId);
+        // Could show a message to the user that they need to subscribe first
       }
-    } else if (customerId && currentUser && connections.length > 0) {
+    } else if (customerId && currentUser && connections?.length > 0) {
       // Business owner wants to message customer
-      const connection = connections.find(conn => conn.connected_user_id === customerId);
+      console.log('Looking for customer connection with customerId:', customerId);
+      console.log('Available connections:', connections);
+      
+      const connection = connections.find(conn => 
+        conn.connected_user_id === customerId && 
+        conn.connection_type === 'business_customer'
+      );
+      
       if (connection) {
+        console.log('Found customer connection:', connection);
         startNewConversation(connection);
+      } else {
+        console.log('No customer connection found, creating new conversation');
+        // Could create a connection here or show a message
       }
     }
   }, [searchParams, currentUser, connections]);
@@ -350,14 +369,37 @@ function MessagesPageContent() {
 
   const startNewConversation = async (connection: UserConnection) => {
     try {
+      // First check if a conversation already exists between these users
+      const existingConvResponse = await fetch(`/api/messaging/conversations?participant1_id=${currentUser?.id}&participant2_id=${connection.connected_user_id}`);
+      
+      if (existingConvResponse.ok) {
+        const existingData = await existingConvResponse.json();
+        
+        // If conversation exists, just open it
+        if (existingData.conversations && existingData.conversations.length > 0) {
+          const existingConversation = existingData.conversations[0];
+          console.log('Found existing conversation:', existingConversation);
+          setSelectedConversation(existingConversation);
+          await fetchConversations();
+          
+          // Clear URL parameters after opening existing conversation
+          const url = new URL(window.location.href);
+          url.searchParams.delete('business');
+          url.searchParams.delete('customer');
+          window.history.replaceState({}, '', url.toString());
+          return;
+        }
+      }
+
+      // If no existing conversation, create a new one
       const response = await fetch('/api/messaging/conversations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          participant1_id: currentUser?.id,
           participant2_id: connection.connected_user_id,
+          initial_message: 'Hello! I\'d like to start a conversation.',
         }),
       });
 
@@ -384,23 +426,44 @@ function MessagesPageContent() {
         url.searchParams.delete('business');
         url.searchParams.delete('customer');
         window.history.replaceState({}, '', url.toString());
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Failed to create conversation:', errorData);
+        alert(`Failed to start conversation: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error starting conversation:', error);
+      alert('Failed to start conversation. Please try again.');
     }
   };
 
   const startConversationWithUser = async (userId: string, userHandle: string) => {
     try {
-      // Directly start the conversation without requiring a prior connection
+      // First check if a conversation already exists between these users
+      const existingConvResponse = await fetch(`/api/messaging/conversations?participant1_id=${currentUser?.id}&participant2_id=${userId}`);
+      
+      if (existingConvResponse.ok) {
+        const existingData = await existingConvResponse.json();
+        
+        // If conversation exists, just open it
+        if (existingData.conversations && existingData.conversations.length > 0) {
+          const existingConversation = existingData.conversations[0];
+          console.log('Found existing conversation:', existingConversation);
+          setSelectedConversation(existingConversation);
+          await fetchConversations();
+          return;
+        }
+      }
+
+      // If no existing conversation, create a new one
       const response = await fetch('/api/messaging/conversations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          participant1_id: currentUser?.id,
           participant2_id: userId,
+          initial_message: `Hello! I'd like to start a conversation with @${userHandle}.`,
         }),
       });
 
@@ -492,7 +555,7 @@ function MessagesPageContent() {
     return { type: 'letter', src: null, fallback: letter.toUpperCase() };
   };
 
-  const filteredConnections = connections.filter(connection =>
+  const filteredConnections = connections?.filter(connection =>
     (() => {
       const q = searchQuery.trim().toLowerCase();
       if (!q) return true;
@@ -501,9 +564,9 @@ function MessagesPageContent() {
       const business = connection.business?.name?.toLowerCase() || '';
       return name.includes(q) || handle.includes(q) || business.includes(q);
     })()
-  );
+  ) || [];
 
-  const filteredConversations = conversations.filter(conversation => {
+  const filteredConversations = conversations?.filter(conversation => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return true;
     const anyConv: any = conversation as any;
@@ -513,7 +576,7 @@ function MessagesPageContent() {
     const email = (otherParticipant.email || '').toLowerCase();
     const lastMessage = (anyConv.last_message?.content || '').toLowerCase();
     return name.includes(q) || handle.includes(q) || email.includes(q) || lastMessage.includes(q);
-  });
+  }) || [];
 
   if (loading) {
     return (

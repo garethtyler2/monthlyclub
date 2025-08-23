@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { headers } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
+import { createUserConnectionsForSubscription } from "@/lib/utils";
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-05-28.basil",
@@ -183,6 +184,18 @@ export async function POST(req: Request) {
         console.error("Error initializing user credit:", creditError);
         // Don't fail the subscription for this, just log it
       }
+    }
+
+    // Create user connections for messaging
+    try {
+      await createUserConnectionsForSubscription(
+        userId,
+        productId,
+        businessId
+      );
+    } catch (error) {
+      console.error("Error creating user connections for messaging:", error);
+      // Don't fail the subscription for this, just log it
     }
 
     // Send subscription confirmation email
