@@ -1,0 +1,228 @@
+# Monthly Club - Cursor Rules
+
+## Project Overview
+Monthly Club is a subscription service platform for local service businesses. It helps businesses like cleaners, hairdressers, personal trainers, and other service providers create and manage recurring subscription plans.
+
+## Tech Stack
+- **Framework**: Next.js 15.2.4 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS 4.0.17
+- **UI Components**: Radix UI primitives with custom styling
+- **Database**: Supabase (PostgreSQL)
+- **Payments**: Stripe
+- **Authentication**: Supabase Auth
+- **Email**: Resend
+- **AI**: OpenAI GPT-4o-mini
+- **State Management**: React Query (@tanstack/react-query)
+- **Forms**: React Hook Form with Zod validation
+- **Icons**: Lucide React
+- **Animations**: Framer Motion
+
+## Code Style & Conventions
+
+### File Structure
+- Use Next.js App Router structure (`app/` directory)
+- Components go in `components/` with organized subdirectories
+- Business logic in `lib/` directory
+- Custom hooks in `hooks/` directory
+- Types in `types/` directory
+- API routes in `app/api/` following RESTful patterns
+
+### Component Patterns
+- Use functional components with TypeScript
+- Prefer `"use client"` directive for client-side components
+- Use React.forwardRef for components that need ref forwarding
+- Export components as default exports
+- Use PascalCase for component names and files
+
+### Styling Guidelines
+- Use Tailwind CSS classes for styling
+- Prefer the `cn()` utility from `@/lib/utils` for conditional classes
+- Use CSS variables for theming (defined in globals.css)
+- Follow the existing color scheme with brand-purple as primary
+- Use consistent spacing and sizing patterns
+- Prefer darker backgrounds over white (user preference)
+
+### Button Styling
+- Main call-to-action buttons should use the "hero-button-primary" class
+- Use the Button component from `@/components/ui/button` for consistency
+- Follow the existing button variants: default, destructive, outline, secondary, ghost, link
+
+### State Management
+- Use React Query for server state management
+- Use React hooks (useState, useEffect) for local component state
+- Prefer custom hooks for reusable stateful logic
+
+### API Patterns
+- Use Next.js API routes in `app/api/` directory
+- Follow RESTful conventions
+- Use proper HTTP status codes
+- Include error handling with try-catch blocks
+- Use NextResponse for API responses
+
+### Database Patterns
+- Use Supabase client for database operations
+- Prefer server-side operations when possible
+- Use proper TypeScript types for database entities
+- Handle loading and error states appropriately
+
+### Form Handling
+- Use React Hook Form for form management
+- Use Zod for validation schemas
+- Use the Form components from `@/components/ui/form`
+- Include proper error handling and user feedback
+
+### Error Handling
+- Use try-catch blocks for async operations
+- Provide meaningful error messages to users
+- Log errors to console for debugging
+- Use proper HTTP status codes in API responses
+
+### Performance
+- Use dynamic imports for code splitting when appropriate
+- Optimize images with Next.js Image component
+- Use React.memo for expensive components when needed
+- Prefer server components when possible
+
+### Accessibility
+- Use semantic HTML elements
+- Include proper ARIA labels
+- Ensure keyboard navigation works
+- Use proper color contrast ratios
+
+### Testing
+- Run tests fully in terminal without requiring manual interaction
+- Use proper test structure and naming conventions
+
+## Business Domain Knowledge
+
+### Core Concepts
+- **Businesses**: Service providers who offer subscription plans
+- **Products**: Individual subscription offerings (e.g., "Weekly Cleaning", "Monthly Haircut")
+- **Subscriptions**: Active customer subscriptions to products
+- **Handles**: Unique identifiers for businesses (like @username)
+- **Posts**: Business updates and announcements
+
+### Key Features
+- Business profile creation and management
+- Subscription plan creation and pricing
+- Customer subscription management
+- Payment processing through Stripe
+- Messaging system between users and businesses
+- AI-powered business summary generation
+- Dashboard for business owners and customers
+
+### User Types
+- **Business Owners**: Create and manage subscription plans
+- **Customers**: Subscribe to business services
+- **Both**: Can use messaging system
+
+## Common Patterns
+
+### Component Structure
+```tsx
+"use client";
+
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+interface ComponentProps {
+  // Define props with TypeScript
+}
+
+export default function ComponentName({ prop1, prop2 }: ComponentProps) {
+  const [state, setState] = useState();
+  
+  useEffect(() => {
+    // Side effects
+  }, []);
+
+  return (
+    <div className={cn("base-classes", conditionalClasses)}>
+      {/* Component content */}
+    </div>
+  );
+}
+```
+
+### API Route Structure
+```tsx
+import { NextResponse } from "next/server";
+
+export async function POST(req: Request) {
+  try {
+    const data = await req.json();
+    
+    // Process data
+    
+    return NextResponse.json({ success: true, data });
+  } catch (error) {
+    console.error("Error:", error);
+    return NextResponse.json({ error: "Error message" }, { status: 500 });
+  }
+}
+```
+
+### Database Query Pattern
+```tsx
+import { supabase } from "@/lib/supabase/client";
+
+const { data, error } = await supabase
+  .from('table_name')
+  .select('*')
+  .eq('column', value);
+
+if (error) {
+  console.error('Database error:', error);
+  return;
+}
+```
+
+## Specific Guidelines
+
+### When creating new components:
+1. Check if similar components exist first
+2. Use existing UI components from `@/components/ui/`
+3. Follow the established naming conventions
+4. Include proper TypeScript types
+5. Use consistent styling patterns
+
+### When working with forms:
+1. Use React Hook Form with Zod validation
+2. Include proper error handling
+3. Provide user feedback for form states
+4. Use the established form components
+
+### When working with API routes:
+1. Follow RESTful conventions
+2. Include proper error handling
+3. Use appropriate HTTP status codes
+4. Validate input data
+5. Use TypeScript for request/response types
+
+### When working with the database:
+1. Use Supabase client appropriately
+2. Handle loading and error states
+3. Use proper TypeScript types
+4. Consider security implications
+
+## File Naming Conventions
+- Components: PascalCase (e.g., `UserProfile.tsx`)
+- Pages: lowercase with hyphens (e.g., `create-a-business`)
+- API routes: lowercase with hyphens (e.g., `generate-business-summary`)
+- Utilities: camelCase (e.g., `formatDate.ts`)
+- Types: camelCase with `.ts` extension (e.g., `messaging.ts`)
+
+## Import Organization
+1. React and Next.js imports first
+2. Third-party library imports
+3. Internal component imports
+4. Utility and type imports
+5. Relative imports last
+
+## Comments and Documentation
+- Use JSDoc comments for complex functions
+- Include inline comments for non-obvious logic
+- Keep comments up-to-date with code changes
+- Use meaningful variable and function names instead of comments when possible

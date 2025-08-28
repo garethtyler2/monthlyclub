@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, Settings, LogOut, Plus, Home, BookOpen, Zap, DollarSign, Building2, CreditCard, Newspaper, ImagePlus, MessageCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import {
   DropdownMenu,
@@ -76,28 +77,6 @@ const Navbar = () => {
     getUser();
   }, []);
 
-  // Fetch unread message count when user changes
-  useEffect(() => {
-    if (user) {
-      fetchUnreadMessageCount();
-      // Set up interval to refresh unread count every 30 seconds
-      const interval = setInterval(fetchUnreadMessageCount, 30000);
-      
-      // Listen for messages being read
-      const handleMessagesRead = () => {
-        fetchUnreadMessageCount();
-      };
-      window.addEventListener('messagesRead', handleMessagesRead);
-      
-      return () => {
-        clearInterval(interval);
-        window.removeEventListener('messagesRead', handleMessagesRead);
-      };
-    } else {
-      setUnreadMessageCount(0);
-    }
-  }, [user]);
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -121,7 +100,7 @@ const Navbar = () => {
   const closeMenu = () => setIsMenuOpen(false);
 
   // Fetch unread message count
-  const fetchUnreadMessageCount = async () => {
+  const fetchUnreadMessageCount = useCallback(async () => {
     if (!user) return;
     
     try {
@@ -134,7 +113,29 @@ const Navbar = () => {
     } catch (error) {
       console.error('Error fetching unread message count:', error);
     }
-  };
+  }, [user]);
+
+  // Fetch unread message count when user changes
+  useEffect(() => {
+    if (user) {
+      fetchUnreadMessageCount();
+      // Set up interval to refresh unread count every 30 seconds
+      const interval = setInterval(fetchUnreadMessageCount, 30000);
+      
+      // Listen for messages being read
+      const handleMessagesRead = () => {
+        fetchUnreadMessageCount();
+      };
+      window.addEventListener('messagesRead', handleMessagesRead);
+      
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('messagesRead', handleMessagesRead);
+      };
+    } else {
+      setUnreadMessageCount(0);
+    }
+  }, [user, fetchUnreadMessageCount]);
 
   // Prevent body scrolling when menu is open
   useEffect(() => {
@@ -239,7 +240,7 @@ const Navbar = () => {
                     <div className="relative">
                       <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue ring-2 ring-white/20 group-hover:ring-brand-purple/50 transition-all duration-200">
                         {businessImageUrl ? (
-                          <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
+                          <Image src={businessImageUrl} alt={businessName ?? "Business"} width={40} height={40} className="rounded-full object-cover w-full h-full" />
                         ) : (
                           <AvatarFallback className="text-white font-semibold">
                             {businessName ? businessName.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
@@ -255,7 +256,7 @@ const Navbar = () => {
                       <div className="flex items-center space-x-3">
                         <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue w-10 h-10">
                           {businessImageUrl ? (
-                            <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
+                            <Image src={businessImageUrl} alt={businessName ?? "Business"} width={40} height={40} className="rounded-full object-cover w-full h-full" />
                           ) : (
                             <AvatarFallback className="text-white font-semibold">
                               {businessName ? businessName.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
@@ -432,7 +433,7 @@ const Navbar = () => {
             {user ? (
               <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue w-8 h-8">
                 {businessImageUrl ? (
-                  <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
+                  <Image src={businessImageUrl} alt={businessName ?? "Business"} width={32} height={32} className="rounded-full object-cover w-full h-full" />
                 ) : (
                   <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
                 )}
@@ -476,7 +477,7 @@ const Navbar = () => {
                         >
                           <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue w-10 h-10">
                             {businessImageUrl ? (
-                              <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
+                              <Image src={businessImageUrl} alt={businessName ?? "Business"} width={32} height={32} className="rounded-full object-cover w-full h-full" />
                             ) : (
                               <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
                             )}
@@ -494,7 +495,7 @@ const Navbar = () => {
                         <>
                           <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue w-10 h-10">
                             {businessImageUrl ? (
-                              <img src={businessImageUrl} alt={businessName ?? "Business"} className="rounded-full object-cover w-full h-full" />
+                              <Image src={businessImageUrl} alt={businessName ?? "Business"} width={32} height={32} className="rounded-full object-cover w-full h-full" />
                             ) : (
                               <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
                             )}

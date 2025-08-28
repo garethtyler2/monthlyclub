@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase/client";
+import Image from "next/image";
 
 export function EditBusinessModal({ business }: { business: any }) {
   const router = useRouter();
@@ -145,9 +146,11 @@ export function EditBusinessModal({ business }: { business: any }) {
         {editImageUrl && (
           <div className="flex justify-center mb-4 relative group">
             <label className="cursor-pointer">
-              <img
+              <Image
                 src={newImageFile ? URL.createObjectURL(newImageFile) : editImageUrl}
                 alt="Business preview"
+                width={96}
+                height={96}
                 className="w-24 h-24 object-cover rounded-full border"
               />
               <div className="text-center mt-2">

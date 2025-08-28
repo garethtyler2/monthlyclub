@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { Conversation, Message, UserConnection } from '@/types/messaging';
@@ -13,6 +13,7 @@ import { Search, Send, Image as ImageIcon, Plus, X, MessageCircle } from 'lucide
 import { Check, CheckCheck } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Textarea } from '@/components/ui/textarea';
+import Image from 'next/image';
 
 function MessagesPageContent() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -40,6 +41,98 @@ function MessagesPageContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const getCurrentUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setCurrentUser(user);
+  };
+
+  const fetchConversations = useCallback(async () => {
+    try {
+      const response = await fetch('/api/messaging/conversations');
+      const data = await response.json();
+      if (response.ok) {
+        setConversations(data.conversations);
+      }
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchConnections = async () => {
+    try {
+      const response = await fetch('/api/messaging/connections');
+      const data = await response.json();
+      if (response.ok) {
+        setConnections(data.connections);
+      }
+    } catch (error) {
+      console.error('Error fetching connections:', error);
+    }
+  };
+
+  const fetchMessages = useCallback(async (conversationId: string) => {
+    console.log('fetchMessages called with conversationId:', conversationId);
+    try {
+      const response = await fetch(`/api/messaging/messages?conversation_id=${conversationId}`);
+      const data = await response.json();
+      if (response.ok) {
+        console.log('Fetched messages:', data.messages);
+        setMessages(data.messages);
+        // Refresh conversations to update unread counts
+        console.log('Refreshing conversations after fetching messages');
+        fetchConversations();
+        // Notify navbar to refresh unread count
+        window.dispatchEvent(new CustomEvent('messagesRead'));
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  }, [fetchConversations]);
+
+  const startNewConversation = useCallback(async (connection: UserConnection) => {
+    try {
+      const response = await fetch('/api/messaging/conversations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          participant1_id: currentUser?.id,
+          participant2_id: connection.connected_user_id,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Fetch the conversation with full participant details
+        const convResponse = await fetch(`/api/messaging/conversations/${data.conversation.id}`);
+        if (convResponse.ok) {
+          const convData = await convResponse.json();
+          setSelectedConversation(convData.conversation);
+        } else {
+          setSelectedConversation(data.conversation);
+        }
+        
+        setShowNewChat(false);
+        await fetchConversations();
+        
+        // Notify navbar to refresh unread count
+        window.dispatchEvent(new CustomEvent('messagesRead'));
+        
+        // Clear URL parameters after starting conversation
+        const url = new URL(window.location.href);
+        url.searchParams.delete('business');
+        url.searchParams.delete('customer');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch (error) {
+      console.error('Error starting conversation:', error);
+    }
+  }, [currentUser?.id, fetchConversations]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -66,7 +159,7 @@ function MessagesPageContent() {
       window.removeEventListener('resize', checkMobile);
       window.removeEventListener('focus', handleFocus);
     };
-  }, []);
+  }, [fetchConversations]);
 
   useEffect(() => {
     if (selectedConversation) {
@@ -97,7 +190,7 @@ function MessagesPageContent() {
         subscription.unsubscribe();
       };
     }
-  }, [selectedConversation]);
+  }, [selectedConversation, fetchMessages]);
 
   // Set up global real-time subscription for new messages
   useEffect(() => {
@@ -129,7 +222,7 @@ function MessagesPageContent() {
         subscription.unsubscribe();
       };
     }
-  }, [currentUser, selectedConversation]);
+  }, [currentUser, selectedConversation, fetchConversations]);
 
   useEffect(() => {
     // Handle URL parameters for starting conversations
@@ -149,57 +242,7 @@ function MessagesPageContent() {
         startNewConversation(connection);
       }
     }
-  }, [searchParams, currentUser, connections]);
-
-  const getCurrentUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setCurrentUser(user);
-  };
-
-  const fetchConversations = async () => {
-    try {
-      const response = await fetch('/api/messaging/conversations');
-      const data = await response.json();
-      if (response.ok) {
-        setConversations(data.conversations);
-      }
-    } catch (error) {
-      console.error('Error fetching conversations:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchConnections = async () => {
-    try {
-      const response = await fetch('/api/messaging/connections');
-      const data = await response.json();
-      if (response.ok) {
-        setConnections(data.connections);
-      }
-    } catch (error) {
-      console.error('Error fetching connections:', error);
-    }
-  };
-
-  const fetchMessages = async (conversationId: string) => {
-    console.log('fetchMessages called with conversationId:', conversationId);
-    try {
-      const response = await fetch(`/api/messaging/messages?conversation_id=${conversationId}`);
-      const data = await response.json();
-      if (response.ok) {
-        console.log('Fetched messages:', data.messages);
-        setMessages(data.messages);
-        // Refresh conversations to update unread counts
-        console.log('Refreshing conversations after fetching messages');
-        fetchConversations();
-        // Notify navbar to refresh unread count
-        window.dispatchEvent(new CustomEvent('messagesRead'));
-      }
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-    }
-  };
+  }, [searchParams, currentUser, connections, startNewConversation]);
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -345,48 +388,6 @@ function MessagesPageContent() {
       alert('Failed to send message');
     } finally {
       setUploadingImage(false);
-    }
-  };
-
-  const startNewConversation = async (connection: UserConnection) => {
-    try {
-      const response = await fetch('/api/messaging/conversations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          participant1_id: currentUser?.id,
-          participant2_id: connection.connected_user_id,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Fetch the conversation with full participant details
-        const convResponse = await fetch(`/api/messaging/conversations/${data.conversation.id}`);
-        if (convResponse.ok) {
-          const convData = await convResponse.json();
-          setSelectedConversation(convData.conversation);
-        } else {
-          setSelectedConversation(data.conversation);
-        }
-        
-        setShowNewChat(false);
-        await fetchConversations();
-        
-        // Notify navbar to refresh unread count
-        window.dispatchEvent(new CustomEvent('messagesRead'));
-        
-        // Clear URL parameters after starting conversation
-        const url = new URL(window.location.href);
-        url.searchParams.delete('business');
-        url.searchParams.delete('customer');
-        window.history.replaceState({}, '', url.toString());
-      }
-    } catch (error) {
-      console.error('Error starting conversation:', error);
     }
   };
 
@@ -843,9 +844,11 @@ function MessagesPageContent() {
                     } rounded-2xl px-4 py-3`}>
                        {message.image_url ? (
                          <div className="space-y-2">
-                           <img 
+                           <Image 
                              src={message.image_url} 
                              alt="Message image" 
+                             width={300}
+                             height={200}
                              className="max-w-full h-auto rounded-lg"
                            />
                            {message.content && (
@@ -907,9 +910,11 @@ function MessagesPageContent() {
                      </Button>
                    </div>
                    <div className="flex items-center space-x-3">
-                     <img 
+                     <Image 
                        src={imagePreview} 
                        alt="Preview" 
+                       width={64}
+                       height={64}
                        className="h-16 w-16 object-cover rounded-lg border border-gray-200"
                      />
                      <div className="flex-1">
