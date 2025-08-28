@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "analyze": "ANALYZE=true npm run build",
+    "perf-check": "node scripts/performance-check.js",
     "generate-handles": "npx tsx scripts/generate-handles.ts",
     "populate-connections": "npx tsx scripts/populate-connections.ts",
     "add-handle-trigger": "echo 'Run this SQL in your Supabase SQL editor: scripts/add-handle-trigger.sql'",
