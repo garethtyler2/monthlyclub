@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { createStyledEmail } from './email-styles';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -160,53 +161,91 @@ export class EmailService {
 
   // User notifications
   static async sendWelcomeEmail(userEmail: string, userName?: string) {
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #6366f1;">Welcome to MonthlyClub! 🎉</h2>
-        <p>Hi ${userName || 'there'},</p>
-        <p>Welcome to MonthlyClub! We're excited to have you on board.</p>
-        <p>With MonthlyClub, you can:</p>
-        <ul>
-          <li>Discover amazing subscription services</li>
-          <li>Manage all your subscriptions in one place</li>
-          <li>Never miss a payment with our smart billing system</li>
-        </ul>
-        <p>Ready to get started? <a href="https://monthlyclubhq.com" style="color: #6366f1;">Browse our services</a></p>
-        <p>Best regards,<br>The MonthlyClub Team</p>
+    const html = createStyledEmail(`
+      <div class="email-header">
+        <div style="font-size: 28px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Monthly Club</div>
+        <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">The Future of Service Subscriptions</div>
       </div>
-    `;
+      
+      <div class="email-main">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <div class="email-badge">🎉 Welcome to Monthly Club</div>
+          <h1>Welcome to Monthly Club!</h1>
+          <h2>Hi ${userName || 'there'},</h2>
+        </div>
+        
+        <p>We're excited to have you on board! Monthly Club makes it easy to discover and manage amazing subscription services.</p>
+        
+        <div class="email-card">
+          <h3>🚀 What you can do with Monthly Club:</h3>
+          <ul style="color: #cbd5e1; padding-left: 20px;">
+            <li style="margin-bottom: 8px;">Discover amazing subscription services</li>
+            <li style="margin-bottom: 8px;">Manage all your subscriptions in one place</li>
+            <li style="margin-bottom: 8px;">Never miss a payment with our smart billing system</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="https://monthlyclubhq.com" class="email-button">Browse Our Services</a>
+        </div>
+        
+        <p style="text-align: center; color: #cbd5e1;">Best regards,<br><strong>The Monthly Club Team</strong></p>
+      </div>
+      
+      <div class="email-footer">
+        <p style="color: #94a3b8; font-size: 14px; margin: 4px 0; font-weight: 600;">Monthly Club</p>
+        <p style="color: #64748b; font-size: 12px; margin: 16px 0 0 0;">© ${new Date().getFullYear()} Monthly Club. All rights reserved.</p>
+      </div>
+    `, 'Welcome to Monthly Club');
 
     return this.sendEmail({
       to: userEmail,
-      subject: 'Welcome to MonthlyClub!',
+      subject: 'Welcome to Monthly Club!',
       html,
     });
   }
 
   static async sendSubscriptionConfirmation(data: SubscriptionNotification) {
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #10b981;">Subscription Confirmed! ✅</h2>
-        <p>Hi there,</p>
-        <p>Your subscription has been successfully set up!</p>
+    const html = createStyledEmail(`
+      <div class="email-header">
+        <div style="font-size: 28px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Monthly Club</div>
+        <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">The Future of Service Subscriptions</div>
+      </div>
+      
+      <div class="email-main">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <div class="email-badge">✅ Subscription Confirmed</div>
+          <h1>Subscription Confirmed!</h1>
+          <h2>Hi there,</h2>
+        </div>
         
-        <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <h3>Subscription Details</h3>
-          <ul>
-            <li><strong>Service:</strong> ${data.productName}</li>
-            <li><strong>Business:</strong> ${data.businessName}</li>
-            <li><strong>Amount:</strong> £${(data.amount / 100).toFixed(2)}</li>
-            <li><strong>Payment Day:</strong> ${data.paymentDay}${this.getOrdinalSuffix(data.paymentDay)} of each month</li>
-            <li><strong>Next Payment:</strong> ${this.getNextPaymentDate(data.paymentDay)}</li>
-          </ul>
+        <p>Your subscription has been successfully set up! You're now part of something special.</p>
+        
+        <div class="email-card">
+          <h3>📋 Subscription Details</h3>
+          <div style="color: #e2e8f0;">
+            <p style="margin-bottom: 12px;"><strong>Service:</strong> ${data.productName}</p>
+            <p style="margin-bottom: 12px;"><strong>Business:</strong> ${data.businessName}</p>
+            <p style="margin-bottom: 12px;"><strong>Amount:</strong> £${(data.amount / 100).toFixed(2)}</p>
+            <p style="margin-bottom: 12px;"><strong>Payment Day:</strong> ${data.paymentDay}${this.getOrdinalSuffix(data.paymentDay)} of each month</p>
+            <p style="margin-bottom: 0;"><strong>Next Payment:</strong> ${this.getNextPaymentDate(data.paymentDay)}</p>
+          </div>
         </div>
 
         <p>Your first payment will be taken on ${this.getNextPaymentDate(data.paymentDay)}.</p>
-        <p>You can manage your subscription anytime from your <a href="https://monthlyclubhq.com/dashboard/subscriptions" style="color: #6366f1;">dashboard</a>.</p>
         
-        <p>Best regards,<br>The MonthlyClub Team</p>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="https://monthlyclubhq.com/dashboard/subscriptions" class="email-button">Manage Subscription</a>
+        </div>
+        
+        <p style="text-align: center; color: #cbd5e1;">Best regards,<br><strong>The Monthly Club Team</strong></p>
       </div>
-    `;
+      
+      <div class="email-footer">
+        <p style="color: #94a3b8; font-size: 14px; margin: 4px 0; font-weight: 600;">Monthly Club</p>
+        <p style="color: #64748b; font-size: 12px; margin: 16px 0 0 0;">© ${new Date().getFullYear()} Monthly Club. All rights reserved.</p>
+      </div>
+    `, `Subscription Confirmed - ${data.productName}`);
 
     return this.sendEmail({
       to: data.userEmail,
@@ -216,40 +255,56 @@ export class EmailService {
   }
 
   static async sendPaymentNotification(data: PaymentNotification) {
-    const statusColor = data.status === 'success' ? '#10b981' : '#ef4444';
     const statusIcon = data.status === 'success' ? '✅' : '❌';
     const statusText = data.status === 'success' ? 'Successful' : 'Failed';
+    const badgeColor = data.status === 'success' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)';
 
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: ${statusColor};">Payment ${statusText} ${statusIcon}</h2>
-        <p>Hi there,</p>
-        <p>Your payment has been processed.</p>
+    const html = createStyledEmail(`
+      <div class="email-header">
+        <div style="font-size: 28px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Monthly Club</div>
+        <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">The Future of Service Subscriptions</div>
+      </div>
+      
+      <div class="email-main">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <div class="email-badge" style="border-color: ${badgeColor};">${statusIcon} Payment ${statusText}</div>
+          <h1>Payment ${statusText}!</h1>
+          <h2>Hi there,</h2>
+        </div>
         
-        <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <h3>Payment Details</h3>
-          <ul>
-            <li><strong>Service:</strong> ${data.productName}</li>
-            <li><strong>Business:</strong> ${data.businessName}</li>
-            <li><strong>Amount:</strong> £${(data.amount / 100).toFixed(2)}</li>
-            <li><strong>Date:</strong> ${data.paymentDate}</li>
-            <li><strong>Status:</strong> ${statusText}</li>
-            ${data.failureReason ? `<li><strong>Reason:</strong> ${data.failureReason}</li>` : ''}
-          </ul>
+        <p>Your payment has been processed. ${data.status === 'success' ? 'Thank you for your payment!' : 'We encountered an issue with your payment.'}</p>
+        
+        <div class="email-card">
+          <h3>💳 Payment Details</h3>
+          <div style="color: #e2e8f0;">
+            <p style="margin-bottom: 12px;"><strong>Service:</strong> ${data.productName}</p>
+            <p style="margin-bottom: 12px;"><strong>Business:</strong> ${data.businessName}</p>
+            <p style="margin-bottom: 12px;"><strong>Amount:</strong> £${(data.amount / 100).toFixed(2)}</p>
+            <p style="margin-bottom: 12px;"><strong>Date:</strong> ${data.paymentDate}</p>
+            <p style="margin-bottom: 12px;"><strong>Status:</strong> ${statusText}</p>
+            ${data.failureReason ? `<p style="margin-bottom: 0;"><strong>Reason:</strong> ${data.failureReason}</p>` : ''}
+          </div>
         </div>
 
         ${data.status === 'failed' ? `
-          <p style="color: #ef4444; font-weight: bold;">
-            Your payment failed. Please update your payment method in your 
-            <a href="https://monthlyclubhq.com/dashboard/subscriptions" style="color: #6366f1;">dashboard</a>.
-          </p>
-        ` : `
-          <p>Thank you for your payment!</p>
-        `}
+          <div class="email-card" style="border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1);">
+            <h3 style="color: #ef4444;">⚠️ Action Required</h3>
+            <p style="color: #e2e8f0;">Your payment failed. Please update your payment method in your dashboard to continue your subscription.</p>
+          </div>
+        ` : ''}
         
-        <p>Best regards,<br>The MonthlyClub Team</p>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="https://monthlyclubhq.com/dashboard/subscriptions" class="email-button">${data.status === 'success' ? 'View Dashboard' : 'Update Payment Method'}</a>
+        </div>
+        
+        <p style="text-align: center; color: #cbd5e1;">Best regards,<br><strong>The Monthly Club Team</strong></p>
       </div>
-    `;
+      
+      <div class="email-footer">
+        <p style="color: #94a3b8; font-size: 14px; margin: 4px 0; font-weight: 600;">Monthly Club</p>
+        <p style="color: #64748b; font-size: 12px; margin: 16px 0 0 0;">© ${new Date().getFullYear()} Monthly Club. All rights reserved.</p>
+      </div>
+    `, `Payment ${statusText} - ${data.productName}`);
 
     return this.sendEmail({
       to: data.userEmail,
@@ -259,27 +314,51 @@ export class EmailService {
   }
 
   static async sendSubscriptionCancelledEmail(userEmail: string, productName: string, businessName: string) {
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #6b7280;">Subscription Cancelled</h2>
-        <p>Hi there,</p>
-        <p>Your subscription has been cancelled as requested.</p>
+    const html = createStyledEmail(`
+      <div class="email-header">
+        <div style="font-size: 28px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Monthly Club</div>
+        <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">The Future of Service Subscriptions</div>
+      </div>
+      
+      <div class="email-main">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <div class="email-badge" style="border-color: rgba(107, 114, 128, 0.3);">📋 Subscription Cancelled</div>
+          <h1>Subscription Cancelled</h1>
+          <h2>Hi there,</h2>
+        </div>
         
-        <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <h3>Cancelled Subscription</h3>
-          <ul>
-            <li><strong>Service:</strong> ${productName}</li>
-            <li><strong>Business:</strong> ${businessName}</li>
-            <li><strong>Cancelled Date:</strong> ${new Date().toLocaleDateString()}</li>
-          </ul>
+        <p>Your subscription has been cancelled as requested. We're sorry to see you go!</p>
+        
+        <div class="email-card">
+          <h3>📋 Cancelled Subscription Details</h3>
+          <div style="color: #e2e8f0;">
+            <p style="margin-bottom: 12px;"><strong>Service:</strong> ${productName}</p>
+            <p style="margin-bottom: 12px;"><strong>Business:</strong> ${businessName}</p>
+            <p style="margin-bottom: 0;"><strong>Cancelled Date:</strong> ${new Date().toLocaleDateString()}</p>
+          </div>
         </div>
 
-        <p>You won't be charged any further payments for this service.</p>
-        <p>If you change your mind, you can always resubscribe from the business page.</p>
+        <div class="email-card" style="border-color: rgba(107, 114, 128, 0.3); background: rgba(107, 114, 128, 0.1);">
+          <h3>ℹ️ What happens next?</h3>
+          <ul style="color: #cbd5e1; padding-left: 20px;">
+            <li style="margin-bottom: 8px;">You won't be charged any further payments for this service</li>
+            <li style="margin-bottom: 8px;">Your access will continue until the end of your current billing period</li>
+            <li style="margin-bottom: 0;">You can always resubscribe from the business page if you change your mind</li>
+          </ul>
+        </div>
         
-        <p>Best regards,<br>The MonthlyClub Team</p>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="https://monthlyclubhq.com/dashboard/subscriptions" class="email-button-secondary">View Dashboard</a>
+        </div>
+        
+        <p style="text-align: center; color: #cbd5e1;">Best regards,<br><strong>The Monthly Club Team</strong></p>
       </div>
-    `;
+      
+      <div class="email-footer">
+        <p style="color: #94a3b8; font-size: 14px; margin: 4px 0; font-weight: 600;">Monthly Club</p>
+        <p style="color: #64748b; font-size: 12px; margin: 16px 0 0 0;">© ${new Date().getFullYear()} Monthly Club. All rights reserved.</p>
+      </div>
+    `, `Subscription Cancelled - ${productName}`);
 
     return this.sendEmail({
       to: userEmail,
@@ -290,27 +369,52 @@ export class EmailService {
 
   // Business notifications
   static async sendNewSubscriberNotification(data: BusinessNotification) {
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #10b981;">🎉 New Subscriber!</h2>
-        <p>Hi there,</p>
-        <p>Congratulations! You have a new subscriber to your service.</p>
+    const html = createStyledEmail(`
+      <div class="email-header">
+        <div style="font-size: 28px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Monthly Club</div>
+        <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">The Future of Service Subscriptions</div>
+      </div>
+      
+      <div class="email-main">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <div class="email-badge" style="border-color: rgba(34, 197, 94, 0.3);">🎉 New Subscriber!</div>
+          <h1>Congratulations!</h1>
+          <h2>You have a new subscriber!</h2>
+        </div>
         
-        <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <h3>New Subscription Details</h3>
-          <ul>
-            <li><strong>Service:</strong> ${data.productName}</li>
-            <li><strong>Customer Email:</strong> ${data.subscriberEmail}</li>
-            <li><strong>Subscription ID:</strong> ${data.subscriptionId}</li>
-            <li><strong>Date:</strong> ${new Date().toLocaleDateString()}</li>
-          </ul>
+        <p>Great news! Someone just subscribed to your service. This is the start of a recurring revenue stream for your business.</p>
+        
+        <div class="email-card">
+          <h3>📋 New Subscription Details</h3>
+          <div style="color: #e2e8f0;">
+            <p style="margin-bottom: 12px;"><strong>Service:</strong> ${data.productName}</p>
+            <p style="margin-bottom: 12px;"><strong>Customer Email:</strong> ${data.subscriberEmail}</p>
+            <p style="margin-bottom: 12px;"><strong>Subscription ID:</strong> ${data.subscriptionId}</p>
+            <p style="margin-bottom: 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+          </div>
         </div>
 
-        <p>You can view all your subscribers in your <a href="https://monthlyclubhq.com/dashboard/business" style="color: #6366f1;">business dashboard</a>.</p>
+        <div class="email-card" style="border-color: rgba(34, 197, 94, 0.3); background: rgba(34, 197, 94, 0.1);">
+          <h3 style="color: #22c55e;">💡 What's next?</h3>
+          <ul style="color: #cbd5e1; padding-left: 20px;">
+            <li style="margin-bottom: 8px;">Your customer will receive their first payment confirmation</li>
+            <li style="margin-bottom: 8px;">You can start posting updates to your subscriber feed</li>
+            <li style="margin-bottom: 0;">Track your growing subscriber base in your dashboard</li>
+          </ul>
+        </div>
         
-        <p>Best regards,<br>The MonthlyClub Team</p>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="https://monthlyclubhq.com/dashboard/business" class="email-button">View Business Dashboard</a>
+        </div>
+        
+        <p style="text-align: center; color: #cbd5e1;">Best regards,<br><strong>The Monthly Club Team</strong></p>
       </div>
-    `;
+      
+      <div class="email-footer">
+        <p style="color: #94a3b8; font-size: 14px; margin: 4px 0; font-weight: 600;">Monthly Club</p>
+        <p style="color: #64748b; font-size: 12px; margin: 16px 0 0 0;">© ${new Date().getFullYear()} Monthly Club. All rights reserved.</p>
+      </div>
+    `, `New Subscriber - ${data.productName}`);
 
     return this.sendEmail({
       to: data.businessEmail,
@@ -320,29 +424,53 @@ export class EmailService {
   }
 
   static async sendPaymentFailureNotification(data: PaymentFailureNotification) {
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #ef4444;">⚠️ Payment Failed</h2>
-        <p>Hi there,</p>
-        <p>A customer's payment has failed for your service.</p>
+    const html = createStyledEmail(`
+      <div class="email-header">
+        <div style="font-size: 28px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Monthly Club</div>
+        <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">The Future of Service Subscriptions</div>
+      </div>
+      
+      <div class="email-main">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <div class="email-badge" style="border-color: rgba(239, 68, 68, 0.3);">⚠️ Payment Failed</div>
+          <h1>Payment Failed</h1>
+          <h2>Hi there,</h2>
+        </div>
         
-        <div style="background: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444;">
-          <h3>Failed Payment Details</h3>
-          <ul>
-            <li><strong>Service:</strong> ${data.productName}</li>
-            <li><strong>Customer Email:</strong> ${data.customerEmail}</li>
-            <li><strong>Amount:</strong> £${(data.amount / 100).toFixed(2)}</li>
-            <li><strong>Failure Reason:</strong> ${data.failureReason}</li>
-            <li><strong>Date:</strong> ${new Date().toLocaleDateString()}</li>
-          </ul>
+        <p>A customer's payment has failed for your service. Don't worry - we'll automatically retry the payment next month.</p>
+        
+        <div class="email-card" style="border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1);">
+          <h3 style="color: #ef4444;">💳 Failed Payment Details</h3>
+          <div style="color: #e2e8f0;">
+            <p style="margin-bottom: 12px;"><strong>Service:</strong> ${data.productName}</p>
+            <p style="margin-bottom: 12px;"><strong>Customer Email:</strong> ${data.customerEmail}</p>
+            <p style="margin-bottom: 12px;"><strong>Amount:</strong> £${(data.amount / 100).toFixed(2)}</p>
+            <p style="margin-bottom: 12px;"><strong>Failure Reason:</strong> ${data.failureReason}</p>
+            <p style="margin-bottom: 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+          </div>
         </div>
 
-        <p>We'll automatically retry the payment next month. You don't need to take any action.</p>
-        <p>You can view all payment details in your <a href="https://monthlyclubhq.com/dashboard/business" style="color: #6366f1;">business dashboard</a>.</p>
+        <div class="email-card">
+          <h3>ℹ️ What happens next?</h3>
+          <ul style="color: #cbd5e1; padding-left: 20px;">
+            <li style="margin-bottom: 8px;">We'll automatically retry the payment next month</li>
+            <li style="margin-bottom: 8px;">Your customer will be notified to update their payment method</li>
+            <li style="margin-bottom: 0;">You don't need to take any action - we handle this automatically</li>
+          </ul>
+        </div>
         
-        <p>Best regards,<br>The MonthlyClub Team</p>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="https://monthlyclubhq.com/dashboard/business" class="email-button-secondary">View Business Dashboard</a>
+        </div>
+        
+        <p style="text-align: center; color: #cbd5e1;">Best regards,<br><strong>The Monthly Club Team</strong></p>
       </div>
-    `;
+      
+      <div class="email-footer">
+        <p style="color: #94a3b8; font-size: 14px; margin: 4px 0; font-weight: 600;">Monthly Club</p>
+        <p style="color: #64748b; font-size: 12px; margin: 16px 0 0 0;">© ${new Date().getFullYear()} Monthly Club. All rights reserved.</p>
+      </div>
+    `, `Payment Failed - ${data.productName}`);
 
     return this.sendEmail({
       to: data.businessEmail,
@@ -368,46 +496,57 @@ export class EmailService {
         : messageContent;
 
     const businessInfo = businessContext 
-      ? `<p style="color: #6b7280; font-size: 14px; margin: 10px 0;">
-           <strong>Business:</strong> ${businessContext.name}
-         </p>`
+      ? `<div class="email-card" style="border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.1);">
+           <h3 style="color: #3b82f6;">🏢 Business Context</h3>
+           <p style="color: #e2e8f0; margin: 0;"><strong>Business:</strong> ${businessContext.name}</p>
+         </div>`
       : '';
 
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #6366f1;">💬 New Message from ${senderName}</h2>
-        <p>Hi there,</p>
-        <p>You have received a new message on MonthlyClub.</p>
+    const html = createStyledEmail(`
+      <div class="email-header">
+        <div style="font-size: 28px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Monthly Club</div>
+        <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">The Future of Service Subscriptions</div>
+      </div>
+      
+      <div class="email-main">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <div class="email-badge" style="border-color: rgba(59, 130, 246, 0.3);">💬 New Message</div>
+          <h1>New Message from ${senderName}</h1>
+          <h2>Hi there,</h2>
+        </div>
+        
+        <p>You have received a new message on Monthly Club. Don't miss out on important updates from your service providers!</p>
         
         ${businessInfo}
         
-        <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #6366f1;">
-          <h3>Message Preview</h3>
-          <p style="font-style: italic; color: #6b7280; margin: 0;">
+        <div class="email-card" style="border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.1);">
+          <h3 style="color: #3b82f6;">💬 Message Preview</h3>
+          <p style="font-style: italic; color: #cbd5e1; margin: 0; padding: 16px; background: rgba(15, 23, 42, 0.5); border-radius: 8px;">
             "${messageSnippet}"
           </p>
         </div>
 
-        <p style="text-align: center; margin: 30px 0;">
-          <a href="https://monthlyclubhq.com/messages" 
-             style="background: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">
-            View Message
-          </a>
-        </p>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="https://monthlyclubhq.com/messages" class="email-button">View Message</a>
+        </div>
 
-        <p style="font-size: 14px; color: #6b7280;">
-          You can visit your 
-          <a href="https://monthlyclubhq.com/messages" style="color: #6366f1;">messages page</a> 
-          to continue the conversation.
-        </p>
+        <div class="email-card">
+          <h3>💡 Stay Connected</h3>
+          <p style="color: #cbd5e1; margin: 0;">You can visit your <a href="https://monthlyclubhq.com/messages" style="color: #22d3ee;">messages page</a> to continue the conversation and stay updated with your service providers.</p>
+        </div>
         
-        <p>Best regards,<br>The MonthlyClub Team</p>
+        <p style="text-align: center; color: #cbd5e1;">Best regards,<br><strong>The Monthly Club Team</strong></p>
       </div>
-    `;
+      
+      <div class="email-footer">
+        <p style="color: #94a3b8; font-size: 14px; margin: 4px 0; font-weight: 600;">Monthly Club</p>
+        <p style="color: #64748b; font-size: 12px; margin: 16px 0 0 0;">© ${new Date().getFullYear()} Monthly Club. All rights reserved.</p>
+      </div>
+    `, `New message from ${senderName} - Monthly Club`);
 
     return this.sendEmail({
       to: recipientEmail,
-      subject: `New message from ${senderName} - MonthlyClub`,
+      subject: `New message from ${senderName} - Monthly Club`,
       html,
     });
   }
