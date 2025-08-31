@@ -38,6 +38,10 @@ export async function POST(req: Request) {
         console.log('Subscription cancellation email sent successfully');
         break;
       
+      case 'charge_notification':
+        await EmailService.sendChargeNotification(data);
+        break;
+      
       case 'new_subscriber': {
         // If businessEmail is not provided, derive the business owner's email from productId or businessId
         let businessEmail = data.businessEmail as string | undefined;

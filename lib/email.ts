@@ -552,6 +552,72 @@ export class EmailService {
     });
   }
 
+  // Charge notifications
+  static async sendChargeNotification(data: {
+    userEmail: string;
+    businessName: string;
+    productName: string;
+    chargeAmount: number;
+    reference: string;
+    remainingBalance: number;
+    chargeDate: string;
+  }) {
+    const html = createStyledEmail(`
+      <div class="email-header">
+        <div style="font-size: 28px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">Monthly Club</div>
+        <div style="font-size: 14px; color: #94a3b8; font-weight: 500;">The Future of Service Subscriptions</div>
+      </div>
+      
+      <div class="email-main">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <div class="email-badge" style="border-color: rgba(245, 158, 11, 0.3);">💳 Charge Applied</div>
+          <h1>You've been charged!</h1>
+          <h2>Hi there,</h2>
+        </div>
+        
+        <p>Your service provider has charged your balance builder fund for a service or product.</p>
+        
+        <div class="email-card">
+          <h3>💳 Charge Details</h3>
+          <div style="color: #e2e8f0;">
+            <p style="margin-bottom: 12px;"><strong>Business:</strong> ${data.businessName}</p>
+            <p style="margin-bottom: 12px;"><strong>Service:</strong> ${data.productName}</p>
+            <p style="margin-bottom: 12px;"><strong>Amount Charged:</strong> £${(data.chargeAmount / 100).toFixed(2)}</p>
+            <p style="margin-bottom: 12px;"><strong>Reference:</strong> ${data.reference}</p>
+            <p style="margin-bottom: 12px;"><strong>Date:</strong> ${data.chargeDate}</p>
+            <p style="margin-bottom: 0;"><strong>Remaining Balance:</strong> £${(data.remainingBalance / 100).toFixed(2)}</p>
+          </div>
+        </div>
+
+        <div class="email-card" style="border-color: rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.1);">
+          <h3 style="color: #f59e0b;">💡 What's next?</h3>
+          <ul style="color: #cbd5e1; padding-left: 20px;">
+            <li style="margin-bottom: 8px;">Your balance builder fund has been updated</li>
+            <li style="margin-bottom: 8px;">You can view your transaction history in your dashboard</li>
+            <li style="margin-bottom: 0;">Contact ${data.businessName} if you have any questions about this charge</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="https://monthlyclubhq.com/dashboard" class="email-button">View Dashboard</a>
+        </div>
+        
+        <p style="text-align: center; color: #cbd5e1;">Best regards,<br><strong>The Monthly Club Team</strong></p>
+      </div>
+      
+      <div class="email-footer">
+        <p style="color: #94a3b8; font-size: 14px; margin: 4px 0; font-weight: 600;">Monthly Club</p>
+        <p style="color: #64748b; font-size: 12px; margin: 16px 0 0 0;">© ${new Date().getFullYear()} Monthly Club. All rights reserved.</p>
+      </div>
+    `, `Charge Applied - ${data.businessName}`);
+
+    return this.sendEmail({
+      to: data.userEmail,
+      subject: `Charge Applied - ${data.businessName}`,
+      html,
+    });
+  }
+
   // Helper methods
   private static getOrdinalSuffix(day: number): string {
     if (day > 3 && day < 21) return 'th';

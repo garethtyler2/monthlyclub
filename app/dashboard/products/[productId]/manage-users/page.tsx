@@ -395,6 +395,44 @@ export default function ManageUsersPage() {
         return;
       }
 
+      // Send charge notification email to customer
+      try {
+        const { data: userProfile } = await supabase
+          .from('user_profiles')
+          .select('email')
+          .eq('id', selectedUserForCharge)
+          .single();
+
+        if (userProfile?.email) {
+          // Get business name
+          const { data: businessData } = await supabase
+            .from('businesses')
+            .select('name')
+            .eq('id', product.business_id)
+            .single();
+
+          await fetch('/api/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'charge_notification',
+              data: {
+                userEmail: userProfile.email,
+                businessName: businessData?.name || 'Unknown Business',
+                productName: product.name || 'Unknown Product',
+                chargeAmount: amount,
+                reference: chargeDescription,
+                remainingBalance: currentCredit.balance - amount,
+                chargeDate: new Date().toLocaleDateString()
+              }
+            })
+          });
+          console.log(`Charge notification email sent to ${userProfile.email}`);
+        }
+      } catch (emailError) {
+        console.error('Failed to send charge notification email:', emailError);
+      }
+
       setShowSuccessAnimation(true);
       setChargeAmount('');
       setChargeDescription('');
