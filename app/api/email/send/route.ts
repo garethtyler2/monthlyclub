@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         if (!businessEmail) {
           const supabase = await createClient();
 
-          // Prefer businessId, otherwise compute via productId
+          // Prefer businessId, otherwise compute via productId, or lookup by business name
           let ownerUserId: string | undefined;
           if (data.businessId) {
             const { data: biz } = await supabase
@@ -68,6 +68,16 @@ export async function POST(req: Request) {
             if (prod && (prod as any).businesses) {
               const biz = (prod as any).businesses as { name?: string; user_id?: string };
               businessName = businessName || biz.name;
+              ownerUserId = biz.user_id;
+            }
+          } else if (businessName) {
+            // Lookup business by name as fallback
+            const { data: biz } = await supabase
+              .from('businesses')
+              .select('id, name, user_id')
+              .eq('name', businessName)
+              .single();
+            if (biz) {
               ownerUserId = biz.user_id;
             }
           }

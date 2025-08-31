@@ -207,22 +207,14 @@ const Navbar = () => {
             </div>
 
             <div className="flex items-center space-x-3">
-              {(!hasBusiness && (
+              {((businessStatus === 'draft' || businessStatus === 'pre-stripe') && (
                 <button 
                   onClick={onCreateBusinessClick} 
-                  className="px-4 py-2 bg-gradient-to-r from-brand-purple to-brand-blue text-white text-sm font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
-                  Create Business
+                  Finish Setup
                 </button>
-              )) ||
-                ((businessStatus === 'draft' || businessStatus === 'pre-stripe') && (
-                  <button 
-                    onClick={onCreateBusinessClick} 
-                    className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl"
-                  >
-                    Finish Setup
-                  </button>
-                ))}
+              ))}
 
               {/* Desktop Create Post as its own nav item */}
               {user && businessId && (
@@ -576,13 +568,9 @@ const Navbar = () => {
                         <span className="font-medium text-sm">Guides</span>
                       </Link>
                     </div>
-                  </div>
-                )}
-
-                {/* Create Business Section - Show for logged out users or users without business */}
-                {(!user || (!hasBusiness && businessStatus === null)) && (
-                  <div className="mb-4">
-                    <div className="p-2.5 rounded-lg bg-gradient-to-r from-brand-purple/10 to-brand-blue/10 border border-white/10">
+                    
+                    {/* Create Business button for logged-out users */}
+                    <div className="mt-3 p-2.5 rounded-lg bg-gradient-to-r from-brand-purple/10 to-brand-blue/10 border border-white/10">
                       <button
                         onClick={() => {
                           onCreateBusinessClick();
@@ -596,6 +584,8 @@ const Navbar = () => {
                     </div>
                   </div>
                 )}
+
+
 
                 {/* My Posts + Create Post + Feed (above Business section) */}
                 {user && (

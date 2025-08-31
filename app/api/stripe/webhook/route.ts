@@ -209,35 +209,7 @@ export async function POST(req: Request) {
         })
       });
 
-      // Send new subscriber notification to business owner email
-      if (businessData) {
-        const ownerUserId = businessData.user_id;
-        const { data: ownerProfile } = await supabase
-          .from('user_profiles')
-          .select('email')
-          .eq('id', ownerUserId)
-          .single();
-
-        const ownerEmail = ownerProfile?.email || null;
-        if (ownerEmail) {
-          await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              type: 'new_subscriber',
-              data: {
-                businessEmail: ownerEmail,
-                businessName: businessData.name,
-                subscriberEmail: userProfile?.email || '',
-                productName: product.name || 'Unknown Product',
-                subscriptionId: purchase.id
-              }
-            })
-          });
-        } else {
-          console.warn('Owner email not found; skipping new subscriber notification');
-        }
-      }
+      // New subscriber notification is now sent from the success page to avoid duplication
     } catch (emailError) {
       console.error('Failed to send subscription emails:', emailError);
     }

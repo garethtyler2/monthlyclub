@@ -101,7 +101,25 @@ export default function SubscriptionSuccessPage() {
           .single();
 
         if (subscriptionData) {
-          // Email notifications are sent server-side via webhook to avoid duplicates and ensure delivery
+          // Send new subscriber notification to business owner
+          try {
+            await fetch('/api/email/send', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'new_subscriber',
+                data: {
+                  businessName: product.business?.name ?? "Unknown business",
+                  subscriberEmail: user.email || '',
+                  productName: product.name ?? "Unknown product",
+                  subscriptionId: subscriptionData.id
+                }
+              })
+            });
+            console.log('New subscriber notification sent');
+          } catch (emailError) {
+            console.error('Failed to send new subscriber notification:', emailError);
+          }
         }
       } catch (emailError) {
         console.error('Failed to send subscription emails:', emailError);
