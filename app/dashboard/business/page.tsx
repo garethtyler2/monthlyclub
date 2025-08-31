@@ -86,7 +86,7 @@ export default function BusinessDashboardPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-semibold text-white mb-4">Please log in to access your dashboard</h1>
-          <Button onClick={() => window.location.href = "/login"}>
+          <Button onClick={() => window.location.href = "/login"} variant="primary">
             Go to Login
           </Button>
         </div>
@@ -119,10 +119,10 @@ export default function BusinessDashboardPage() {
               {businessSlug && (
                 <>
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     size="sm"
                     onClick={() => window.open(`/businesses/${businessSlug}`, '_blank')}
-                    className="border-white/20 text-white hover:bg-white/10 w-full sm:w-auto"
+                    className="w-full sm:w-auto"
                   >
                     View Business Page
                   </Button>
@@ -158,7 +158,8 @@ export default function BusinessDashboardPage() {
                 <div className="w-full sm:w-auto">
                   <Button
                     onClick={handleVerifyClick}
-                    className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white"
+                    variant="primary"
+                    className="w-full sm:w-auto"
                   >
                     Verify Now
                   </Button>

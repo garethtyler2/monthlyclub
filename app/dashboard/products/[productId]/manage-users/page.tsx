@@ -787,23 +787,23 @@ export default function ManageUsersPage() {
                     {/* Expanded Actions + History */}
                     {expandedUserTransactions === sub.user_id && (
                       <div className="mt-3 pt-3 border-t border-white/10">
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          <Button size="sm" className="bg-white/10 text-white" onClick={() => { setSelectedUserForLog(sub.user_id); setShowLogModal(true); }}>
-                            Log Visit
-                          </Button>
-                          <Button size="sm" className="bg-blue-500 hover:bg-blue-600 text-white" onClick={() => {
+                        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mb-3">
+                          {product?.is_credit_builder && (
+                            <Button size="sm" variant="primary" onClick={() => { setSelectedUserForCharge(sub.user_id); setShowChargeModal(true); }}>
+                              Charge
+                            </Button>
+                          )}
+                          <Button size="sm" variant="secondary" onClick={() => {
                             // Navigate to messages page with this customer
                             window.location.href = `/messages?customer=${sub.user_id}`;
                           }}>
                             <MessageCircle className="w-4 h-4 mr-2" />
                             Message Customer
                           </Button>
-                          {product?.is_credit_builder && (
-                            <Button size="sm" className="bg-gradient-to-r from-green-500 to-emerald-500 hover:bg-green-700 text-white" onClick={() => { setSelectedUserForCharge(sub.user_id); setShowChargeModal(true); }}>
-                              Charge
-                            </Button>
-                          )}
-                          <Button size="sm" variant="destructive" onClick={() => { setSelectedSubId(sub.id); setShowCancelDialog(true); }}>
+                          <Button size="sm" variant="tertiary" onClick={() => { setSelectedUserForLog(sub.user_id); setShowLogModal(true); }}>
+                            Log Visit
+                          </Button>
+                          <Button size="sm" variant="danger" onClick={() => { setSelectedSubId(sub.id); setShowCancelDialog(true); }}>
                             Cancel
                           </Button>
                         </div>
@@ -991,13 +991,13 @@ export default function ManageUsersPage() {
             )}
           </div>
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setShowChargeModal(false)} className="border-white/20 text-white">
+            <Button variant="tertiary" onClick={() => setShowChargeModal(false)}>
               Cancel
             </Button>
             <Button 
               onClick={handleChargeCredit} 
               disabled={isCharging || !chargeAmount || !chargeDescription}
-              className="bg-gradient-to-r mb-2 from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+              variant="primary"
             >
               {isCharging ? 'Charging...' : 'Charge Credit'}
             </Button>
@@ -1015,10 +1015,10 @@ export default function ManageUsersPage() {
             Are you sure you want to cancel this subscription? This action cannot be undone.
           </p>
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setShowCancelDialog(false)} className="border-white/20 text-white">
+            <Button variant="tertiary" onClick={() => setShowCancelDialog(false)}>
               Keep Subscription
             </Button>
-            <Button variant="destructive" onClick={handleCancelSubscription} disabled={isCancelling}>
+            <Button variant="danger" onClick={handleCancelSubscription} disabled={isCancelling}>
               {isCancelling ? 'Cancelling...' : 'Confirm Cancel'}
             </Button>
           </DialogFooter>
@@ -1044,10 +1044,10 @@ export default function ManageUsersPage() {
             </div>
           </div>
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setShowLogModal(false)} className="border-white/20 text-white">
+            <Button variant="tertiary" onClick={() => setShowLogModal(false)}>
               Cancel
             </Button>
-            <Button onClick={handleLogVisit} disabled={isLogging || !selectedUserForLog} className="bg-gradient-to-r mb-2 from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 text-white">
+            <Button onClick={handleLogVisit} disabled={isLogging || !selectedUserForLog} variant="primary">
               {isLogging ? 'Saving...' : 'Log Visit'}
             </Button>
           </DialogFooter>

@@ -9,27 +9,37 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // PRIMARY - Main call-to-action buttons
+        primary: "bg-gradient-to-r from-brand-purple to-brand-blue text-white hover:from-brand-purple/90 hover:to-brand-blue/90 h-11 px-6",
+        
+        // SECONDARY - Important but not primary actions
+        secondary: "bg-blue-600/20 text-blue-300 border border-blue-500/30 hover:bg-blue-600/30 hover:border-blue-500/50",
+        
+        // TERTIARY - Less important actions, subtle styling
+        tertiary: "bg-transparent text-gray-300 border border-gray-500/30 hover:bg-gray-600/20 hover:text-gray-200 hover:border-gray-500/50",
+        
+        // DANGER - Destructive actions (delete, cancel, etc.)
+        danger: "bg-red-500/20 text-white hover:bg-[#b91c1c] border border-[#dc2626] hover:border-[#b91c1c]",
+        
+        // LEGACY VARIANTS (keeping for backward compatibility)
         default: "bg-primary text-primary-foreground text-white hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         hero: "hero-button-primary",
         heroSecondary: "hero-button-secondary",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        // Mobile-first sizing
+        sm: "h-8 px-3 text-xs", // Small buttons for mobile
+        default: "h-10 px-4 py-2", // Standard size
+        lg: "h-12 px-6 text-base", // Large buttons for desktop
+        icon: "h-10 w-10", // Icon-only buttons
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "primary",
       size: "default",
     },
   }

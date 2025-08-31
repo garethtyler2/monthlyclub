@@ -18,6 +18,9 @@ Monthly Club is a subscription service platform for local service businesses. It
 - **Icons**: Lucide React
 - **Animations**: Framer Motion
 
+Hosting on vercel
+Always add comments to code so I know what the code does and if another developer comes along they can also know. 
+
 ## Code Style & Conventions
 
 ### File Structure

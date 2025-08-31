@@ -593,7 +593,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                   </Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="ghost" size="sm" className="p-1 h-auto text-muted-foreground hover:text-white">
+                      <Button variant="tertiary" size="sm" className="p-1 h-auto">
                         <Info className="w-4 h-4" />
                       </Button>
                     </PopoverTrigger>

@@ -349,21 +349,10 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                         }}
                       />
                       
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-white/20 text-white hover:bg-white/10"
-                        onClick={() => setOpenSubId(sub.id)}
-                      >
-                        <Settings className="w-4 h-4 mr-2" />
-                        Change Payment Day
-                      </Button>
-                      
                       {product.is_credit_builder && (
                         <Button
                           size="sm"
-                          variant="outline"
-                          className="border-blue-500/20 text-blue-400 hover:bg-blue-500/10"
+                          variant="primary"
                           onClick={() => setChangeAmountSubId(sub.id)}
                         >
                           <PoundSterling className="w-4 h-4" />
@@ -373,8 +362,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                       
                       <Button
                         size="sm"
-                        variant="outline"
-                        className="border-green-500/20 text-green-400 hover:bg-green-500/10"
+                        variant="secondary"
                         onClick={() => {
                           // Navigate to messages page with this business
                           window.location.href = `/messages?business=${product.business?.id}`;
@@ -386,8 +374,16 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                       
                       <Button
                         size="sm"
-                        variant="outline"
-                        className="border-red-500/20 text-red-400 hover:bg-red-500/10"
+                        variant="tertiary"
+                        onClick={() => setOpenSubId(sub.id)}
+                      >
+                        <Settings className="w-4 h-4 mr-2" />
+                        Change Payment Day
+                      </Button>
+                      
+                      <Button
+                        size="sm"
+                        variant="danger"
                         onClick={() => setCancelSubId(sub.id)}
                       >
                         <XCircle className="w-4 h-4" />
