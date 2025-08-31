@@ -837,13 +837,21 @@ export default function ManageUsersPage() {
                                 txn => txn.related_subscription_id === sub.id
                               );
                               subscriptionCreditTransactions.forEach(txn => {
-                                allTransactions.push({
-                                  id: `credit-${txn.id}`,
-                                  date: new Date(txn.created_at),
-                                  type: txn.type === 'earned' ? 'credit_earned' : 'credit_spent',
-                                  amount: Math.abs(txn.amount),
-                                  description: txn.description
-                                });
+                                // Only show credit transactions that don't have a corresponding service event
+                                // (service events will show the better "Charged — [description]" format)
+                                const hasServiceEvent = serviceEventsByUser[sub.user_id]?.some(
+                                  ev => ev.notes === txn.description && ev.source === 'credit_charge'
+                                );
+                                
+                                if (!hasServiceEvent) {
+                                  allTransactions.push({
+                                    id: `credit-${txn.id}`,
+                                    date: new Date(txn.created_at),
+                                    type: txn.type === 'earned' ? 'credit_earned' : 'credit_spent',
+                                    amount: Math.abs(txn.amount),
+                                    description: txn.description
+                                  });
+                                }
                               });
                             }
 
