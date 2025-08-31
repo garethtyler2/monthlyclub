@@ -112,7 +112,8 @@ export default function SubscriptionSuccessPage() {
                   businessName: product.business?.name ?? "Unknown business",
                   subscriberEmail: user.email || '',
                   productName: product.name ?? "Unknown product",
-                  subscriptionId: subscriptionData.id
+                  subscriptionId: subscriptionData.id,
+                  price: displayPrice
                 }
               })
             });

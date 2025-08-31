@@ -43,6 +43,7 @@ export async function POST(req: Request) {
         const subscriberEmail = data.subscriberEmail as string | undefined;
         const productName = data.productName as string | undefined;
         const subscriptionId = data.subscriptionId as string | undefined;
+        const price = data.price as number | undefined;
 
         if (!businessEmail) {
           const supabase = await createClient();
@@ -99,15 +100,7 @@ export async function POST(req: Request) {
             subscriberEmail: subscriberEmail || 'unknown@unknown',
             productName: productName || 'Product',
             subscriptionId: subscriptionId || 'unknown',
-          });
-
-          // Send a copy to platform owner for monitoring
-          await EmailService.sendNewSubscriberNotification({
-            businessEmail: EmailService["OWNER_EMAIL" as keyof typeof EmailService] as unknown as string || 'gareth@monthlyclubhq.com',
-            businessName: businessName || 'Business',
-            subscriberEmail: subscriberEmail || 'unknown@unknown',
-            productName: productName || 'Product',
-            subscriptionId: subscriptionId || 'unknown',
+            price,
           });
           return NextResponse.json({ success: true });
         }

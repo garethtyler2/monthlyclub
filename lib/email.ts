@@ -46,6 +46,7 @@ export interface BusinessNotification {
   subscriberEmail: string;
   productName: string;
   subscriptionId: string;
+  price?: number;
 }
 
 export interface PaymentFailureNotification {
@@ -389,7 +390,7 @@ export class EmailService {
           <div style="color: #e2e8f0;">
             <p style="margin-bottom: 12px;"><strong>Service:</strong> ${data.productName}</p>
             <p style="margin-bottom: 12px;"><strong>Customer Email:</strong> ${data.subscriberEmail}</p>
-            <p style="margin-bottom: 12px;"><strong>Subscription ID:</strong> ${data.subscriptionId}</p>
+            ${data.price ? `<p style="margin-bottom: 12px;"><strong>Price:</strong> £${data.price.toFixed(2)}/month</p>` : ''}
             <p style="margin-bottom: 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
           </div>
         </div>
@@ -490,9 +491,9 @@ export class EmailService {
   ) {
     const isImageMessage = messageType === 'image';
     const messageSnippet = isImageMessage 
-      ? (messageContent ? `📷 Image with caption: "${messageContent}"` : '📷 Image')
-      : messageContent.length > 100 
-        ? `${messageContent.substring(0, 100)}...` 
+      ? (messageContent ? `📷 Image with caption: "${messageContent.substring(0, 50)}${messageContent.length > 50 ? '...' : ''}"` : '📷 Image')
+      : messageContent.length > 50 
+        ? `${messageContent.substring(0, 50)}...` 
         : messageContent;
 
     const businessInfo = businessContext 
