@@ -239,6 +239,19 @@ export default function ManageUsersPage() {
     setIsCancelling(true);
     const cancelledAt = new Date().toISOString();
 
+    // Get subscription details before cancelling
+    const { data: subscriptionData } = await supabase
+      .from('subscriptions')
+      .select(`
+        id,
+        user_id,
+        product_id,
+        products!inner(name, business_id),
+        businesses!inner(name)
+      `)
+      .eq('id', selectedSubId)
+      .single();
+
     const { data: subData, error: subError } = await supabase
       .from('subscriptions')
       .update({ status: 'cancelled', cancel_at: cancelledAt })
@@ -248,6 +261,35 @@ export default function ManageUsersPage() {
       .from('scheduled_payments')
       .update({ status: 'cancelled', cancel_at: cancelledAt })
       .eq('purchase_id', selectedSubId);
+
+    // Send cancellation email
+    if (!subError && !schedError && subscriptionData) {
+      try {
+        // Get user email
+        const { data: userData } = await supabase
+          .from('user_profiles')
+          .select('email')
+          .eq('id', subscriptionData.user_id)
+          .single();
+
+        if (userData?.email) {
+          await fetch('/api/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'subscription_cancelled',
+              data: {
+                userEmail: userData.email,
+                productName: (subscriptionData as any).products?.name || 'Unknown Product',
+                businessName: (subscriptionData as any).businesses?.name || 'Unknown Business'
+              }
+            })
+          });
+        }
+      } catch (emailError) {
+        console.error('Failed to send cancellation email:', emailError);
+      }
+    }
 
     setIsCancelling(false);
     setSelectedSubId(null);

@@ -30,17 +30,22 @@ export default function CancelSubscriptionModal({
     setLoading(true);
 
     // Get subscription details before cancelling
-    const { data: subscriptionData } = await supabase
+    const { data: subscriptionData, error: subscriptionDataError } = await supabase
         .from("subscriptions")
         .select(`
             id,
             user_id,
             product_id,
-            products(name, business_id),
-            businesses(name)
+            products!inner(
+                name, 
+                business_id,
+                businesses!inner(name)
+            )
         `)
         .eq("id", subscriptionId)
         .single();
+    
+    console.log('Subscription data query result:', { subscriptionData, subscriptionDataError });
 
     const { error: subError } = await supabase
         .from("subscriptions")
@@ -53,8 +58,10 @@ export default function CancelSubscriptionModal({
         .eq("purchase_id", subscriptionId);
 
     // Send cancellation email
+    console.log('Cancellation email check:', { subError, schedError, subscriptionData });
     if (!subError && !schedError && subscriptionData) {
         try {
+            console.log('Attempting to send cancellation email...');
             // Get user email
             const { data: userData } = await supabase
                 .from("user_profiles")
@@ -62,23 +69,30 @@ export default function CancelSubscriptionModal({
                 .eq("id", subscriptionData.user_id)
                 .single();
 
+            console.log('User data for email:', userData);
             if (userData?.email) {
-                await fetch('/api/email/send', {
+                console.log('Sending cancellation email to:', userData.email);
+                const emailResponse = await fetch('/api/email/send', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         type: 'subscription_cancelled',
                         data: {
                             userEmail: userData.email,
-                            productName: subscriptionData.products[0]?.name || 'Unknown Product',
-                            businessName: subscriptionData.businesses[0]?.name || 'Unknown Business'
+                            productName: (subscriptionData.products as any)?.name || 'Unknown Product',
+                            businessName: (subscriptionData.products as any)?.businesses?.name || 'Unknown Business'
                         }
                     })
                 });
+                console.log('Email API response:', emailResponse.status, await emailResponse.text());
+            } else {
+                console.log('No user email found, skipping email');
             }
         } catch (emailError) {
             console.error('Failed to send cancellation email:', emailError);
         }
+    } else {
+        console.log('Skipping email due to errors or missing data');
     }
 
     setLoading(false);

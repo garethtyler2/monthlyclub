@@ -33,7 +33,9 @@ export async function POST(req: Request) {
         break;
       
       case 'subscription_cancelled':
+        console.log('Received subscription_cancelled email request:', data);
         await EmailService.sendSubscriptionCancelledEmail(data.userEmail, data.productName, data.businessName);
+        console.log('Subscription cancellation email sent successfully');
         break;
       
       case 'new_subscriber': {

@@ -45,7 +45,7 @@ export async function GET() {
 
   const { data: scheduled, error: scheduledError } = await supabase
     .from("scheduled_payments")
-    .select("*, subscriptions(*), products(*, businesses(id, stripe_account_id, is_vip))")
+    .select("*, subscriptions(*), products(*, businesses(id, name, stripe_account_id, is_vip))")
     .eq("scheduled_for", today)
     .eq("status", "active");
 
@@ -226,6 +226,36 @@ export async function GET() {
 
       console.log(`PaymentIntent created: ${paymentIntent.id}`);
       console.log(`Successfully charged customer ${record.user_id}`);
+
+      // Send payment confirmation email to customer
+      try {
+        const { data: userProfile } = await supabase
+          .from('user_profiles')
+          .select('email')
+          .eq('id', record.user_id)
+          .single();
+
+        if (userProfile?.email) {
+          await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'payment_notification',
+              data: {
+                userEmail: userProfile.email,
+                businessName: business.name || 'Unknown Business',
+                productName: product.name,
+                amount: paymentIntent.amount,
+                status: 'success',
+                paymentDate: new Date().toLocaleDateString()
+              }
+            })
+          });
+          console.log(`Payment confirmation email sent to ${userProfile.email}`);
+        }
+      } catch (emailError) {
+        console.error('Failed to send payment confirmation email:', emailError);
+      }
     } catch (err) {
       console.error("Error processing payment for record:", record.id, err);
       const { error: insertFailureError } = await supabase.from("payments").insert({
@@ -256,6 +286,37 @@ export async function GET() {
         reason: `Error processing payment for record ${record.id}`,
         batch_id: batchId,
       });
+
+      // Send payment failure email to customer
+      try {
+        const { data: userProfile } = await supabase
+          .from('user_profiles')
+          .select('email')
+          .eq('id', record.user_id)
+          .single();
+
+        if (userProfile?.email) {
+          await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'payment_notification',
+              data: {
+                userEmail: userProfile.email,
+                businessName: record.products?.businesses?.name || 'Unknown Business',
+                productName: record.products?.name || 'Unknown Product',
+                amount: record.products?.price * 100 || 0,
+                status: 'failed',
+                failureReason: `Payment processing error: ${err}`,
+                paymentDate: new Date().toLocaleDateString()
+              }
+            })
+          });
+          console.log(`Payment failure email sent to ${userProfile.email}`);
+        }
+      } catch (emailError) {
+        console.error('Failed to send payment failure email:', emailError);
+      }
 
       skippedCount++;
       skipReasons.push(`Error processing payment for record ${record.id}`);
