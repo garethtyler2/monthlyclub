@@ -224,6 +224,16 @@ const Navbar = () => {
             </div>
 
             <div className="flex items-center space-x-3">
+              {/* Desktop Create Business button */}
+              {businessStatus === null && (
+                <button 
+                  onClick={onCreateBusinessClick} 
+                  className="px-4 py-2 bg-gradient-to-r from-brand-purple to-brand-blue text-white text-sm font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Create Business
+                </button>
+              )}
+
               {((businessStatus === 'draft' || businessStatus === 'pre-stripe') && (
                 <button 
                   onClick={onCreateBusinessClick} 
