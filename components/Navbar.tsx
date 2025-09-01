@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Settings, LogOut, Plus, Home, BookOpen, Zap, DollarSign, Building2, CreditCard, Newspaper, ImagePlus, MessageCircle } from "lucide-react";
+import { Menu, X, User, Settings, LogOut, Plus, Home, BookOpen, Zap, DollarSign, Building2, CreditCard, Newspaper, ImagePlus, MessageCircle, Shield } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import {
@@ -32,6 +32,7 @@ const Navbar = () => {
   const isMobile = useIsMobile();
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const [isAdmin, setIsAdmin] = useState(false);
   
   // Create Post Modal
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -71,6 +72,22 @@ const Navbar = () => {
         if (subData && subData.length > 0) {
           setHasSubscriptions(true);
         }
+
+        // Check if user is admin
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        // Check if user has admin privileges
+        const adminEmails = ['gareth@monthlyclubhq.com']; // Add your admin emails
+        const adminHandles = ['admin', 'gareth']; // Add your admin handles
+        
+        const isAdminUser = adminEmails.includes(user.email || '') || 
+                           adminHandles.includes(profile?.handle || '');
+        
+        setIsAdmin(isAdminUser);
       }
     };
 
@@ -367,6 +384,23 @@ const Navbar = () => {
                             <span>Payment Details - Stripe</span>
                           </button>
                         </DropdownMenuItem>
+                      </>
+                    )}
+
+                    {/* Admin Section */}
+                    {isAdmin && (
+                      <>
+                        <div className="border-t border-white/10 mt-2 pt-2">
+                          <div className="px-3 pb-1">
+                            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Admin</div>
+                          </div>
+                          <DropdownMenuItem asChild className="px-3 py-2 hover:bg-white/5">
+                            <Link href="/overwatch" className="flex items-center space-x-2 text-sm">
+                              <Shield size={16} className="text-muted-foreground" />
+                              <span>Admin Dashboard</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        </div>
                       </>
                     )}
 

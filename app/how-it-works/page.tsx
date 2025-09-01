@@ -463,7 +463,7 @@ const HowItWorks = () => {
                   <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-600/30 max-w-md mx-auto">
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground mb-2">Your Business Link</p>
-                      <p className="font-mono text-primary font-medium">monthlyclub.com/s/hair-salon</p>
+                      <p className="font-mono text-primary font-medium">monthlyclubhq.com/s/hair-salon</p>
                     </div>
                   </div>
                   
