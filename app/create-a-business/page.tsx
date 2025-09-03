@@ -707,7 +707,6 @@ export default function CreateBusinessPage() {
                         value={product.name}
                         onChange={(e) => handleProductChange(index, "name", e.target.value)}
                         placeholder="Product Name"
-                        disabled={product.product_type === 'balance_builder'}
                       />
                     </div>
                     <div>
@@ -717,7 +716,6 @@ export default function CreateBusinessPage() {
                         value={product.description}
                         onChange={(e) => handleProductChange(index, "description", e.target.value)}
                         placeholder="Product Description"
-                        disabled={product.product_type === 'balance_builder'}
                       />
                     </div>
                     {requiresPrice(product.product_type) && (

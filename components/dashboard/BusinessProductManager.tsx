@@ -565,6 +565,11 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                 <DialogTitle className="text-white">Add New Product</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
+                <ProductTypeSelector
+                  selectedType={addForm.product_type || 'standard'}
+                  onTypeChange={(newType) => updateAddForm('product_type', newType)}
+                  className="mb-4"
+                />
                 <div className="space-y-2">
                   <Label htmlFor="add-name" className="text-sm font-medium text-white">Name</Label>
                   <Input
@@ -572,7 +577,6 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                     value={addForm.name || ''}
                     onChange={(e) => updateAddForm('name', e.target.value)}
                     placeholder="Product name"
-                    disabled={addForm.product_type === 'balance_builder'}
                     className="bg-white/5 border-white/10 text-white"
                   />
                 </div>
@@ -584,14 +588,8 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                     onChange={(e) => updateAddForm('description', e.target.value)}
                     placeholder="Product description"
                     className="min-h-[100px] bg-white/5 border-white/10 text-white"
-                    disabled={addForm.product_type === 'balance_builder'}
                   />
                 </div>
-                <ProductTypeSelector
-                  selectedType={addForm.product_type || 'standard'}
-                  onTypeChange={(newType) => updateAddForm('product_type', newType)}
-                  className="mb-4"
-                />
                 {requiresPrice(addForm.product_type || 'standard') && (
                   <div className="space-y-2">
                     <Label htmlFor="add-price" className="text-sm font-medium text-white">

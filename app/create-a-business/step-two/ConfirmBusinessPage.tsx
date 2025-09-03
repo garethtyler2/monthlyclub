@@ -261,6 +261,11 @@ export default function ConfirmBusinessPage() {
                           <Trash className="w-4 h-4" />
                         </button>
                       </div>
+                      <ProductTypeSelector
+                        selectedType={product.product_type}
+                        onTypeChange={(newType) => handleProductTypeChange(index, newType)}
+                        className="mb-4"
+                      />
                       <div>
                         <label className="text-sm font-semibold text-white">Product Name</label>
                         <Input
@@ -268,7 +273,6 @@ export default function ConfirmBusinessPage() {
                           value={product.name}
                           onChange={(e) => handleProductChange(index, "name", e.target.value)}
                           placeholder="Product Name"
-                          disabled={product.product_type === 'balance_builder'}
                         />
                       </div>
                       <div>
@@ -278,14 +282,8 @@ export default function ConfirmBusinessPage() {
                           value={product.description}
                           onChange={(e) => handleProductChange(index, "description", e.target.value)}
                           placeholder="Product Description"
-                          disabled={product.product_type === 'balance_builder'}
                         />
                       </div>
-                      <ProductTypeSelector
-                        selectedType={product.product_type}
-                        onTypeChange={(newType) => handleProductTypeChange(index, newType)}
-                        className="mb-4"
-                      />
                       {requiresPrice(product.product_type) && (
                         <div>
                           <label className="text-sm font-semibold text-white">
