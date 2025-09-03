@@ -5,6 +5,14 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-05-28.basil",
 });
+
+// Check if we're in development and using live mode
+const isDevelopment = process.env.NODE_ENV === "development";
+const isLiveMode = process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_");
+
+if (isDevelopment && isLiveMode) {
+  console.warn("⚠️ Warning: Using live Stripe key in development mode. This may cause issues.");
+}
 console.log("🚀 API route hit");
 export async function POST(req: Request) {
   const supabase = createClient(
@@ -74,6 +82,14 @@ export async function POST(req: Request) {
       console.log("✅ Stripe account created:", account.id);
     } catch (err) {
       console.error("❌ Stripe account creation failed:", err);
+      
+      // Check if it's a live mode error
+      if (err instanceof Error && err.message.includes("Livemode requests must always be redirected via HTTPS")) {
+        return NextResponse.json({ 
+          error: "Development environment detected. Please use Stripe test keys for development." 
+        }, { status: 500 });
+      }
+      
       return NextResponse.json({ error: "Stripe account creation failed" }, { status: 500 });
     }
 

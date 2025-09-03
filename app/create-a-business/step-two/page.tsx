@@ -1,10 +1,5 @@
-import { Suspense } from "react";
-import ConfirmBusinessPage from "./ConfirmBusinessPage";
+import { redirect } from 'next/navigation';
 
-export default function ConfirmBusinessPageWrapper() {
-  return (
-    <Suspense fallback={<div className="p-6">Loading...</div>}>
-      <ConfirmBusinessPage />
-    </Suspense>
-  );
+export default function StepTwoRedirect() {
+  redirect('/create-a-business');
 }

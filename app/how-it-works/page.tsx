@@ -522,7 +522,7 @@ const HowItWorks = () => {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="hero-button-primary">
-                <Link href="/create-a-business/step-one">
+                <Link href="/create-a-business">
                   Get Started Today
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
@@ -624,7 +624,7 @@ const HowItWorks = () => {
                 Your success story starts today.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-               <Link href="/create-a-business/step-one">
+                               <Link href="/create-a-business">
                 <Button className="hero-button-primary bg-white text-primary hover:bg-white/90">
                   Start Creating Now
                   <Sparkles className="w-5 h-5 ml-2" />

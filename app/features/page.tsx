@@ -167,7 +167,7 @@ const FeaturesPage = () => {
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
                   </Link>
-                  <Link href="/create-a-business/step-one">
+                  <Link href="/create-a-business">
                     <Button className="hero-button-primary">
                       Start Your Club
                       <ArrowRight className="w-5 h-5 ml-2" />

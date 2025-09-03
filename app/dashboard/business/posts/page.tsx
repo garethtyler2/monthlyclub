@@ -30,7 +30,7 @@ export default async function BusinessPostsPage() {
         <h1 className="text-2xl font-semibold mb-4">My Posts</h1>
         <p className="text-muted-foreground">You don't have a business yet.</p>
         <div className="mt-4">
-          <Link href="/create-a-business/step-one" className="underline">Create a business</Link>
+                          <Link href="/create-a-business" className="underline">Create a business</Link>
         </div>
       </section>
     );

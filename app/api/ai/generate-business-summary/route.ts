@@ -18,29 +18,20 @@ export async function POST(req: Request) {
         },
         {
           role: "user",
-          content: `Please summarize the business below and extract up to 3 subscription products from the user's paragraph.
+          content: `Please create a polished, professional business summary based on the user's description.
 
 Business Name: ${businessName}
 Paragraph: ${paragraph}
 
 🧠 Instructions:
-- Write a concise, friendly business summary.
-- Extract up to 3 products.
-- Each product should include:
-  - A short, clear name (e.g., "Weekly Cleaning")
-  - A 1–2 sentence description
-  - A monthly price (number only, no currency)
+- Write a concise, friendly, and professional business summary
+- Keep the same key information but make it more polished and engaging
+- Focus on what makes the business unique and valuable
+- Use clear, compelling language that would appeal to potential customers
 
 📦 Return only valid JSON in this format:
 {
-  "summary": "Business summary here...",
-  "products": [
-    {
-      "name": "Option 1",
-      "description": "Description...",
-      "price": 25
-    }
-  ]
+  "summary": "Polished business summary here..."
 }`,
         },
       ],
@@ -52,22 +43,9 @@ Paragraph: ${paragraph}
             type: "object",
             additionalProperties: false,
             properties: {
-              summary: { type: "string" },
-              products: {
-                type: "array",
-                items: {
-                  type: "object",
-                  additionalProperties: false,
-                  properties: {
-                    name: { type: "string" },
-                    description: { type: "string" },
-                    price: { type: "number" }
-                  },
-                  required: ["name", "description", "price"]
-                }
-              }
+              summary: { type: "string" }
             },
-            required: ["summary", "products"]
+            required: ["summary"]
           },
         },
       },

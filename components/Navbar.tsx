@@ -108,9 +108,17 @@ const Navbar = () => {
 
   const onCreateBusinessClick = () => {
     if (!user) {
-      window.location.href = "/login?redirect=/create-a-business/step-one";
+      window.location.href = "/login?redirect=/create-a-business";
     } else {
-      window.location.href = "/create-a-business/step-one";
+      window.location.href = "/create-a-business";
+    }
+  };
+
+  const onFinishSetupClick = () => {
+    if (!user) {
+      window.location.href = "/login?redirect=/create-a-business";
+    } else {
+      window.location.href = "/create-a-business";
     }
   };
 
@@ -236,7 +244,7 @@ const Navbar = () => {
 
               {((businessStatus === 'draft' || businessStatus === 'pre-stripe') && (
                 <button 
-                  onClick={onCreateBusinessClick} 
+                  onClick={onFinishSetupClick} 
                   className="px-4 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-medium rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   Finish Setup
@@ -297,7 +305,7 @@ const Navbar = () => {
                     {businessStatus === null && (
                       <div className="px-3 py-2">
                         <button 
-                          onClick={() => handleRedirect("/create-a-business/step-one")}
+                          onClick={() => handleRedirect("/create-a-business")}
                           className="w-full flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-brand-purple to-brand-blue text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
                         >
                           <Plus size={16} />
@@ -308,7 +316,7 @@ const Navbar = () => {
                     {(businessStatus === "draft" || businessStatus === "pre-stripe") && (
                       <div className="px-3 py-2">
                         <button 
-                          onClick={() => handleRedirect("/create-a-business/step-one")}
+                          onClick={() => handleRedirect("/create-a-business")}
                           className="w-full flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-orange-500 to-red-500 text-white text-sm font-medium rounded-lg hover:opacity-90 transition-opacity"
                         >
                           <Settings size={16} />
@@ -565,7 +573,7 @@ const Navbar = () => {
                       {(businessStatus === "draft" || businessStatus === "pre-stripe") && (
                         <button
                           onClick={() => {
-                            onCreateBusinessClick();
+                            onFinishSetupClick();
                             closeMenu();
                           }}
                           className="flex-1 flex items-center justify-center space-x-2 px-2 py-1.5 bg-gradient-to-r from-brand-purple to-brand-blue text-white text-xs font-medium rounded-lg hover:opacity-90 transition-opacity"

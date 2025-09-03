@@ -50,7 +50,7 @@ const Hero = () => {
       } = await supabase.auth.getUser();
 
       if (user) {
-        setCtaHref("/create-a-business/step-one");
+        setCtaHref("/create-a-business");
       }
     };
 
