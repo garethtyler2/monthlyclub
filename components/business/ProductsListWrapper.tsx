@@ -2,16 +2,7 @@
 
 // This wrapper is needed to use a Client Component inside a Server Component
 import ProductsList from "@/components/business/products-list";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  product_type: 'subscription' | 'credit_builder';
-  is_credit_builder: boolean;
-  status?: 'active' | 'inactive';
-}
+import { Product } from "@/types/products";
 
 interface ProductsListWrapperProps {
   products: Product[];

@@ -190,7 +190,7 @@ function MessagesPageContent() {
         subscription.unsubscribe();
       };
     }
-  }, [selectedConversation, fetchMessages]);
+  }, [selectedConversation, fetchMessages, fetchConversations]);
 
   // Set up global real-time subscription for new messages
   useEffect(() => {

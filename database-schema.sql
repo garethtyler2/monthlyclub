@@ -134,7 +134,6 @@ CREATE TABLE public.products (
   product_type text DEFAULT 'subscription'::text,
   status text DEFAULT 'active'::text,
   currency text,
-  total_amount numeric,
   CONSTRAINT products_pkey PRIMARY KEY (id),
   CONSTRAINT products_business_id_fkey FOREIGN KEY (business_id) REFERENCES public.businesses(id)
 );

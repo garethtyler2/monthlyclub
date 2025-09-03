@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -69,14 +69,7 @@ export function EditBusinessModal({ business }: { business: any }) {
     return () => clearTimeout(timeout);
   }, [editSlug, business.slug, business.id]);
 
-  // Fetch products when modal opens
-  useEffect(() => {
-    if (editing) {
-      fetchProducts();
-    }
-  }, [editing, business.id]);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     const { data, error } = await supabase
       .from('products')
       .select('*')
@@ -88,7 +81,14 @@ export function EditBusinessModal({ business }: { business: any }) {
     } else {
       setProducts(data || []);
     }
-  };
+  }, [business.id]);
+
+  // Fetch products when modal opens
+  useEffect(() => {
+    if (editing) {
+      fetchProducts();
+    }
+  }, [editing, business.id, fetchProducts]);
 
   const updateAddForm = (field: keyof Product, value: any) => {
     setAddForm(prev => ({ ...prev, [field]: value }));

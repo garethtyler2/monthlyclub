@@ -55,7 +55,6 @@ export default function CreatePostModal({ businessId, trigger, onCreated, open: 
         candidate = candidate.replace(/^https?:\/\//i, (m) => m.toLowerCase());
         try {
           // Basic URL validation
-          // eslint-disable-next-line no-new
           new URL(candidate);
           normalizedLinkUrl = candidate;
         } catch {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -92,43 +92,7 @@ export default function AdminDashboard() {
   const [dateFilter, setDateFilter] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const checkAdminAccess = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-
-      if (user) {
-        // Check if user has admin privileges
-        // For now, we'll check if the user has a specific email or handle
-        // You can modify this logic based on your admin identification method
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        // For now, let's check if the user has a specific email or handle
-        // You can replace this with your actual admin check logic
-        const adminEmails = ['gareth@monthlyclubhq.com']; // Add your admin emails
-        const adminHandles = ['admin', 'gareth']; // Add your admin handles
-        
-        const isAdminUser = adminEmails.includes(user.email || '') || 
-                           adminHandles.includes(profile?.handle || '');
-        
-        setIsAdmin(isAdminUser);
-        
-        if (isAdminUser) {
-          await fetchAdminData();
-        }
-      }
-      
-      setLoading(false);
-    };
-
-    checkAdminAccess();
-  }, []);
-
-  const fetchAdminData = async () => {
+  const fetchAdminData = useCallback(async () => {
     setRefreshing(true);
     
     try {
@@ -157,6 +121,16 @@ export default function AdminDashboard() {
       // Fetch business stats
       const { count: totalBusinesses } = await supabase
         .from('businesses')
+        .select('*', { count: 'exact', head: true });
+
+      const { count: activeBusinesses } = await supabase
+        .from('businesses')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+
+      // Fetch subscription stats
+      const { count: totalSubscriptions } = await supabase
+        .from('subscriptions')
         .select('*', { count: 'exact', head: true });
 
       const { count: activeSubscriptions } = await supabase
@@ -196,7 +170,43 @@ export default function AdminDashboard() {
     } finally {
       setRefreshing(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const checkAdminAccess = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+
+      if (user) {
+        // Check if user has admin privileges
+        // For now, we'll check if the user has a specific email or handle
+        // You can modify this logic based on your admin identification method
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        // For now, let's check if the user has a specific email or handle
+        // You can replace this with your actual admin check logic
+        const adminEmails = ['gareth@monthlyclubhq.com']; // Add your admin emails
+        const adminHandles = ['admin', 'gareth']; // Add your admin handles
+        
+        const isAdminUser = adminEmails.includes(user.email || '') || 
+                           adminHandles.includes(profile?.handle || '');
+        
+        setIsAdmin(isAdminUser);
+        
+        if (isAdminUser) {
+          await fetchAdminData();
+        }
+      }
+      
+      setLoading(false);
+    };
+
+    checkAdminAccess();
+  }, [fetchAdminData]);
 
   const fetchConversations = async () => {
     try {
