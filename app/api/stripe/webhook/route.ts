@@ -98,18 +98,41 @@ export async function POST(req: Request) {
       return new NextResponse("Subscription already exists", { status: 200 });
     }
 
+    // Fetch product details first
+    const { data: product, error: productError } = await supabase
+      .from("products")
+      .select("price, business_id, product_type, name")
+      .eq("id", productId)
+      .single();
+      if (productError || !product) {
+        return NextResponse.json({ error: "Product not found" }, { status: 400 });
+        }
+
     // Insert into subscriptions
+    const subscriptionData: any = {
+      user_id: userId,
+      product_id: productId,
+      status: "active",
+      customer_reference: customerReference,
+      start_date: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      email: userProfile?.email ?? null,
+    };
+
+    // Add pay_it_off specific fields
+    if (product.product_type === 'pay_it_off') {
+      const paymentMonths = parseInt(metadata.paymentMonths || '12');
+      const monthlyAmount = product.price / paymentMonths;
+      
+      subscriptionData.total_paid = 0;
+      subscriptionData.remaining_amount = product.price * 100; // Store in pence
+      subscriptionData.payment_count = 0;
+      subscriptionData.total_payments = paymentMonths;
+    }
+
     const { data: purchase, error: purchaseError } = await supabase
       .from("subscriptions")
-      .insert({
-        user_id: userId,
-        product_id: productId,
-        status: "active",
-        customer_reference: customerReference,
-        start_date: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        email: userProfile?.email ?? null,
-      })
+      .insert(subscriptionData)
       .select()
       .single();
 
@@ -119,15 +142,6 @@ export async function POST(req: Request) {
     }
 
     // Insert into scheduled_payments
-    // Fetch product price and check if it's a balance builder
-    const { data: product, error: productError } = await supabase
-      .from("products")
-      .select("price, business_id, is_credit_builder, name")
-      .eq("id", productId)
-      .single();
-      if (productError || !product) {
-        return NextResponse.json({ error: "Product not found" }, { status: 400 });
-        }
 
     const { data: existingScheduled, error: existingScheduledError } = await supabase
       .from("scheduled_payments")
@@ -142,7 +156,15 @@ export async function POST(req: Request) {
     }
 
     const businessId = product.business_id;
-    const amount = product.is_credit_builder && creditAmount ? parseFloat(creditAmount) * 100 : product.price * 100;
+    let amount;
+    if (product.product_type === 'balance_builder' && creditAmount) {
+      amount = Math.round(parseFloat(creditAmount) * 100);
+    } else if (product.product_type === 'pay_it_off') {
+      const paymentMonths = parseInt(metadata.paymentMonths || '12');
+      amount = Math.round((product.price / paymentMonths) * 100);
+    } else {
+      amount = Math.round(product.price * 100);
+    }
     
     const { error: scheduleError } = await supabase
       .from("scheduled_payments")
@@ -164,7 +186,7 @@ export async function POST(req: Request) {
     }
 
     // Initialize user credit record if this is a balance builder product
-    if (product.is_credit_builder) {
+    if (product.product_type === 'balance_builder') {
       const { error: creditError } = await supabase
         .from("user_credits")
         .upsert({

@@ -7,7 +7,8 @@ import { supabase } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
-import { CheckCircle, Calendar, CreditCard, Settings, ArrowRight } from "lucide-react";
+import { CheckCircle, Calendar, CreditCard, Settings, ArrowRight, TrendingUp, PoundSterling } from "lucide-react";
+import { ProductType, getProductTypeConfig } from "@/types/products";
 
 function formatOrdinal(n: number) {
   const suffixes = ["th", "st", "nd", "rd"];
@@ -19,7 +20,7 @@ type ProductWithBusiness = {
   name: string;
   description: string;
   price: number;
-  is_credit_builder: boolean;
+  product_type: ProductType;
   business: {
     name: string;
   };
@@ -34,6 +35,9 @@ export default function SubscriptionSuccessPage() {
     businessName: string;
     preferredPaymentDay: number;
     price: number;
+    productType: ProductType;
+    totalAmount?: number;
+    paymentMonths?: number;
   } | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -54,7 +58,7 @@ export default function SubscriptionSuccessPage() {
 
       const { data: scheduledData, error: scheduleError } = await supabase
         .from("scheduled_payments")
-        .select("scheduled_for, product_id, amount")
+        .select("scheduled_for, product_id, amount, purchase_id")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(1);
@@ -66,10 +70,17 @@ export default function SubscriptionSuccessPage() {
         return;
       }
 
+      // Get subscription data separately to get total_payments
+      const { data: subscriptionInfo, error: subError } = await supabase
+        .from("subscriptions")
+        .select("total_payments")
+        .eq("id", scheduled.purchase_id)
+        .single();
+
       // Step 2: Fetch product and business manually
       const { data: product, error: productError } = await supabase
         .from("products")
-        .select("name, description, price, business:businesses(name), is_credit_builder")
+        .select("name, description, price, product_type, business:businesses(name)")
         .eq("id", scheduled.product_id)
         .single<ProductWithBusiness>();
 
@@ -78,15 +89,26 @@ export default function SubscriptionSuccessPage() {
         return;
       }
 
-      // Use the amount from scheduled payment for balance builder products, otherwise use product price
-      const displayPrice = product.is_credit_builder ? (scheduled.amount / 100) : (product.price ?? 0);
+      // Use the amount from scheduled payment for balance builder and pay_it_off products, otherwise use product price
+      const displayPrice = (product.product_type === 'balance_builder' || product.product_type === 'pay_it_off') 
+        ? (scheduled.amount / 100) 
+        : (product.price ?? 0);
       
+      console.log("Debug - Product:", product);
+      console.log("Debug - Subscription Info:", subscriptionInfo);
+      console.log("Debug - Product Type:", product.product_type);
+      console.log("Debug - Product Price:", product.price);
+      console.log("Debug - Total Payments:", subscriptionInfo?.total_payments);
+
       setScheduledInfo({
         productName: product.name ?? "Unknown product",
         productDescription: product.description ?? "No description provided",
         businessName: product.business?.name ?? "Unknown business",
         preferredPaymentDay: scheduled.scheduled_for,
         price: displayPrice,
+        productType: product.product_type,
+        totalAmount: product.product_type === 'pay_it_off' ? product.price : undefined,
+        paymentMonths: product.product_type === 'pay_it_off' ? subscriptionInfo?.total_payments : undefined,
       });
 
       // Send subscription confirmation email
@@ -164,10 +186,45 @@ export default function SubscriptionSuccessPage() {
                       {scheduledInfo?.productName}
                     </h2>
                     <p className="text-sm text-white/80 italic">"{scheduledInfo?.productDescription}"</p>
+                    
+                    {/* Product Type Badge */}
+                    <div className="mt-2">
+                      {scheduledInfo?.productType === 'balance_builder' && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                          <TrendingUp className="w-3 h-3 mr-1" />
+                          Balance Builder
+                        </span>
+                      )}
+                      {scheduledInfo?.productType === 'pay_it_off' && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                          <PoundSterling className="w-3 h-3 mr-1" />
+                          Pay it Off
+                        </span>
+                      )}
+                      {scheduledInfo?.productType === 'standard' && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                          <CreditCard className="w-3 h-3 mr-1" />
+                          Standard
+                        </span>
+                      )}
+                    </div>
+
                     <div className="flex flex-col items-center sm:items-end mt-4">
-                      <p className="text-xl font-bold text-white">
-                        £{scheduledInfo?.price}/month
-                      </p>
+                      {scheduledInfo?.productType === 'balance_builder' ? (
+                        <div>
+                          <p className="text-xl font-bold text-green-300">£{scheduledInfo?.price}/month</p>
+                          <p className="text-sm text-green-200">Flexible amount</p>
+                        </div>
+                      ) : scheduledInfo?.productType === 'pay_it_off' ? (
+                        <div>
+                          <p className="text-xl font-bold text-purple-300">£{scheduledInfo?.totalAmount} total</p>
+                          <p className="text-sm text-purple-200">
+                            £{scheduledInfo?.price}/month for {scheduledInfo?.paymentMonths} months
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-xl font-bold text-white">£{scheduledInfo?.price}/month</p>
+                      )}
                       <p className="text-xs text-white/70 mt-1 italic">
                         from {scheduledInfo?.businessName}
                       </p>

@@ -25,20 +25,15 @@ import {
   AlertTriangle,
   CheckCircle,
   ArrowRight,
-  PoundSterling
+  PoundSterling,
+  Calendar
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
+import { ProductWithSubscribers, ProductType, getProductTypeConfig, requiresPrice } from '@/types/products';
+import ProductTypeSelector from '@/components/shared/ProductTypeSelector';
+import { cn } from '@/lib/utils';
 
-interface ProductWithSubscribers {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  product_type: 'subscription' | 'credit_builder';
-  is_credit_builder: boolean;
-  status: 'active' | 'inactive';
-  subscriberCount: number;
-}
+// ProductWithSubscribers interface is now imported from types/products.ts
 
 export default function BusinessProductManager({ businessId }: { businessId: string }) {
   const [products, setProducts] = useState<ProductWithSubscribers[]>([]);
@@ -75,8 +70,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
       name: "",
       description: "",
       price: 0,
-      product_type: 'subscription',
-      is_credit_builder: false,
+      product_type: 'standard',
     });
     setIsAddModalOpen(true);
   };
@@ -105,13 +99,21 @@ export default function BusinessProductManager({ businessId }: { businessId: str
       const updated = { ...prev, [field]: value };
       
       // If balance builder is enabled, set default values
-      if (field === 'is_credit_builder' && value === true) {
-        updated.name = "Balance Builder";
-        updated.description = "Build up a balance over time to use on any of our services. Choose how much you'd like to add each month.";
-        updated.price = 0; // Will be set by user
-        updated.product_type = 'credit_builder';
-      } else if (field === 'is_credit_builder' && value === false) {
-        updated.product_type = 'subscription';
+      if (field === 'product_type') {
+        const config = getProductTypeConfig(value as ProductType);
+        if (value === 'balance_builder') {
+          updated.name = "Balance Builder";
+          updated.description = "Build up a balance over time to use on any of our services. Choose how much you'd like to add each month.";
+          updated.price = 0;
+        } else if (value === 'pay_it_off') {
+          updated.name = "Pay it off";
+          updated.description = "Pay off a larger amount over time with monthly installments.";
+          updated.price = 0;
+        } else {
+          updated.name = "";
+          updated.description = "";
+          updated.price = 0;
+        }
       }
       
       return updated;
@@ -141,7 +143,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
     setLoading(true);
     const { data: productData, error: productError } = await supabase
       .from("products")
-      .select("id, name, description, price, product_type, is_credit_builder, status")
+      .select("id, name, description, price, product_type, status")
       .eq("business_id", businessId);
 
     if (productError) {
@@ -182,8 +184,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
         name: addForm.name,
         description: addForm.description,
         price: addForm.price,
-        product_type: addForm.product_type || 'subscription',
-        is_credit_builder: addForm.is_credit_builder || false,
+        product_type: addForm.product_type || 'standard',
         status: 'active',
       });
 
@@ -195,7 +196,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
     // Re-fetch products to show the new one
     const { data: productData, error: productError } = await supabase
       .from("products")
-      .select("id, name, description, price, product_type, is_credit_builder, status")
+      .select("id, name, description, price, product_type, status")
       .eq("business_id", businessId);
 
     if (productError) {
@@ -265,7 +266,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
 
       const { data: productData, error: productError } = await supabase
         .from("products")
-        .select("id, name, description, price, product_type, is_credit_builder, status")
+        .select("id, name, description, price, product_type, status")
         .eq("business_id", businessId)
         .eq("status", "active"); // Only show active products
 
@@ -300,7 +301,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
 
   const totalSubscribers = products.reduce((sum, product) => sum + product.subscriberCount, 0);
   const totalRevenue = products.reduce((sum, product) => {
-    if (product.is_credit_builder) return sum;
+    if (product.product_type === 'balance_builder') return sum;
     return sum + (product.price * product.subscriberCount);
   }, 0);
 
@@ -340,15 +341,26 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-3">
                       <div className="p-2 bg-white/10 rounded-lg">
-                        {product.is_credit_builder ? (
-                          <CreditCard className="w-5 h-5 text-blue-400" />
+                        {product.product_type === 'balance_builder' ? (
+                          <TrendingUp className="w-5 h-5 text-green-400" />
+                        ) : product.product_type === 'pay_it_off' ? (
+                          <Calendar className="w-5 h-5 text-purple-400" />
                         ) : (
-                          <Building2 className="w-5 h-5 text-green-400" />
+                          <CreditCard className="w-5 h-5 text-blue-400" />
                         )}
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold text-white capitalize">{product.name}</h3>
-
+                        <div className="flex items-center space-x-2 mt-1">
+                          <Badge className={cn(
+                            "text-xs",
+                            product.product_type === 'balance_builder' && "bg-green-500/20 text-green-400 border-green-500/30",
+                            product.product_type === 'pay_it_off' && "bg-purple-500/20 text-purple-400 border-purple-500/30",
+                            product.product_type === 'standard' && "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                          )}>
+                            {getProductTypeConfig(product.product_type).label}
+                          </Badge>
+                        </div>
                       </div>
                     </div>
                     
@@ -367,15 +379,23 @@ export default function BusinessProductManager({ businessId }: { businessId: str
 
                   {/* Pricing */}
                   <div className="mb-4">
-                    {product.is_credit_builder ? (
+                    {product.product_type === 'balance_builder' ? (
                       <div className="flex items-center space-x-2">
-                        <PoundSterling className="w-4 h-4 text-blue-400" />
-                        <span className="text-lg font-bold text-blue-300">Flexible Pricing</span>
+                        <PoundSterling className="w-4 h-4 text-green-400" />
+                        <span className="text-lg font-bold text-green-300">Flexible Pricing</span>
+                      </div>
+                    ) : product.product_type === 'pay_it_off' ? (
+                      <div className="flex items-center space-x-2">
+                        <PoundSterling className="w-4 h-4 text-purple-400" />
+                        <div>
+                          <span className="text-lg font-bold text-purple-300">£{product.price?.toFixed(2)} total</span>
+                          <p className="text-sm text-purple-200">Customer chooses payment plan</p>
+                        </div>
                       </div>
                     ) : (
                       <div className="flex items-center space-x-2">
-                        <PoundSterling className="w-4 h-4 text-green-400" />
-                        <span className="text-lg font-bold text-green-300">£{product.price.toFixed(2)}/month</span>
+                        <PoundSterling className="w-4 h-4 text-blue-400" />
+                        <span className="text-lg font-bold text-blue-300">£{product.price.toFixed(2)}/month</span>
                       </div>
                     )}
                   </div>
@@ -385,7 +405,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                     <div className="flex items-center space-x-2">
                       <Users className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">
-                        {product.is_credit_builder ? 'Builders' : 'Subscribers'}
+                        {product.product_type === 'balance_builder' ? 'Builders' : 'Subscribers'}
                       </span>
                     </div>
                     <div className="text-lg font-bold text-white">
@@ -405,7 +425,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                       Manage Users
                     </Button>
                     
-                    {!product.is_credit_builder && (
+                    {product.product_type !== 'balance_builder' && (
                       <Button
                         size="sm"
                         variant="outline"
@@ -434,7 +454,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                           <AlertDialogDescription className="text-muted-foreground">
                             {product.subscriberCount > 0 ? (
                               <div className="space-y-2">
-                                <p>You cannot delete "{product.name}" because it has active {product.is_credit_builder ? 'builders' : 'subscribers'}.</p>
+                                <p>You cannot delete "{product.name}" because it has active {product.product_type === 'balance_builder' ? 'builders' : 'subscribers'}.</p>
                                 <div className="flex items-center space-x-2 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
                                   <AlertTriangle className="w-4 h-4 text-yellow-400" />
                                   <p className="text-sm text-yellow-300">
@@ -552,7 +572,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                     value={addForm.name || ''}
                     onChange={(e) => updateAddForm('name', e.target.value)}
                     placeholder="Product name"
-                    disabled={addForm.is_credit_builder}
+                    disabled={addForm.product_type === 'balance_builder'}
                     className="bg-white/5 border-white/10 text-white"
                   />
                 </div>
@@ -564,12 +584,19 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                     onChange={(e) => updateAddForm('description', e.target.value)}
                     placeholder="Product description"
                     className="min-h-[100px] bg-white/5 border-white/10 text-white"
-                    disabled={addForm.is_credit_builder}
+                    disabled={addForm.product_type === 'balance_builder'}
                   />
                 </div>
-                {!addForm.is_credit_builder && (
+                <ProductTypeSelector
+                  selectedType={addForm.product_type || 'standard'}
+                  onTypeChange={(newType) => updateAddForm('product_type', newType)}
+                  className="mb-4"
+                />
+                {requiresPrice(addForm.product_type || 'standard') && (
                   <div className="space-y-2">
-                    <Label htmlFor="add-price" className="text-sm font-medium text-white">Price (£)</Label>
+                    <Label htmlFor="add-price" className="text-sm font-medium text-white">
+                      {addForm.product_type === 'pay_it_off' ? 'Total Amount (£)' : 'Price (£)'}
+                    </Label>
                     <Input
                       id="add-price"
                       type="number"
@@ -579,35 +606,13 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                       placeholder="0.00"
                       className="bg-white/5 border-white/10 text-white"
                     />
+                    {addForm.product_type === 'pay_it_off' && (
+                      <p className="text-xs text-gray-400">
+                        Customers will choose how many months to pay this off over
+                      </p>
+                    )}
                   </div>
                 )}
-                <div className="flex items-center space-x-2 p-3 bg-white/5 rounded-lg">
-                  <Checkbox
-                    id="add-credit-builder"
-                    checked={addForm.is_credit_builder || false}
-                    onCheckedChange={(checked) => updateAddForm("is_credit_builder", checked)}
-                    className="text-white"
-                  />
-                  <Label htmlFor="add-credit-builder" className="text-sm text-white">
-                    Enable Builder Mode
-                  </Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="tertiary" size="sm" className="p-1 h-auto">
-                        <Info className="w-4 h-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80 bg-slate-800 border-white/10">
-                      <div className="space-y-2">
-                        <h4 className="font-medium text-white">Balance Builder</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Allow customers to build up a balance over time that they can use for future services. 
-                          Customers choose how much they want to add each month, and you can charge against their balance.
-                        </p>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
               </div>
               <DialogFooter>
 

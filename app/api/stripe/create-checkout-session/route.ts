@@ -9,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(request: Request) {
   const supabase = await createClient();
 
-  const { productId, reference, preferredPaymentDay, creditAmount } = await request.json();
+  const { productId, reference, preferredPaymentDay, creditAmount, paymentMonths } = await request.json();
 
   // 1. Get product info from Supabase
   const { data: product, error: productError } = await supabase
@@ -71,6 +71,9 @@ export async function POST(request: Request) {
     if (creditAmount) {
       confirmUrl.searchParams.set("creditAmount", creditAmount.toString());
     }
+    if (paymentMonths) {
+      confirmUrl.searchParams.set("paymentMonths", paymentMonths.toString());
+    }
 
     return NextResponse.json({ url: confirmUrl.toString() }, { status: 200 });
   }
@@ -90,6 +93,7 @@ export async function POST(request: Request) {
         customer_reference: reference,
         preferred_payment_day: preferredPaymentDay,
         credit_amount: creditAmount?.toString() || '',
+        paymentMonths: paymentMonths?.toString() || '',
       },
     });
 

@@ -35,13 +35,9 @@ interface UserSubscriptionsViewProps {
   userId: string;
 }
 
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  product_type: 'subscription' | 'credit_builder';
-  is_credit_builder: boolean;
+import { Product, Subscription } from '@/types/products';
+
+interface ProductWithBusiness extends Product {
   business: {
     id: string;
     name: string;
@@ -49,19 +45,14 @@ interface Product {
   };
 }
 
-interface Subscription {
-  id: string;
-  product_id: string;
-  status: string;
-  start_date: string;
-  cancel_at: string | null;
-}
+// Subscription interface is now imported from types/products.ts
 
 interface ScheduledPayment {
   purchase_id: string;
   scheduled_for: number;
   customer_reference: string;
   amount: number;
+  status: 'active' | 'cancelled' | 'completed';
 }
 
 interface UserCredit {
@@ -85,7 +76,7 @@ interface CreditTransaction {
 
 export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewProps) {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductWithBusiness[]>([]);
   const [scheduledPayments, setScheduledPayments] = useState<ScheduledPayment[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [userCredits, setUserCredits] = useState<UserCredit[]>([]);
@@ -104,7 +95,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
 
     const { data: subs } = await supabase
       .from("subscriptions")
-      .select("*")
+      .select("*, total_paid, remaining_amount, payment_count, total_payments")
       .eq("user_id", user.id);
 
     const { data: prods } = await supabase
@@ -115,11 +106,10 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
         description,
         price,
         product_type,
-        is_credit_builder,
         business:business_id (
           id, name, slug
         )
-      `) as unknown as { data: Product[] };
+      `) as unknown as { data: ProductWithBusiness[] };
 
     const { data: schedules } = await supabase
       .from("scheduled_payments")
@@ -145,7 +135,10 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
       .order("created_at", { ascending: false });
 
     setSubscriptions(subs || []);
-    setProducts(prods || []);
+    setProducts((prods || []).map(p => ({
+      ...p,
+      product_type: (p.product_type as any) === 'credit_builder' ? 'balance_builder' : p.product_type
+    })));
     setScheduledPayments(schedules || []);
     setPayments(userPayments || []);
     setUserCredits(credits || []);
@@ -202,8 +195,32 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
     return <LoadingOverlay show message="Loading your subscriptions..." />;
   }
 
-  const activeSubs = subscriptions.filter((s) => s.status === "active");
-  const cancelledSubs = subscriptions.filter((s) => s.status === "cancelled");
+  // Filter subscriptions based on status and product type
+  const activeSubs = subscriptions.filter((s) => {
+    if (s.status === "cancelled") return false;
+    
+    const product = products.find((p) => p.id === s.product_id);
+    if (product?.product_type === 'balance_builder') {
+      // For balance builders, check if scheduled payments are cancelled
+      const schedule = scheduledPayments.find((sp) => sp.purchase_id === s.id);
+      return schedule?.status !== "cancelled";
+    }
+    
+    return s.status === "active";
+  });
+
+  const cancelledSubs = subscriptions.filter((s) => {
+    if (s.status === "cancelled") return true;
+    
+    const product = products.find((p) => p.id === s.product_id);
+    if (product?.product_type === 'balance_builder') {
+      // For balance builders, show as cancelled if scheduled payments are cancelled
+      const schedule = scheduledPayments.find((sp) => sp.purchase_id === s.id);
+      return schedule?.status === "cancelled";
+    }
+    
+    return false;
+  });
 
   return (
     <div className="space-y-6">
@@ -240,7 +257,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-3">
                         <div className="p-2 bg-white/10 rounded-lg">
-                          {product.is_credit_builder ? (
+                          {product.product_type === 'balance_builder' ? (
                             <CreditCard className="w-5 h-5 text-blue-400" />
                           ) : (
                             <Building2 className="w-5 h-5 text-green-400" />
@@ -270,10 +287,15 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
 
                     {/* Pricing */}
                     <div className="mb-4">
-                      {product.is_credit_builder ? (
+                      {product.product_type === 'balance_builder' ? (
                         <div className="flex items-center space-x-2">
                           <PoundSterling className="w-4 h-4 text-blue-400" />
-                          <span className="text-lg font-bold text-blue-300">£{(schedule?.amount || 0) / 100}/month</span>
+                          <span className="text-lg font-bold text-blue-300">£{((schedule?.amount || 0) / 100).toFixed(2)}/month</span>
+                        </div>
+                      ) : product.product_type === 'pay_it_off' ? (
+                        <div className="flex items-center space-x-2">
+                          <PoundSterling className="w-4 h-4 text-purple-400" />
+                          <span className="text-lg font-bold text-purple-300">£{((schedule?.amount || 0) / 100).toFixed(2)}/month</span>
                         </div>
                       ) : (
                         <div className="flex items-center space-x-2">
@@ -284,7 +306,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                     </div>
 
                     {/* Credit Balance for Balance Builders */}
-                    {product.is_credit_builder && (
+                    {product.product_type === 'balance_builder' && (
                       <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-2">
@@ -295,12 +317,59 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                             Available
                           </Badge>
                         </div>
-                                                 <div className="text-2xl font-bold text-blue-300">
-                           £{(userCredits.find(c => c.business_id === product.business?.id)?.balance || 0) / 100}
-                         </div>
+                                                                         <div className="text-2xl font-bold text-blue-300">
+                          £{((userCredits.find(c => c.business_id === product.business?.id)?.balance || 0) / 100).toFixed(2)}
+                        </div>
                         <p className="text-xs text-blue-300/70 mt-1">
                           Available to use for future services
                         </p>
+                      </div>
+                    )}
+
+                    {/* Payment Progress for Pay it Off */}
+                    {product.product_type === 'pay_it_off' && (
+                      <div className="mb-4 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <Calendar className="w-4 h-4 text-purple-400" />
+                            <span className="text-sm font-medium text-purple-400">Payment Progress</span>
+                          </div>
+                          <Badge className={`text-xs ${
+                            sub.status === 'completed' 
+                              ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                              : 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+                          }`}>
+                            {sub.status === 'completed' ? 'Paid Off' : 'In Progress'}
+                          </Badge>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-purple-300">Total Amount:</span>
+                            <span className="text-purple-300">£{product.price}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-purple-300">Paid:</span>
+                            <span className="text-purple-300">£{((sub.total_paid || 0) / 100).toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-purple-300">Remaining:</span>
+                            <span className="text-purple-300">£{((sub.remaining_amount || product.price * 100) / 100).toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-purple-300">Payments:</span>
+                            <span className="text-purple-300">{sub.payment_count || 0} / {sub.total_payments || 0}</span>
+                          </div>
+                          {sub.status !== 'completed' && (
+                            <div className="w-full bg-purple-500/20 rounded-full h-2 mt-2">
+                              <div 
+                                className="bg-purple-400 h-2 rounded-full transition-all duration-300"
+                                style={{ 
+                                  width: `${((sub.total_paid || 0) / (product.price * 100)) * 100}%` 
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
 
@@ -331,7 +400,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                     </div>
 
                     {/* Actions */}
-                    <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0 mb-4">
+                    <div className="flex flex-wrap gap-2 mb-4">
                       <ManagePaymentDayModal
                         isOpen={openSubId === sub.id}
                         onClose={() => setOpenSubId(null)}
@@ -344,12 +413,14 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                         isOpen={cancelSubId === sub.id}
                         onClose={() => setCancelSubId(null)}
                         subscriptionId={sub.id}
+                        productType={product.product_type}
+                        businessName={product.business?.name}
                         onSuccess={() => {
                           fetchData();
                         }}
                       />
                       
-                      {product.is_credit_builder && (
+                      {product.product_type === 'balance_builder' && (
                         <Button
                           size="sm"
                           variant="primary"
@@ -441,7 +512,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                             });
 
                             // Add credit transactions for this business
-                            if (product.is_credit_builder) {
+                            if (product.product_type === 'balance_builder') {
                               businessCreditTransactions.forEach(transaction => {
                                 allTransactions.push({
                                   id: `credit-${transaction.id}`,
@@ -540,7 +611,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-3">
                         <div className="p-2 bg-white/10 rounded-lg">
-                          {product.is_credit_builder ? (
+                          {product.product_type === 'balance_builder' ? (
                             <CreditCard className="w-5 h-5 text-blue-400" />
                           ) : (
                             <Building2 className="w-5 h-5 text-green-400" />
@@ -571,10 +642,15 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
 
                     {/* Pricing */}
                     <div className="mb-4">
-                      {product.is_credit_builder ? (
+                      {product.product_type === 'balance_builder' ? (
                         <div className="flex items-center space-x-2">
                           <PoundSterling className="w-4 h-4 text-blue-400" />
-                          <span className="text-lg font-bold text-blue-300">£{(schedule?.amount || 0) / 100}/month</span>
+                          <span className="text-lg font-bold text-blue-300">£{((schedule?.amount || 0) / 100).toFixed(2)}/month</span>
+                        </div>
+                      ) : product.product_type === 'pay_it_off' ? (
+                        <div className="flex items-center space-x-2">
+                          <PoundSterling className="w-4 h-4 text-purple-400" />
+                          <span className="text-lg font-bold text-purple-300">£{((schedule?.amount || 0) / 100).toFixed(2)}/month</span>
                         </div>
                       ) : (
                         <div className="flex items-center space-x-2">
@@ -584,11 +660,37 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                       )}
                     </div>
 
+                    {/* Balance Builder Fund for Cancelled Balance Builders */}
+                    {product.product_type === 'balance_builder' && (
+                      <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <TrendingUp className="w-4 h-4 text-blue-400" />
+                            <span className="text-sm font-medium text-blue-400">Remaining Balance</span>
+                          </div>
+                          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs">
+                            Available
+                          </Badge>
+                        </div>
+                        <div className="text-2xl font-bold text-blue-300">
+                          £{((userCredits.find(c => c.business_id === product.business?.id)?.balance || 0) / 100).toFixed(2)}
+                        </div>
+                        <p className="text-xs text-blue-300/70 mt-1">
+                          Available to use for future services
+                        </p>
+                      </div>
+                    )}
+
                     {/* Cancelled Message */}
                     <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg mb-4">
                       <div className="flex items-center space-x-2">
                         <AlertTriangle className="w-4 h-4 text-red-400" />
-                        <span className="text-sm text-red-300">This subscription has been cancelled</span>
+                        <span className="text-sm text-red-300">
+                          {product.product_type === 'balance_builder' 
+                            ? 'Payments stopped - balance remains available' 
+                            : 'This subscription has been cancelled'
+                          }
+                        </span>
                       </div>
                     </div>
 
@@ -643,7 +745,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                             });
 
                             // Add credit transactions for this business
-                            if (product.is_credit_builder) {
+                            if (product.product_type === 'balance_builder') {
                               const businessCreditTransactions = getCreditTransactions(product.business?.id || '', sub.id);
                               businessCreditTransactions.forEach(transaction => {
                                 allTransactions.push({

@@ -7,7 +7,8 @@ import { supabase } from "@/lib/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
-import { Settings, Calendar, CreditCard, CheckCircle } from "lucide-react";
+import { Settings, Calendar, CreditCard, CheckCircle, TrendingUp, PoundSterling } from "lucide-react";
+import { ProductType, getProductTypeConfig, isCustomerAmountType, requiresTotalAmount } from "@/types/products";
 
 function formatOrdinal(n: number) {
   const suffixes = ["th", "st", "nd", "rd"];
@@ -23,6 +24,7 @@ function SubscriptionConfirmPageInner() {
   const reference = searchParams.get("reference");
   const preferredPaymentDay = searchParams.get("preferredPaymentDay");
   const creditAmount = searchParams.get("creditAmount");
+  const paymentMonths = searchParams.get("paymentMonths");
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,7 @@ function SubscriptionConfirmPageInner() {
 
       const { data, error } = await supabase
         .from("products")
-        .select("name, description, price, business:businesses(name), business_id, is_credit_builder")
+        .select("name, description, price, product_type, business:businesses(name), business_id")
         .eq("id", productId)
         .single();
 
@@ -70,17 +72,28 @@ function SubscriptionConfirmPageInner() {
       .single();
 
     // 3. Insert into the subscriptions table
+    const subscriptionData: any = {
+      user_id: user.id,
+      product_id: productId,
+      status: "active",
+      customer_reference: reference,
+      start_date: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      email: profile?.email ?? null,
+    };
+
+    // Add pay_it_off specific fields
+    if (product.product_type === 'pay_it_off') {
+      const months = parseInt(paymentMonths || '12');
+      subscriptionData.total_paid = 0;
+      subscriptionData.remaining_amount = product.price * 100; // Store in pence
+      subscriptionData.payment_count = 0;
+      subscriptionData.total_payments = months;
+    }
+
     const { data: subscription, error: subError } = await supabase
       .from("subscriptions")
-      .insert({
-        user_id: user.id,
-        product_id: productId,
-        status: "active",
-        customer_reference: reference,
-        start_date: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        email: profile?.email ?? null,
-      })
+      .insert(subscriptionData)
       .select()
       .single();
 
@@ -91,7 +104,15 @@ function SubscriptionConfirmPageInner() {
     }
 
     // 4. Insert into the scheduled_payments table
-    const amount = product.is_credit_builder && creditAmount ? parseFloat(creditAmount) * 100 : product.price * 100;
+    let amount;
+    if (product.product_type === 'balance_builder' && creditAmount) {
+      amount = Math.round(parseFloat(creditAmount) * 100);
+    } else if (product.product_type === 'pay_it_off') {
+      const months = parseInt(paymentMonths || '12');
+      amount = Math.round((product.price / months) * 100);
+    } else {
+      amount = Math.round(product.price * 100);
+    }
     
     const { error: scheduleError } = await supabase
       .from("scheduled_payments")
@@ -114,7 +135,7 @@ function SubscriptionConfirmPageInner() {
     }
 
     // 5. Initialize user credit record if this is a balance builder product
-    if (product.is_credit_builder) {
+    if (product.product_type === 'balance_builder') {
       const { error: creditError } = await supabase
         .from("user_credits")
         .upsert({
@@ -168,13 +189,45 @@ function SubscriptionConfirmPageInner() {
                     {product?.name}
                   </h2>
                   <p className="text-sm text-white/80 italic">"{product?.description}"</p>
+                  
+                  {/* Product Type Badge */}
+                  <div className="mt-2">
+                    {product?.product_type === 'balance_builder' && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
+                        <TrendingUp className="w-3 h-3 mr-1" />
+                        Balance Builder
+                      </span>
+                    )}
+                    {product?.product_type === 'pay_it_off' && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                        <PoundSterling className="w-3 h-3 mr-1" />
+                        Pay it Off
+                      </span>
+                    )}
+                    {product?.product_type === 'standard' && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        <CreditCard className="w-3 h-3 mr-1" />
+                        Standard
+                      </span>
+                    )}
+                  </div>
+
                   <div className="flex flex-col items-center sm:items-end mt-4">
-                    <p className="text-xl font-bold text-white">
-                      {product?.is_credit_builder && creditAmount 
-                        ? `£${creditAmount}/month` 
-                        : `£${product?.price}/month`
-                      }
-                    </p>
+                    {product?.product_type === 'balance_builder' && creditAmount ? (
+                      <div>
+                        <p className="text-xl font-bold text-green-300">£{creditAmount}/month</p>
+                        <p className="text-sm text-green-200">Flexible amount</p>
+                      </div>
+                                          ) : product?.product_type === 'pay_it_off' ? (
+                        <div>
+                          <p className="text-xl font-bold text-purple-300">£{product?.price} total</p>
+                          <p className="text-sm text-purple-200">
+                            £{(product?.price / parseInt(paymentMonths || '12')).toFixed(2)}/month for {paymentMonths} months
+                          </p>
+                        </div>
+                      ) : (
+                      <p className="text-xl font-bold text-white">£{product?.price}/month</p>
+                    )}
                     <p className="text-xs text-white/70 mt-1 italic">
                       from {product?.business?.name}
                     </p>

@@ -14,7 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Trash, Info, TrendingUp } from "lucide-react";
+import { Trash, Info, TrendingUp, Calendar, CreditCard } from "lucide-react";
 import { LoadingOverlay } from "@/components/ui/loading-overlay"
 
 const gradientStyles = [
@@ -24,14 +24,8 @@ const gradientStyles = [
   "from-brand-pink/10 to-transparent border-brand-pink/20",
 ];
 
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  product_type: 'subscription' | 'credit_builder';
-  is_credit_builder: boolean;
-}
+import { Product, ProductType, getProductTypeConfig, requiresPrice } from '@/types/products';
+import ProductTypeSelector from '@/components/shared/ProductTypeSelector';
 
 export default function ConfirmBusinessPage() {
   const searchParams = useSearchParams();
@@ -86,35 +80,39 @@ export default function ConfirmBusinessPage() {
         name: "", 
         description: "", 
         price: 0,
-        product_type: 'subscription',
-        is_credit_builder: false
+        product_type: 'standard'
       }
     ]);
   };
 
-  const handleProductTypeChange = (index: number, isCreditBuilder: boolean) => {
+  const handleProductTypeChange = (index: number, newType: ProductType) => {
     setProducts((prev) =>
       prev.map((p, i) => {
         if (i === index) {
-          if (isCreditBuilder) {
-            return {
-              ...p,
-              name: "Balance Builder",
-              description: "Build up a balance over time to use on any of our services. Choose how much you'd like to add each month.",
-              price: 0,
-              product_type: 'credit_builder',
-              is_credit_builder: true
-            };
-          } else {
-            return {
-              ...p,
-              name: "",
-              description: "",
-              price: 0,
-              product_type: 'subscription',
-              is_credit_builder: false
-            };
+          const config = getProductTypeConfig(newType);
+          
+          // Set default values based on product type
+          let defaultName = "";
+          let defaultDescription = "";
+          let defaultPrice = 0;
+          
+          if (newType === 'balance_builder') {
+            defaultName = "Balance Builder";
+            defaultDescription = "Build up a balance over time to use on any of our services. Choose how much you'd like to add each month.";
+            defaultPrice = 0;
+          } else if (newType === 'pay_it_off') {
+            defaultName = "Pay it off";
+            defaultDescription = "Pay off a larger amount over time with monthly installments.";
+            defaultPrice = 0;
           }
+          
+          return {
+            ...p,
+            name: defaultName,
+            description: defaultDescription,
+            price: defaultPrice,
+            product_type: newType
+          };
         }
         return p;
       })
@@ -146,8 +144,8 @@ export default function ConfirmBusinessPage() {
         name: product.name,
         description: product.description,
         price: product.price,
-        product_type: product.product_type || 'subscription',
-        is_credit_builder: product.is_credit_builder || false,
+        product_type: product.product_type || 'standard',
+
       }));
 
       const { error: insertError } = await supabase
@@ -270,7 +268,7 @@ export default function ConfirmBusinessPage() {
                           value={product.name}
                           onChange={(e) => handleProductChange(index, "name", e.target.value)}
                           placeholder="Product Name"
-                          disabled={product.is_credit_builder}
+                          disabled={product.product_type === 'balance_builder'}
                         />
                       </div>
                       <div>
@@ -280,48 +278,33 @@ export default function ConfirmBusinessPage() {
                           value={product.description}
                           onChange={(e) => handleProductChange(index, "description", e.target.value)}
                           placeholder="Product Description"
-                          disabled={product.is_credit_builder}
+                          disabled={product.product_type === 'balance_builder'}
                         />
                       </div>
-                      {!product.is_credit_builder && (
+                      <ProductTypeSelector
+                        selectedType={product.product_type}
+                        onTypeChange={(newType) => handleProductTypeChange(index, newType)}
+                        className="mb-4"
+                      />
+                      {requiresPrice(product.product_type) && (
                         <div>
-                          <label className="text-sm font-semibold text-white">Price (£/month)</label>
+                          <label className="text-sm font-semibold text-white">
+                            {product.product_type === 'pay_it_off' ? 'Total Amount (£)' : 'Price (£/month)'}
+                          </label>
                           <Input
                             className="bg-gray-800 border border-white text-white placeholder-gray-400"
                             type="number"
                             value={product.price}
                             onChange={(e) => handleProductChange(index, "price", parseFloat(e.target.value))}
-                            placeholder="Monthly Price"
+                            placeholder={product.product_type === 'pay_it_off' ? 'Total amount to be paid off' : 'Monthly Price'}
                           />
+                          {product.product_type === 'pay_it_off' && (
+                            <p className="text-xs text-gray-400 mt-1">
+                              Customers will choose how many months to pay this off over
+                            </p>
+                          )}
                         </div>
                       )}
-                      <div className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`credit-builder-${product.id}`}
-                          checked={product.is_credit_builder}
-                          onCheckedChange={(checked) => handleProductTypeChange(index, checked as boolean)}
-                          className="text-white"
-                        />
-                        <label htmlFor={`credit-builder-${product.id}`} className="text-sm text-white">
-                          Enable Builder Mode
-                        </label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="ghost" size="sm" className="p-1 h-auto">
-                              <Info className="w-4 h-4 text-gray-400" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-80">
-                            <div className="space-y-2">
-                              <h4 className="font-medium">Balance Builder</h4>
-                              <p className="text-sm text-muted-foreground">
-                                Allow customers to build up a balance over time that they can use for future services.
-                                Customers choose how much they want to add each month, and you can charge against their balance.
-                              </p>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      </div>
                     </div>
                   ))}
                 </div>
@@ -387,16 +370,35 @@ export default function ConfirmBusinessPage() {
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="text-lg font-semibold">{product.name}</h3>
-                        {product.is_credit_builder && (
-                          <div className="flex items-center space-x-2">
-                            <TrendingUp className="w-4 h-4 text-blue-400" />
-                            <span className="text-sm text-blue-400">Balance Builder</span>
-                          </div>
-                        )}
+                        <div className="flex items-center space-x-2">
+                          {product.product_type === 'balance_builder' && (
+                            <>
+                              <TrendingUp className="w-4 h-4 text-green-400" />
+                              <span className="text-sm text-green-400">Balance Builder</span>
+                            </>
+                          )}
+                          {product.product_type === 'pay_it_off' && (
+                            <>
+                              <Calendar className="w-4 h-4 text-purple-400" />
+                              <span className="text-sm text-purple-400">Pay it off</span>
+                            </>
+                          )}
+                          {product.product_type === 'standard' && (
+                            <>
+                              <CreditCard className="w-4 h-4 text-blue-400" />
+                              <span className="text-sm text-blue-400">Standard</span>
+                            </>
+                          )}
+                        </div>
                       </div>
                       <p className="text-sm opacity-90 mb-3">{product.description}</p>
-                      {product.is_credit_builder ? (
-                        <p className="text-md font-bold mb-4 text-blue-300">Choose your monthly amount</p>
+                      {product.product_type === 'balance_builder' ? (
+                        <p className="text-md font-bold mb-4 text-green-300">Choose your monthly amount</p>
+                      ) : product.product_type === 'pay_it_off' ? (
+                        <div className="text-md font-bold mb-4">
+                          <p className="text-purple-300">Total: £{product.price}</p>
+                          <p className="text-sm text-gray-300">Choose payment plan at checkout</p>
+                        </div>
                       ) : (
                         <p className="text-md font-bold mb-4">£{product.price}/month</p>
                       )}
@@ -409,7 +411,7 @@ export default function ConfirmBusinessPage() {
                           className="hero-button-primary mt-4"
                           onClick={() => setClickedProductId(product.id)}
                         >
-                          {product.is_credit_builder ? "Start Building" : "Subscribe"}
+                          {product.product_type === 'balance_builder' ? "Start Building" : product.product_type === 'pay_it_off' ? "Start Paying" : "Subscribe"}
                         </Button>
                         {clickedProductId === product.id && (
                           <p className="mt-2 text-sm text-green-400 text-center animate-bounce">

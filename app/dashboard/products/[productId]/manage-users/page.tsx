@@ -49,6 +49,7 @@ interface Product {
   id: string;
   name: string;
   is_credit_builder: boolean;
+  product_type: 'standard' | 'balance_builder' | 'pay_it_off';
   business_id: string;
 }
 
@@ -111,12 +112,31 @@ export default function ManageUsersPage() {
     const from = (page - 1) * pageSize;
     const to = from + pageSize - 1;
 
+    // For balance builders, we need to include users with cancelled payments but remaining balances
+    // For other products, only show active subscriptions
     let query = supabase
       .from('subscriptions')
-      .select('id, user_id, start_date, status, product_id, customer_reference, user_profiles(email)')
+      .select(`
+        id, 
+        user_id, 
+        start_date, 
+        status, 
+        product_id, 
+        customer_reference, 
+        user_profiles(email),
+        products!inner(product_type)
+      `)
       .eq('product_id', productId)
-      .eq('status', 'active')
       .range(from, to);
+
+    // Apply status filter based on product type
+    if (product?.product_type === 'balance_builder') {
+      // For balance builders, show both active and cancelled (but with remaining balance)
+      // We'll filter out cancelled ones without balance later
+    } else {
+      // For other products, only show active
+      query = query.eq('status', 'active');
+    }
 
     if (searchTerm) {
       query = query.or(`email.ilike.%${searchTerm}%,customer_reference.ilike.%${searchTerm}%`);
@@ -132,9 +152,31 @@ export default function ManageUsersPage() {
       return;
     }
 
-    const uniqueSubs = Array.from(
+    let uniqueSubs = Array.from(
       new Map(subs.map(sub => [sub.user_id, sub])).values()
     );
+
+    // For balance builders, filter out cancelled subscriptions without remaining balance
+    if (product?.product_type === 'balance_builder') {
+      const userIds = uniqueSubs.map(sub => sub.user_id);
+      
+      // Fetch user credits to check remaining balances
+      const { data: creditData } = await supabase
+        .from('user_credits')
+        .select('user_id, balance')
+        .eq('business_id', product.business_id)
+        .in('user_id', userIds);
+
+      // Filter out cancelled subscriptions that have no remaining balance
+      uniqueSubs = uniqueSubs.filter(sub => {
+        if (sub.status === 'active') return true; // Keep all active subscriptions
+        
+        // For cancelled subscriptions, only keep if they have remaining balance
+        const userCredit = creditData?.find(credit => credit.user_id === sub.user_id);
+        return userCredit && userCredit.balance > 0;
+      });
+    }
+
     setSubscriptions(uniqueSubs);
     setHasMore(uniqueSubs.length === pageSize);
 
@@ -755,6 +797,11 @@ export default function ManageUsersPage() {
                           {product?.is_credit_builder && userCredits[sub.user_id] && (
                             <div className="text-xs text-green-300/80">
                               Balance £{(userCredits[sub.user_id].balance / 100).toFixed(2)}
+                            </div>
+                          )}
+                          {product?.product_type === 'balance_builder' && sub.status === 'cancelled' && (
+                            <div className="text-xs text-yellow-300/80">
+                              Payments stopped (Balance: £{((userCredits[sub.user_id]?.balance || 0) / 100).toFixed(2)})
                             </div>
                           )}
                         </div>

@@ -22,16 +22,9 @@ import {
   Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Product, isCustomerAmountType } from "@/types/products";
 
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  product_type: 'subscription' | 'credit_builder';
-  is_credit_builder: boolean;
-  status?: 'active' | 'inactive';
-}
+// Product interface is now imported from types/products.ts
 
 interface ProductsListProps {
   products: Product[];
@@ -44,6 +37,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
   const [reference, setReference] = useState("");
   const [preferredPaymentDate, setPreferredPaymentDate] = useState("");
   const [creditAmount, setCreditAmount] = useState("");
+  const [paymentMonths, setPaymentMonths] = useState(12); // For pay_it_off products (default to 12 months)
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
@@ -64,7 +58,14 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
     setIsLoading(true);
     try {
       const selectedProduct = products.find(p => p.id === productId);
-      const amount = selectedProduct?.is_credit_builder ? parseFloat(creditAmount) : selectedProduct?.price;
+      let amount;
+      if (selectedProduct?.product_type === 'balance_builder') {
+        amount = parseFloat(creditAmount);
+      } else if (selectedProduct?.product_type === 'pay_it_off') {
+        amount = Math.round((selectedProduct.price / paymentMonths) * 100) / 100; // Round to 2 decimal places
+      } else {
+        amount = selectedProduct?.price;
+      }
 
       const res = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
@@ -73,7 +74,8 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
           productId, 
           reference, 
           preferredPaymentDay: preferredPaymentDate,
-          creditAmount: selectedProduct?.is_credit_builder ? amount : undefined,
+          creditAmount: selectedProduct?.product_type === 'balance_builder' ? amount : undefined,
+          paymentMonths: selectedProduct?.product_type === 'pay_it_off' ? paymentMonths : undefined,
         }),
       });
 
@@ -100,18 +102,24 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
     const selectedProduct = products.find(p => p.id === selectedProductId);
     if (!selectedProduct) return false;
     
-    if (selectedProduct.is_credit_builder) {
+    if (selectedProduct.product_type === 'balance_builder') {
       return preferredPaymentDate && creditAmount && parseFloat(creditAmount) > 0;
+    }
+    
+    if (selectedProduct.product_type === 'pay_it_off') {
+      return preferredPaymentDate && paymentMonths > 0;
     }
     
     return preferredPaymentDate;
   };
 
   const getProductIcon = (product: Product) => {
-    if (product.is_credit_builder) {
-      return <CreditCard className="w-6 h-6" />;
+    if (product.product_type === 'balance_builder') {
+      return <TrendingUp className="w-6 h-6" />;
+    } else if (product.product_type === 'pay_it_off') {
+      return <Calendar className="w-6 h-6" />;
     }
-    return <Building2 className="w-6 h-6" />;
+    return <CreditCard className="w-6 h-6" />;
   };
 
   const getProductGradient = (index: number) => {
@@ -163,10 +171,22 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-white capitalize">{product.name}</h3>
-                      {product.is_credit_builder && (
-                        <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs mt-1">
-                          <Sparkles className="w-3 h-3 mr-1" />
+                      {product.product_type === 'balance_builder' && (
+                        <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs mt-1">
+                          <TrendingUp className="w-3 h-3 mr-1" />
                           Balance Builder
+                        </Badge>
+                      )}
+                      {product.product_type === 'pay_it_off' && (
+                        <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30 text-xs mt-1">
+                          <Calendar className="w-3 h-3 mr-1" />
+                          Pay it off
+                        </Badge>
+                      )}
+                      {product.product_type === 'standard' && (
+                        <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs mt-1">
+                          <CreditCard className="w-3 h-3 mr-1" />
+                          Standard
                         </Badge>
                       )}
                     </div>
@@ -187,15 +207,23 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
 
                 {/* Pricing */}
                 <div className="mb-4">
-                  {product.is_credit_builder ? (
+                  {isCustomerAmountType(product.product_type) ? (
                     <div className="flex items-center space-x-2">
-                      <PoundSterling className="w-4 h-4 text-blue-400" />
-                      <span className="text-lg font-bold text-blue-300">Choose your amount</span>
+                      <PoundSterling className="w-4 h-4 text-green-400" />
+                      <span className="text-lg font-bold text-green-300">Choose your amount</span>
+                    </div>
+                  ) : product.product_type === 'pay_it_off' ? (
+                    <div className="flex items-center space-x-2">
+                      <PoundSterling className="w-4 h-4 text-purple-400" />
+                      <div>
+                        <span className="text-lg font-bold text-purple-300">£{product.price} total</span>
+                        <p className="text-sm text-purple-200">Choose payment plan</p>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex items-center space-x-2">
-                      <PoundSterling className="w-4 h-4 text-green-400" />
-                      <span className="text-lg font-bold text-green-300">£{product.price}/month</span>
+                      <PoundSterling className="w-4 h-4 text-blue-400" />
+                      <span className="text-lg font-bold text-blue-300">£{product.price}/month</span>
                     </div>
                   )}
                 </div>
@@ -206,7 +234,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                     className="w-full bg-gradient-to-r from-brand-purple to-brand-blue hover:from-brand-purple/90 hover:to-brand-blue/90 text-white"
                     onClick={() => handleSelect(product.id)}
                   >
-                    {product.is_credit_builder ? (
+                    {product.product_type === 'balance_builder' ? (
                       <>
                         <TrendingUp className="w-4 h-4 mr-2" />
                         Start Building
@@ -233,7 +261,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                 {isSelected && (
                   <div className="space-y-4 mt-6 pt-4 border-t border-white/10">
                     {/* Credit Amount Input */}
-                    {product.is_credit_builder && (
+                    {isCustomerAmountType(product.product_type) && (
                       <div className="space-y-2">
                         <Label htmlFor="creditAmount" className="text-sm font-medium text-white">
                           Monthly Amount
@@ -253,6 +281,32 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                         </div>
                         <p className="text-xs text-muted-foreground">
                           Choose how much to add to your balance builder fund each month
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Payment Plan Selector for Pay it Off */}
+                    {product.product_type === 'pay_it_off' && (
+                      <div className="space-y-2">
+                        <Label htmlFor="paymentMonths" className="text-sm font-medium text-white">
+                          Payment Plan
+                        </Label>
+                        <select
+                          id="paymentMonths"
+                          value={paymentMonths}
+                          onChange={(e) => setPaymentMonths(parseInt(e.target.value))}
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 text-white rounded-md"
+                        >
+                          <option value={2}>2 months - £{(product.price / 2).toFixed(2)}/month</option>
+                          <option value={3}>3 months - £{(product.price / 3).toFixed(2)}/month</option>
+                          <option value={4}>4 months - £{(product.price / 4).toFixed(2)}/month</option>
+                          <option value={6}>6 months - £{(product.price / 6).toFixed(2)}/month</option>
+                          <option value={9}>9 months - £{(product.price / 9).toFixed(2)}/month</option>
+                          <option value={12}>12 months - £{(product.price / 12).toFixed(2)}/month</option>
+                          <option value={18}>18 months - £{(product.price / 18).toFixed(2)}/month</option>
+                        </select>
+                        <p className="text-xs text-muted-foreground">
+                          Total: £{product.price} • Monthly payment: £{(product.price / paymentMonths).toFixed(2)}
                         </p>
                       </div>
                     )}
