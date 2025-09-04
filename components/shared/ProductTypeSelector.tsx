@@ -41,9 +41,9 @@ export default function ProductTypeSelector({
 
   // Examples for each product type
   const examples = {
-    standard: "e.g., 'Monthly gym membership - £50/month'",
-    balance_builder: "e.g., 'Personal training credit - choose £20-100/month'",
-    pay_it_off: "e.g., '12-week program - £300 total, pay over 3-12 months'"
+    standard: "e.g., 'Membership to a club, or for a regular service'",
+    balance_builder: "e.g., 'Personal training credit - choose own monthly amount'",
+    pay_it_off: "e.g., 'Wedding Photography - £1200 total, pay over 2-18 months'"
   };
 
   return (
