@@ -761,6 +761,25 @@ const Navbar = () => {
                   </div>
                 )}
 
+                {/* Admin Section */}
+                {user && isAdmin && (
+                  <div className="mb-4">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2.5">
+                      Admin
+                    </h3>
+                    <div className="space-y-0.5">
+                      <Link
+                        href="/overwatch"
+                        className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                        onClick={closeMenu}
+                      >
+                        <Shield size={18} className="text-muted-foreground" />
+                        <span className="font-medium text-sm">Admin Dashboard</span>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+
                 {/* Account Actions */}
                 <div className="border-t border-white/10 pt-3">
                   {user ? (
