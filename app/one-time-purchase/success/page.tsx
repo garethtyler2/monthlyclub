@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle, ShoppingCart, ArrowRight, CreditCard } from "lucide-react";
 import { Product } from "@/types/products";
 
-export default function OneTimePurchaseSuccessPage() {
+function OneTimePurchaseSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -39,7 +39,7 @@ export default function OneTimePurchaseSuccessPage() {
     }
 
     fetchProduct();
-  }, [productId, supabase]);
+  }, [productId]);
 
   if (loading) {
     return (
@@ -147,5 +147,26 @@ export default function OneTimePurchaseSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OneTimePurchaseSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-brand-purple/10 via-brand-blue/10 to-transparent relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 -right-64 w-96 h-96 bg-brand-purple/30 rounded-full blur-[128px] -z-10" />
+          <div className="absolute -bottom-24 -left-64 w-96 h-96 bg-brand-blue/20 rounded-full blur-[128px] -z-10" />
+        </div>
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <div className="text-center text-brand-purple">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-purple mx-auto mb-4"></div>
+            <p>Loading...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <OneTimePurchaseSuccessContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,7 @@ export default function PurchaseHistoryView({ userId }: PurchaseHistoryViewProps
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  const fetchPayments = async () => {
+  const fetchPayments = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("payments")
@@ -91,11 +91,11 @@ export default function PurchaseHistoryView({ userId }: PurchaseHistoryViewProps
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, [userId]);
 
   useEffect(() => {
     fetchPayments();
-  }, [userId]);
+  }, [userId, fetchPayments]);
 
   const handleRefresh = async () => {
     setRefreshing(true);

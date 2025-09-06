@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, CreditCard, ShoppingCart } from "lucide-react";
 import { Product } from "@/types/products";
 
-export default function OneTimePurchaseConfirmPage() {
+function OneTimePurchaseConfirmContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -41,7 +41,7 @@ export default function OneTimePurchaseConfirmPage() {
     }
 
     fetchProduct();
-  }, [productId, supabase]);
+  }, [productId]);
 
   const handlePurchase = async () => {
     if (!productId || !reference) return;
@@ -217,5 +217,26 @@ export default function OneTimePurchaseConfirmPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OneTimePurchaseConfirmPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-brand-purple/10 via-brand-blue/10 to-transparent relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 -right-64 w-96 h-96 bg-brand-purple/30 rounded-full blur-[128px] -z-10" />
+          <div className="absolute -bottom-24 -left-64 w-96 h-96 bg-brand-blue/20 rounded-full blur-[128px] -z-10" />
+        </div>
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <div className="flex items-center gap-2 text-brand-purple">
+            <Loader2 className="w-6 h-6 animate-spin" />
+            <span>Loading...</span>
+          </div>
+        </div>
+      </div>
+    }>
+      <OneTimePurchaseConfirmContent />
+    </Suspense>
   );
 }
