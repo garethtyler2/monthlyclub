@@ -183,59 +183,6 @@ export default function PurchaseHistoryView({ userId }: PurchaseHistoryViewProps
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all" className="space-y-4">
-          {payments.length === 0 ? (
-            <Card className="bg-white/5 border-white/10">
-              <CardContent className="p-8 text-center">
-                <Building2 className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-white mb-2">No Transactions Yet</h3>
-                <p className="text-muted-foreground">
-                  You haven't made any purchases yet. Start exploring products!
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {payments.map((payment) => (
-                <Card key={payment.id} className="bg-white/5 border-white/10 hover:bg-white/10 transition-colors">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className={cn(
-                          "p-2 rounded-lg",
-                          getProductTypeColor(payment.product.product_type)
-                        )}>
-                          {getProductIcon(payment.product.product_type)}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-white">{payment.product.name}</h3>
-                          <p className="text-sm text-gray-400">{payment.product.business.name}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="secondary" className={getProductTypeColor(payment.product.product_type)}>
-                              {getProductTypeLabel(payment.product.product_type)}
-                            </Badge>
-                            <span className="text-xs text-gray-500">
-                              {formatDate(payment.paid_at)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-lg font-bold text-white">
-                          {formatAmount(payment.amount, payment.currency)}
-                        </div>
-                        <div className="flex items-center gap-1 text-green-400 text-sm">
-                          <CheckCircle className="w-4 h-4" />
-                          <span>Completed</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
 
         <TabsContent value="subscriptions">
           <UserSubscriptionsView userId={userId} />
