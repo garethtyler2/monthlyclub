@@ -77,7 +77,16 @@ export default function ManagePaymentDayModal({
   const getNextPaymentDate = (day: number): string => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = today.getDate() <= day ? today.getMonth() : today.getMonth() + 1;
+    
+    // Check if the selected day is today and if it's after 7:00 AM
+    const isToday = today.getDate() === day;
+    const isAfter7AM = today.getHours() >= 7;
+    
+    // If it's today and after 7 AM, use next month
+    // If it's a future day, use this month
+    // If it's today and before 7 AM, use this month
+    // If it's a past day, use next month
+    const month = (isToday && isAfter7AM) || today.getDate() > day ? today.getMonth() + 1 : today.getMonth();
     const nextDate = new Date(year, month, day);
 
     const dayNum = nextDate.getDate();
