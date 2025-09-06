@@ -400,7 +400,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                     </div>
 
                     {/* Actions */}
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 mb-4">
                       <ManagePaymentDayModal
                         isOpen={openSubId === sub.id}
                         onClose={() => setOpenSubId(null)}
@@ -424,6 +424,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                         <Button
                           size="sm"
                           variant="primary"
+                          className="w-full sm:w-auto"
                           onClick={() => setChangeAmountSubId(sub.id)}
                         >
                           <PoundSterling className="w-4 h-4" />
@@ -434,6 +435,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                       <Button
                         size="sm"
                         variant="secondary"
+                        className="w-full sm:w-auto"
                         onClick={() => {
                           // Navigate to messages page with this business
                           window.location.href = `/messages?business=${product.business?.id}`;
@@ -446,6 +448,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                       <Button
                         size="sm"
                         variant="tertiary"
+                        className="w-full sm:w-auto"
                         onClick={() => setOpenSubId(sub.id)}
                       >
                         <Settings className="w-4 h-4 mr-2" />
@@ -455,6 +458,7 @@ export default function UserSubscriptionsView({ userId }: UserSubscriptionsViewP
                       <Button
                         size="sm"
                         variant="danger"
+                        className="w-full sm:w-auto"
                         onClick={() => setCancelSubId(sub.id)}
                       >
                         <XCircle className="w-4 h-4" />

@@ -169,27 +169,17 @@ export default function PurchaseHistoryView({ userId }: PurchaseHistoryViewProps
           <h2 className="text-2xl font-bold text-white">Purchase History</h2>
           <p className="text-gray-400">View all your transactions and subscriptions</p>
         </div>
-        <Button
-          variant="outline"
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="bg-white/5 border-white/20 text-white hover:bg-white/10"
-        >
-          <RefreshCw className={cn("w-4 h-4 mr-2", refreshing && "animate-spin")} />
-          Refresh
-        </Button>
+
       </div>
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-white/5 border-white/10">
-          <TabsTrigger value="all" className="text-white data-[state=active]:bg-white/10">
-            All Transactions
-          </TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 bg-white/5 border-white/10">
+
           <TabsTrigger value="subscriptions" className="text-white data-[state=active]:bg-white/10">
-            Active Subscriptions
+            Subscriptions
           </TabsTrigger>
           <TabsTrigger value="one-time" className="text-white data-[state=active]:bg-white/10">
-            One-time Purchases
+            Purchases
           </TabsTrigger>
         </TabsList>
 
