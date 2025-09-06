@@ -14,7 +14,12 @@ This document explains how to set up Stripe webhooks to automatically update bus
 
 ## New Webhook Events
 
-### 1. `account.updated`
+### 1. `payment_intent.succeeded`
+- **Triggers**: When a payment intent succeeds (including one-time purchases)
+- **Logic**: Checks if `purchase_type` metadata is 'one_time' to handle one-time purchases
+- **Action**: Updates payment status, sends success notifications to customer and business
+
+### 2. `account.updated`
 - **Triggers**: When any Stripe account details are updated
 - **Logic**: Checks if `details_submitted` and `charges_enabled` are both `true`
 - **Action**: Updates business status to 'active' and sends activation email
@@ -38,6 +43,7 @@ https://yourdomain.com/api/stripe/webhook
 ### Required Events
 - `checkout.session.completed` (existing)
 - `payment_intent.payment_failed` (existing)
+- `payment_intent.succeeded` (NEW - for one-time payments)
 - `account.updated` (NEW)
 
 ### Stripe Dashboard Setup
@@ -46,6 +52,7 @@ https://yourdomain.com/api/stripe/webhook
 3. Select events:
    - `checkout.session.completed`
    - `payment_intent.payment_failed`
+   - `payment_intent.succeeded` ← **Add this one**
    - `account.updated` ← **Add this one**
 4. Save the webhook
 

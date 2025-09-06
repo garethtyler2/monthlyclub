@@ -108,6 +108,14 @@ export async function POST(request: Request) {
       },
     });
 
+    // Check if payment was successful
+    if (paymentIntent.status !== 'succeeded') {
+      console.error("Payment intent not succeeded:", paymentIntent.status, paymentIntent.last_payment_error);
+      return NextResponse.json({ 
+        error: `Payment failed: ${paymentIntent.last_payment_error?.message || 'Unknown error'}` 
+      }, { status: 400 });
+    }
+
     // 6. Record the payment in our database
     const { error: insertPaymentError } = await supabase.from("payments").insert({
       user_id: user.id,
@@ -123,7 +131,9 @@ export async function POST(request: Request) {
 
     if (insertPaymentError) {
       console.error("Failed to log payment:", insertPaymentError);
-      return NextResponse.json({ error: "Payment processed but failed to record" }, { status: 500 });
+      // Payment succeeded but failed to record - this is a critical issue
+      // We should still redirect to success but log this error
+      console.error("CRITICAL: Payment succeeded but failed to record in database");
     }
 
     return NextResponse.json({ 
@@ -134,6 +144,16 @@ export async function POST(request: Request) {
 
   } catch (error) {
     console.error("Payment processing failed:", error);
-    return NextResponse.json({ error: "Payment processing failed" }, { status: 500 });
+    
+    // Check if this is a Stripe error with more details
+    if (error instanceof Error) {
+      return NextResponse.json({ 
+        error: `Payment processing failed: ${error.message}` 
+      }, { status: 500 });
+    }
+    
+    return NextResponse.json({ 
+      error: "Payment processing failed. Please try again." 
+    }, { status: 500 });
   }
 }

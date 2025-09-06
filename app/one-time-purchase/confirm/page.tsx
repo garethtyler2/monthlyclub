@@ -74,7 +74,17 @@ function OneTimePurchaseConfirmContent() {
       }
     } catch (error) {
       console.error("Purchase error:", error);
-      alert("Purchase failed. Please try again.");
+      
+      // Try to get more specific error message
+      let errorMessage = "Purchase failed. Please try again.";
+      try {
+        const errorData = await error.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch {
+        // If we can't parse the error, use the default message
+      }
+      
+      alert(errorMessage);
       setSubmitting(false);
     }
   };

@@ -312,6 +312,101 @@ export async function POST(req: Request) {
     return new NextResponse("Account update processed", { status: 200 });
   }
 
+  if (event.type === "payment_intent.succeeded") {
+    const succeededIntent = event.data.object as Stripe.PaymentIntent;
+    console.log("Payment succeeded for intent:", succeededIntent.id);
+    
+    // Check if this is a one-time purchase by looking at metadata
+    const metadata = succeededIntent.metadata || {};
+    const purchaseType = metadata.purchase_type;
+    
+    if (purchaseType === 'one_time') {
+      console.log("Processing one-time purchase success webhook");
+      
+      // Get payment details from our database
+      const { data: paymentData, error: paymentError } = await supabase
+        .from("payments")
+        .select(`
+          *,
+          products(*, businesses(*)),
+          user_profiles(*)
+        `)
+        .eq("stripe_payment_intent_id", succeededIntent.id)
+        .single();
+
+      if (paymentError) {
+        console.error("Failed to fetch payment data for one-time purchase:", paymentError);
+        // Don't return error here as the payment was already processed by the API
+        return new NextResponse("Payment data not found", { status: 200 });
+      }
+
+      // Update payment status to succeeded (in case it wasn't already)
+      const { error: updateError } = await supabase
+        .from("payments")
+        .update({ 
+          status: "succeeded",
+          paid_at: new Date().toISOString()
+        })
+        .eq("stripe_payment_intent_id", succeededIntent.id);
+
+      if (updateError) {
+        console.error("Failed to update payment status:", updateError);
+        // Don't fail the webhook as payment was successful
+      }
+
+      // Send success notifications
+      try {
+        const userData = paymentData.user_profiles;
+        const businessOwnerData = paymentData.products?.businesses;
+
+        // Send payment success notification to customer
+        if (userData?.email) {
+          await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'payment_notification',
+              data: {
+                userEmail: userData.email,
+                businessName: paymentData.products?.businesses?.name || 'Unknown Business',
+                productName: paymentData.products?.name || 'Unknown Product',
+                amount: paymentData.amount,
+                status: 'success',
+                paymentDate: new Date().toLocaleDateString()
+              }
+            })
+          });
+        }
+
+        // Send payment success notification to business
+        if (businessOwnerData?.email) {
+          await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/email/send`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'payment_success',
+              data: {
+                businessEmail: businessOwnerData.email,
+                businessName: paymentData.products?.businesses?.name || 'Unknown Business',
+                customerEmail: userData?.email || 'Unknown',
+                productName: paymentData.products?.name || 'Unknown Product',
+                amount: paymentData.amount,
+                paymentDate: new Date().toLocaleDateString()
+              }
+            })
+          });
+        }
+      } catch (error) {
+        console.error('Failed to send payment success notifications:', error);
+      }
+
+      return new NextResponse("One-time payment success logged", { status: 200 });
+    }
+    
+    // For subscription payments, let the existing logic handle it
+    return new NextResponse("Payment success logged", { status: 200 });
+  }
+
   if (event.type === "payment_intent.payment_failed") {
     const failedIntent = event.data.object as Stripe.PaymentIntent;
     console.warn("Payment failed:", failedIntent.id, failedIntent.last_payment_error?.message);
