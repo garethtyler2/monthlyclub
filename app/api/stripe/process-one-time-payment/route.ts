@@ -1,15 +1,21 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-05-28.basil",
 });
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
+  const supabase = createClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: { persistSession: false, autoRefreshToken: false },
+    }
+  );
 
-  const { productId, reference } = await request.json();
+  const { productId, reference, userId } = await request.json();
 
   // 1. Get product info from Supabase
   const { data: product, error: productError } = await supabase
@@ -22,14 +28,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
   }
 
-  // 2. Check if user is logged in
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // 2. Check if user is logged in - we need to get user from the request
+  // Since we're using service role client, we need to extract user from the request body or headers
+  
+  if (!userId) {
+    return NextResponse.json({ error: "User ID required" }, { status: 400 });
   }
+
+  // Verify user exists
+  const { data: userData, error: userError } = await supabase.auth.admin.getUserById(userId);
+  if (userError || !userData) {
+    return NextResponse.json({ error: "User not found" }, { status: 401 });
+  }
+  
+  const user = userData.user;
 
   // 3. Get or create Stripe customer for the logged in user
   let { data: customerData } = await supabase

@@ -16,14 +16,25 @@ function OneTimePurchaseConfirmContent() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   const productId = searchParams.get("productId");
   const reference = searchParams.get("reference");
 
   useEffect(() => {
-    async function fetchProduct() {
+    async function fetchData() {
       if (!productId) return;
 
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error("User not authenticated:", userError);
+        router.push("/login");
+        return;
+      }
+      setUser(user);
+
+      // Get product data
       const { data, error } = await supabase
         .from("products")
         .select("*, business:businesses(name, description)")
@@ -40,11 +51,11 @@ function OneTimePurchaseConfirmContent() {
       setLoading(false);
     }
 
-    fetchProduct();
-  }, [productId]);
+    fetchData();
+  }, [productId, router]);
 
   const handlePurchase = async () => {
-    if (!productId || !reference) return;
+    if (!productId || !reference || !user) return;
 
     setSubmitting(true);
 
@@ -54,7 +65,8 @@ function OneTimePurchaseConfirmContent() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           productId, 
-          reference 
+          reference,
+          userId: user.id
         }),
       });
 

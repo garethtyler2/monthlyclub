@@ -157,39 +157,6 @@ export async function GET() {
         console.error("Failed to log successful payment:", insertSuccessError);
       }
 
-      // Update pay_it_off subscription progress
-      if (product.product_type === 'pay_it_off') {
-        const { data: subscription, error: subError } = await supabase
-          .from("subscriptions")
-          .select("total_paid, remaining_amount, payment_count, total_payments")
-          .eq("id", record.subscriptions?.id)
-          .single();
-
-        if (!subError && subscription) {
-          const newTotalPaid = (subscription.total_paid || 0) + paymentIntent.amount;
-          const newRemainingAmount = (subscription.remaining_amount || 0) - paymentIntent.amount;
-          const newPaymentCount = (subscription.payment_count || 0) + 1;
-
-          // Update subscription
-          await supabase
-            .from("subscriptions")
-            .update({
-              total_paid: newTotalPaid,
-              remaining_amount: newRemainingAmount,
-              payment_count: newPaymentCount,
-              status: newPaymentCount >= subscription.total_payments ? 'completed' : 'active'
-            })
-            .eq("id", record.subscriptions?.id);
-
-          // If all payments completed, cancel the scheduled payment
-          if (newPaymentCount >= subscription.total_payments) {
-            await supabase
-              .from("scheduled_payments")
-              .update({ status: 'completed' })
-              .eq("purchase_id", record.subscriptions?.id);
-          }
-        }
-      }
 
       // Add credit for balance builderproducts
       if (product.is_credit_builder) {
