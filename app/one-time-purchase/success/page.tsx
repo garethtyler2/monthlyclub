@@ -131,7 +131,7 @@ function OneTimePurchaseSuccessContent() {
           <div className="space-y-3">
             <Button 
               className="w-full bg-gradient-to-r from-brand-purple to-brand-indigo hover:from-brand-purple/90 hover:to-brand-indigo/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 h-12"
-              onClick={() => router.push("/dashboard")}
+              onClick={() => router.push("/dashboard/subscriptions")}
             >
               Go to Dashboard
               <ArrowRight className="w-4 h-4 ml-2" />

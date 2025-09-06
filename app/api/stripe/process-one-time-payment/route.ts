@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   // 1. Get product info from Supabase
   const { data: product, error: productError } = await supabase
     .from("products")
-    .select("*, business:businesses(stripe_account_id)")
+    .select("*, business:businesses(id, stripe_account_id)")
     .eq("id", productId)
     .single();
 
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
       metadata: {
         product_id: product.id,
         user_id: user.id,
-        business_id: product.business.business_id,
+        business_id: product.business.id,
         purchase_type: 'one_time',
         customer_reference: reference,
       },
@@ -120,7 +120,7 @@ export async function POST(request: Request) {
     const { error: insertPaymentError } = await supabase.from("payments").insert({
       user_id: user.id,
       product_id: product.id,
-      business_id: product.business.business_id,
+      business_id: product.business.id,
       amount: paymentIntent.amount,
       currency: paymentIntent.currency,
       stripe_payment_intent_id: paymentIntent.id,
@@ -131,9 +131,22 @@ export async function POST(request: Request) {
 
     if (insertPaymentError) {
       console.error("Failed to log payment:", insertPaymentError);
+      console.error("Payment data that failed to insert:", {
+        user_id: user.id,
+        product_id: product.id,
+        business_id: product.business.id,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        stripe_payment_intent_id: paymentIntent.id,
+        status: "succeeded",
+        paid_at: new Date().toISOString(),
+        subscription_id: null
+      });
       // Payment succeeded but failed to record - this is a critical issue
       // We should still redirect to success but log this error
       console.error("CRITICAL: Payment succeeded but failed to record in database");
+    } else {
+      console.log("Payment successfully recorded in database:", paymentIntent.id);
     }
 
     return NextResponse.json({ 
