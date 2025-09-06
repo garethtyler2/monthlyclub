@@ -54,7 +54,8 @@ export default function PurchaseHistoryView({ userId }: PurchaseHistoryViewProps
 
   const fetchPayments = useCallback(async () => {
     try {
-      const { data, error } = await supabase
+      // First get all payments for the user
+      const { data: paymentsData, error: paymentsError } = await supabase
         .from("payments")
         .select(`
           id,
@@ -64,27 +65,48 @@ export default function PurchaseHistoryView({ userId }: PurchaseHistoryViewProps
           paid_at,
           created_at,
           stripe_payment_intent_id,
-          product:products!inner(
-            id,
-            name,
-            product_type,
-            business:businesses!inner(
-              id,
-              name,
-              slug
-            )
-          )
+          product_id,
+          business_id
         `)
         .eq("user_id", userId)
         .eq("status", "succeeded")
         .order("paid_at", { ascending: false });
 
-      if (error) {
-        console.error("Error fetching payments:", error);
+      if (paymentsError) {
+        console.error("Error fetching payments:", paymentsError);
         return;
       }
 
-      setPayments((data as unknown as Payment[]) || []);
+      // Then get product and business details for each payment
+      const paymentsWithDetails = await Promise.all(
+        (paymentsData || []).map(async (payment) => {
+          // Get product details
+          const { data: product } = await supabase
+            .from("products")
+            .select(`
+              id,
+              name,
+              product_type,
+              business:businesses(
+                id,
+                name,
+                slug
+              )
+            `)
+            .eq("id", payment.product_id)
+            .single();
+
+          return {
+            ...payment,
+            product: product ? {
+              ...product,
+              business: Array.isArray(product.business) ? product.business[0] : product.business
+            } : null
+          };
+        })
+      );
+
+      setPayments(paymentsWithDetails as Payment[]);
     } catch (error) {
       console.error("Error fetching payments:", error);
     } finally {
@@ -205,17 +227,17 @@ export default function PurchaseHistoryView({ userId }: PurchaseHistoryViewProps
                 .filter(p => p.product.product_type === 'one_time')
                 .map((payment) => (
                   <Card key={payment.id} className="bg-white/5 border-white/10 hover:bg-white/10 transition-colors">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="p-2 bg-orange-500/20 text-orange-400 rounded-lg">
-                            <ShoppingCart className="w-5 h-5" />
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div className="flex items-start gap-3 sm:gap-4">
+                          <div className="p-2 bg-orange-500/20 text-orange-400 rounded-lg flex-shrink-0">
+                            <ShoppingCart className="w-4 h-4 sm:w-5 sm:h-5" />
                           </div>
-                          <div>
-                            <h3 className="font-semibold text-white">{payment.product.name}</h3>
-                            <p className="text-sm text-gray-400">{payment.product.business.name}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Badge variant="secondary" className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-semibold text-white text-sm sm:text-base truncate">{payment.product.name}</h3>
+                            <p className="text-xs sm:text-sm text-gray-400 truncate">{payment.product.business.name}</p>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-2">
+                              <Badge variant="secondary" className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-xs w-fit">
                                 One-time purchase
                               </Badge>
                               <span className="text-xs text-gray-500">
@@ -224,12 +246,12 @@ export default function PurchaseHistoryView({ userId }: PurchaseHistoryViewProps
                             </div>
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="flex items-center justify-between sm:flex-col sm:items-end sm:gap-1">
                           <div className="text-lg font-bold text-white">
                             {formatAmount(payment.amount, payment.currency)}
                           </div>
-                          <div className="flex items-center gap-1 text-green-400 text-sm">
-                            <CheckCircle className="w-4 h-4" />
+                          <div className="flex items-center gap-1 text-green-400 text-xs sm:text-sm">
+                            <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>Completed</span>
                           </div>
                         </div>
