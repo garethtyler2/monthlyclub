@@ -172,7 +172,7 @@ export default function PurchaseHistoryView({ userId }: PurchaseHistoryViewProps
 
       </div>
 
-      <Tabs defaultValue="all" className="w-full">
+      <Tabs defaultValue="subscriptions" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-white/5 border-white/10">
 
           <TabsTrigger value="subscriptions" className="text-white data-[state=active]:bg-white/10">

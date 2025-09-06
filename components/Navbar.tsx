@@ -399,7 +399,7 @@ const Navbar = () => {
                             className="w-full flex items-center space-x-2 text-sm text-left"
                           >
                             <Settings size={16} className="text-muted-foreground" />
-                            <span>Payment Details - Stripe</span>
+                            <span>Payment Methods - Stripe</span>
                           </button>
                         </DropdownMenuItem>
                       </>
@@ -755,7 +755,7 @@ const Navbar = () => {
                         className="w-full flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors text-left"
                       >
                         <Settings size={18} className="text-muted-foreground" />
-                        <span className="font-medium text-sm">Payment Details - Stripe</span>
+                        <span className="font-medium text-sm">Payment Methods - Stripe</span>
                       </button>
                     </div>
                   </div>
