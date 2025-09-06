@@ -3,14 +3,15 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { 
   CreditCard, 
   TrendingUp, 
   Calendar, 
+  ShoppingCart,
   Info,
-  Check
+  Check,
+  ChevronDown
 } from "lucide-react";
 import { ProductType, PRODUCT_TYPE_CONFIG, getProductTypeConfig } from "@/types/products";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ const typeIcons = {
   CreditCard,
   TrendingUp,
   Calendar,
+  ShoppingCart,
 };
 
 export default function ProductTypeSelector({ 
@@ -43,8 +45,12 @@ export default function ProductTypeSelector({
   const examples = {
     standard: "e.g., 'Membership to a club, or for a regular service'",
     balance_builder: "e.g., 'Personal training credit - choose own monthly amount'",
-    pay_it_off: "e.g., 'Wedding Photography - £1200 total, pay over 2-18 months'"
+    pay_it_off: "e.g., 'Wedding Photography - £1200 total, pay over 2-18 months'",
+    one_time: "e.g., 'One-off purchase or single service'"
   };
+
+  const recurringTypes = Object.entries(PRODUCT_TYPE_CONFIG).filter(([type]) => type !== 'one_time');
+  const oneTimeTypes = Object.entries(PRODUCT_TYPE_CONFIG).filter(([type]) => type === 'one_time');
 
   return (
     <div className={cn("space-y-3", className)}>
@@ -52,39 +58,46 @@ export default function ProductTypeSelector({
         <label className="text-sm font-semibold text-white">Product Type</label>
         <p className="text-xs text-gray-400">Choose how customers will pay for this service</p>
       </div>
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className={cn(
-              "w-full justify-between h-12 bg-gradient-to-r from-white/5 to-white/10 border-2 border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200",
-              isOpen && "border-blue-500/50 bg-blue-500/10"
-            )}
-            disabled={disabled}
-          >
-            <div className="flex items-center gap-3">
-              <div className={cn(
-                "p-1.5 rounded-lg",
-                selectedConfig.color === 'blue' && "bg-blue-500/20 text-blue-400",
-                selectedConfig.color === 'green' && "bg-green-500/20 text-green-400",
-                selectedConfig.color === 'purple' && "bg-purple-500/20 text-purple-400"
-              )}>
-                <SelectedIcon className="w-4 h-4" />
-              </div>
-              <div className="text-left">
-                <div className="font-medium">{selectedConfig.label}</div>
-                <div className="text-xs text-gray-400">{selectedConfig.shortDescription}</div>
-              </div>
-            </div>
-            <Info className="w-4 h-4 text-gray-400" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-96 p-0 bg-gray-900 border-white/10" align="start">
-          <div className="p-4">
-            <h4 className="font-medium text-sm mb-3 text-white">Choose Product Type</h4>
-            <p className="text-xs text-gray-400 mb-4">Select how customers will pay for this service</p>
+
+      {/* Trigger Button */}
+      <Button
+        variant="outline"
+        className={cn(
+          "w-full justify-between h-12 bg-gradient-to-r from-white/5 to-white/10 border-2 border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200",
+          isOpen && "border-blue-500/50 bg-blue-500/10"
+        )}
+        onClick={() => setIsOpen(!isOpen)}
+        disabled={disabled}
+      >
+        <div className="flex items-center gap-3">
+          <div className={cn(
+            "p-1.5 rounded-lg",
+            selectedConfig.color === 'blue' && "bg-blue-500/20 text-blue-400",
+            selectedConfig.color === 'green' && "bg-green-500/20 text-green-400",
+            selectedConfig.color === 'purple' && "bg-purple-500/20 text-purple-400",
+            selectedConfig.color === 'orange' && "bg-orange-500/20 text-orange-400"
+          )}>
+            <SelectedIcon className="w-4 h-4" />
+          </div>
+          <div className="text-left">
+            <div className="font-medium">{selectedConfig.label}</div>
+            <div className="text-xs text-gray-400">{selectedConfig.shortDescription}</div>
+          </div>
+        </div>
+        <ChevronDown className={cn("w-4 h-4 text-gray-400 transition-transform", isOpen && "rotate-180")} />
+      </Button>
+
+      {/* Dropdown Content */}
+      {isOpen && (
+        <div className="bg-gray-900 border border-white/10 rounded-lg p-4 space-y-4 max-h-80 overflow-y-auto">
+          <h4 className="font-medium text-sm text-white">Choose Product Type</h4>
+          <p className="text-xs text-gray-400">Select how customers will pay for this service</p>
+          
+          {/* Recurring Products Section */}
+          <div>
+            <h5 className="text-xs font-semibold text-gray-300 mb-3 uppercase tracking-wide">Recurring Products</h5>
             <div className="space-y-3">
-              {Object.entries(PRODUCT_TYPE_CONFIG).map(([type, config]) => {
+              {recurringTypes.map(([type, config]) => {
                 const Icon = typeIcons[config.icon as keyof typeof typeIcons];
                 const isSelected = selectedType === type;
                 
@@ -134,8 +147,61 @@ export default function ProductTypeSelector({
               })}
             </div>
           </div>
-        </PopoverContent>
-      </Popover>
+
+          {/* One-Time Products Section */}
+          <div>
+            <h5 className="text-xs font-semibold text-gray-300 mb-3 uppercase tracking-wide">One-Time Products</h5>
+            <div className="space-y-3">
+              {oneTimeTypes.map(([type, config]) => {
+                const Icon = typeIcons[config.icon as keyof typeof typeIcons];
+                const isSelected = selectedType === type;
+                
+                return (
+                  <Card
+                    key={type}
+                    className={cn(
+                      "cursor-pointer transition-all hover:bg-white/10 border-white/10 hover:border-white/20",
+                      isSelected && "ring-2 ring-orange-500 bg-orange-500/20 border-orange-500/30"
+                    )}
+                    onClick={() => {
+                      onTypeChange(type as ProductType);
+                      setIsOpen(false);
+                    }}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3">
+                          <div className={cn(
+                            "p-2 rounded-lg",
+                            config.color === 'orange' && "bg-orange-500/20 text-orange-400"
+                          )}>
+                            <Icon className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h5 className="font-semibold text-sm text-white">{config.label}</h5>
+                              {isSelected && <Check className="w-4 h-4 text-orange-400" />}
+                            </div>
+                            <p className="text-xs text-gray-300 mb-2 font-medium">
+                              {config.shortDescription}
+                            </p>
+                            <p className="text-xs text-gray-400 mb-2">
+                              {config.description}
+                            </p>
+                            <div className="text-xs text-gray-500 italic">
+                              {examples[type as keyof typeof examples]}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Selected type info */}
       <div className="text-xs text-gray-300 bg-white/5 p-3 rounded border border-white/10">
@@ -144,7 +210,8 @@ export default function ProductTypeSelector({
             "p-1 rounded",
             selectedConfig.color === 'blue' && "bg-blue-500/20 text-blue-400",
             selectedConfig.color === 'green' && "bg-green-500/20 text-green-400",
-            selectedConfig.color === 'purple' && "bg-purple-500/20 text-purple-400"
+            selectedConfig.color === 'purple' && "bg-purple-500/20 text-purple-400",
+            selectedConfig.color === 'orange' && "bg-orange-500/20 text-orange-400"
           )}>
             <SelectedIcon className="w-3 h-3" />
           </div>

@@ -1,6 +1,6 @@
 // Product type definitions for the new 3-type system
 
-export type ProductType = 'standard' | 'balance_builder' | 'pay_it_off';
+export type ProductType = 'standard' | 'balance_builder' | 'pay_it_off' | 'one_time';
 
 export interface Product {
   id: string;
@@ -12,6 +12,10 @@ export interface Product {
   business_id?: string;
   created_at?: string;
   currency?: string;
+  business?: {
+    name: string;
+    description?: string;
+  };
 }
 
 export interface ProductWithSubscribers extends Product {
@@ -62,6 +66,16 @@ export const PRODUCT_TYPE_CONFIG = {
     requiresPrice: true, // Uses price for total amount
     customerChoosesAmount: false,
     previewText: (price: number) => `£${price} total (choose payment plan)`
+  },
+  one_time: {
+    label: 'One-time purchase',
+    description: 'Single payment for immediate purchase - no recurring billing',
+    shortDescription: 'One-time payment',
+    icon: 'ShoppingCart',
+    color: 'orange',
+    requiresPrice: true,
+    customerChoosesAmount: false,
+    previewText: (price: number) => `£${price} (one-time)`
   }
 } as const;
 

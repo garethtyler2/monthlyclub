@@ -236,6 +236,10 @@ export default function CreateBusinessPage() {
             defaultName = "Pay it off";
             defaultDescription = "Pay off a larger amount over time with monthly installments.";
             defaultPrice = 0;
+          } else if (newType === 'one_time') {
+            defaultName = "One-time Purchase";
+            defaultDescription = "A single payment for immediate purchase - no recurring billing.";
+            defaultPrice = 0;
           }
           
           return {

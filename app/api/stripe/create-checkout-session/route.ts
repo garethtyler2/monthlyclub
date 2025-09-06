@@ -22,6 +22,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });
   }
 
+  // Handle one-time products differently
+  if (product.product_type === 'one_time') {
+    // Redirect to one-time purchase flow
+    const confirmUrl = new URL(`${process.env.NEXT_PUBLIC_SITE_URL}/one-time-purchase/confirm`);
+    confirmUrl.searchParams.set("productId", productId);
+    confirmUrl.searchParams.set("reference", reference);
+    return NextResponse.json({ url: confirmUrl.toString() }, { status: 200 });
+  }
+
   // 2. Check if user is logged in
   const {
     data: { user },

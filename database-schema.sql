@@ -111,7 +111,7 @@ CREATE TABLE public.messages (
 );
 CREATE TABLE public.payments (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
-  subscription_id uuid NOT NULL,
+  subscription_id uuid,
   stripe_payment_intent_id text,
   amount integer NOT NULL,
   status text NOT NULL,

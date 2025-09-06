@@ -102,6 +102,10 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
     const selectedProduct = products.find(p => p.id === selectedProductId);
     if (!selectedProduct) return false;
     
+    if (selectedProduct.product_type === 'one_time') {
+      return true; // One-time purchases don't need additional form validation
+    }
+    
     if (selectedProduct.product_type === 'balance_builder') {
       return preferredPaymentDate && creditAmount && parseFloat(creditAmount) > 0;
     }
@@ -239,6 +243,11 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                         <TrendingUp className="w-4 h-4 mr-2" />
                         Start Building
                       </>
+                    ) : product.product_type === 'one_time' ? (
+                      <>
+                        <ArrowRight className="w-4 h-4 mr-2" />
+                        Buy Now
+                      </>
                     ) : (
                       <>
                         <ArrowRight className="w-4 h-4 mr-2" />
@@ -252,7 +261,9 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                 {(alreadySubscribed || isOwner) && (
                   <div className="text-center py-4">
                     <p className="text-sm text-muted-foreground">
-                      {alreadySubscribed ? "You're already subscribed to this product" : "You own this product"}
+                      {alreadySubscribed ? 
+                        (product.product_type === 'one_time' ? "You've already purchased this product" : "You're already subscribed to this product") 
+                        : "You own this product"}
                     </p>
                   </div>
                 )}
@@ -325,31 +336,33 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                       />
                     </div>
 
-                    {/* Payment Date Selection */}
-                    <div className="space-y-3">
-                      <Label className="text-sm font-medium text-white">
-                        Preferred Payment Date
-                      </Label>
-                      <div className="bg-white/5 rounded-lg p-4">
-                        <div className="grid grid-cols-7 gap-2">
-                          {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
-                            <button
-                              key={day}
-                              type="button"
-                              className={cn(
-                                "w-8 h-8 rounded-full border text-sm flex items-center justify-center transition-all duration-200",
-                                preferredPaymentDate === String(day)
-                                  ? "bg-gradient-to-r from-brand-purple to-brand-blue text-white font-semibold border-transparent"
-                                  : "bg-white/5 text-white border-white/20 hover:bg-white/10"
-                              )}
-                              onClick={() => setPreferredPaymentDate(String(day))}
-                            >
-                              {day}
-                            </button>
-                          ))}
+                    {/* Payment Date Selection - Only for recurring products */}
+                    {product.product_type !== 'one_time' && (
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium text-white">
+                          Preferred Payment Date
+                        </Label>
+                        <div className="bg-white/5 rounded-lg p-4">
+                          <div className="grid grid-cols-7 gap-2">
+                            {Array.from({ length: 28 }, (_, i) => i + 1).map((day) => (
+                              <button
+                                key={day}
+                                type="button"
+                                className={cn(
+                                  "w-8 h-8 rounded-full border text-sm flex items-center justify-center transition-all duration-200",
+                                  preferredPaymentDate === String(day)
+                                    ? "bg-gradient-to-r from-brand-purple to-brand-blue text-white font-semibold border-transparent"
+                                    : "bg-white/5 text-white border-white/20 hover:bg-white/10"
+                                )}
+                                onClick={() => setPreferredPaymentDate(String(day))}
+                              >
+                                {day}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Continue Button */}
                     <Button
@@ -365,7 +378,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                       ) : (
                         <>
                           <ArrowRight className="w-4 h-4 mr-2" />
-                          Continue to Payment
+                          {product.product_type === 'one_time' ? 'Buy Now' : 'Continue to Payment'}
                         </>
                       )}
                     </Button>

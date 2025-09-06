@@ -104,10 +104,13 @@ export default function BusinessProductManager({ businessId }: { businessId: str
         if (value === 'balance_builder') {
           updated.name = "Balance Builder";
           updated.description = "Build up a balance over time to use on any of our services. Choose how much you'd like to add each month.";
-          updated.price = 0;
         } else if (value === 'pay_it_off') {
           updated.name = "Pay it off";
           updated.description = "Pay off a larger amount over time with monthly installments.";
+          updated.price = 0;
+        } else if (value === 'one_time') {
+          updated.name = "One-time Purchase";
+          updated.description = "A single payment for immediate purchase - no recurring billing.";
           updated.price = 0;
         } else {
           updated.name = "";

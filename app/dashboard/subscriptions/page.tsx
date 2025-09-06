@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import UserSubscriptionsView from "@/components/dashboard/UserSubscriptionsView";
+import PurchaseHistoryView from "@/components/dashboard/PurchaseHistoryView";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { Button } from "@/components/ui/button";
 
@@ -50,8 +50,8 @@ export default function SubscriptionDashboardPage() {
             <div className="flex items-center space-x-3">
               <div className="hidden sm:block w-px h-6 bg-white/20" />
               <div>
-                <h1 className="text-lg font-semibold text-white">My Subscriptions</h1>
-                <p className="text-sm text-muted-foreground">Manage your active subscriptions</p>
+                <h1 className="text-lg font-semibold text-white">Purchase History</h1>
+                <p className="text-sm text-muted-foreground">View all your transactions and subscriptions</p>
               </div>
             </div>
           </div>
@@ -60,9 +60,9 @@ export default function SubscriptionDashboardPage() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-6">
-        {/* Subscriptions List */}
+        {/* Purchase History */}
         <div className="mb-8">
-          <UserSubscriptionsView userId={user.id} />
+          <PurchaseHistoryView userId={user.id} />
         </div>
       </div>
     </div>

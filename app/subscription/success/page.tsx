@@ -33,7 +33,7 @@ export default function SubscriptionSuccessPage() {
     productName: string;
     productDescription: string;
     businessName: string;
-    preferredPaymentDay: number;
+    preferredPaymentDay?: number;
     price: number;
     productType: ProductType;
     totalAmount?: number;
@@ -173,7 +173,7 @@ export default function SubscriptionSuccessPage() {
               <CheckCircle className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-brand-purple mb-2">
-              Subscription Confirmed! 🎉
+              {scheduledInfo?.productType === 'one_time' ? 'Purchase Successful! 🎉' : 'Subscription Confirmed! 🎉'}
             </h1>
           </div>
 
@@ -207,6 +207,12 @@ export default function SubscriptionSuccessPage() {
                           Standard
                         </span>
                       )}
+                      {scheduledInfo?.productType === 'one_time' && (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                          <CreditCard className="w-3 h-3 mr-1" />
+                          One-time Purchase
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex flex-col items-center sm:items-end mt-4">
@@ -222,6 +228,11 @@ export default function SubscriptionSuccessPage() {
                             £{scheduledInfo?.price}/month for {scheduledInfo?.paymentMonths} months
                           </p>
                         </div>
+                      ) : scheduledInfo?.productType === 'one_time' ? (
+                        <div>
+                          <p className="text-xl font-bold text-orange-300">£{scheduledInfo?.price}</p>
+                          <p className="text-sm text-orange-200">One-time payment</p>
+                        </div>
                       ) : (
                         <p className="text-xl font-bold text-white">£{scheduledInfo?.price}/month</p>
                       )}
@@ -232,31 +243,53 @@ export default function SubscriptionSuccessPage() {
                   </div>
 
                   <div className="space-y-3">
-                    <div className="flex items-center space-x-3 p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
-                      <Calendar className="w-5 h-5 text-emerald-600" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">Payment Schedule</p>
-                        <p className="text-sm text-gray-600">
-                          {scheduledInfo ? formatOrdinal(scheduledInfo.preferredPaymentDay) : ""} of each month
-                        </p>
-                      </div>
-                    </div>
+                    {scheduledInfo?.productType === 'one_time' ? (
+                      <>
+                        <div className="flex items-center space-x-3 p-3 rounded-lg bg-orange-50 hover:bg-orange-100 transition-colors">
+                          <CreditCard className="w-5 h-5 text-orange-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">Payment Status</p>
+                            <p className="text-sm text-gray-600">Completed Successfully</p>
+                          </div>
+                        </div>
 
-                    <div className="flex items-center space-x-3 p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
-                      <CreditCard className="w-5 h-5 text-blue-600" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">Billing Status</p>
-                        <p className="text-sm text-gray-600">Active & Ready</p>
-                      </div>
-                    </div>
+                        <div className="flex items-center space-x-3 p-3 rounded-lg bg-green-50 hover:bg-green-100 transition-colors">
+                          <CheckCircle className="w-5 h-5 text-green-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">Next Steps</p>
+                            <p className="text-sm text-gray-600">The business owner will contact you soon</p>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center space-x-3 p-3 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition-colors">
+                          <Calendar className="w-5 h-5 text-emerald-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">Payment Schedule</p>
+                            <p className="text-sm text-gray-600">
+                              {scheduledInfo ? formatOrdinal(scheduledInfo.preferredPaymentDay) : ""} of each month
+                            </p>
+                          </div>
+                        </div>
 
-                    <div className="flex items-center space-x-3 p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors">
-                      <Settings className="w-5 h-5 text-purple-600" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">Manage Subscription</p>
-                        <p className="text-sm text-gray-600">Edit or cancel anytime from your dashboard</p>
-                      </div>
-                    </div>
+                        <div className="flex items-center space-x-3 p-3 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors">
+                          <CreditCard className="w-5 h-5 text-blue-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">Billing Status</p>
+                            <p className="text-sm text-gray-600">Active & Ready</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 p-3 rounded-lg bg-purple-50 hover:bg-purple-100 transition-colors">
+                          <Settings className="w-5 h-5 text-purple-600" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">Manage Subscription</p>
+                            <p className="text-sm text-gray-600">Edit or cancel anytime from your dashboard</p>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
             </CardContent>

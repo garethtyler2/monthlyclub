@@ -409,7 +409,7 @@ export default function ConfirmBusinessPage() {
                           className="hero-button-primary mt-4"
                           onClick={() => setClickedProductId(product.id)}
                         >
-                          {product.product_type === 'balance_builder' ? "Start Building" : product.product_type === 'pay_it_off' ? "Start Paying" : "Subscribe"}
+                          {product.product_type === 'balance_builder' ? "Start Building" : product.product_type === 'pay_it_off' ? "Start Paying" : product.product_type === 'one_time' ? "Buy Now" : "Subscribe"}
                         </Button>
                         {clickedProductId === product.id && (
                           <p className="mt-2 text-sm text-green-400 text-center animate-bounce">

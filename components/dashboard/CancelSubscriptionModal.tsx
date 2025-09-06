@@ -10,13 +10,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabase/client";
+import { ProductType } from "@/types/products";
 
 interface CancelSubscriptionModalProps {
   isOpen: boolean;
   onClose: () => void;
   subscriptionId: string;
   onSuccess: () => void;
-  productType?: 'standard' | 'balance_builder' | 'pay_it_off';
+  productType?: ProductType;
   businessName?: string;
 }
 
