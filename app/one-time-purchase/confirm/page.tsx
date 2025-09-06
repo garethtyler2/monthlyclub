@@ -78,8 +78,11 @@ function OneTimePurchaseConfirmContent() {
       // Try to get more specific error message
       let errorMessage = "Purchase failed. Please try again.";
       try {
-        const errorData = await error.json();
-        errorMessage = errorData.error || errorMessage;
+        // Check if error is a Response object with json method
+        if (error && typeof error === 'object' && 'json' in error && typeof error.json === 'function') {
+          const errorData = await error.json();
+          errorMessage = errorData.error || errorMessage;
+        }
       } catch {
         // If we can't parse the error, use the default message
       }
