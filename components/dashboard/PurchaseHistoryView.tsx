@@ -188,7 +188,7 @@ export default function PurchaseHistoryView({ userId }: PurchaseHistoryViewProps
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white">Purchase History</h2>
+          <h2 className="text-2xl font-bold text-white">My Payments</h2>
           <p className="text-gray-400">View all your transactions and subscriptions</p>
         </div>
 

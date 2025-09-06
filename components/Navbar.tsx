@@ -385,12 +385,12 @@ const Navbar = () => {
                     {hasSubscriptions && (
                       <>
                         <div className="px-3 pt-3 pb-1">
-                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">My Subscriptions</div>
+                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">My Payments</div>
                         </div>
                         <DropdownMenuItem asChild className="px-3 py-2 hover:bg-white/5">
                           <Link href="/dashboard/subscriptions" className="flex items-center space-x-2 text-sm">
                             <CreditCard size={16} className="text-muted-foreground" />
-                            <span>My Subscriptions</span>
+                            <span>My Payments</span>
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild className="px-3 py-2 hover:bg-white/5">
@@ -735,7 +735,7 @@ const Navbar = () => {
                 {user && hasSubscriptions && (
                   <div className="mb-4">
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 px-2.5">
-                      My Subscriptions
+                      My Payments
                     </h3>
                     <div className="space-y-0.5">
                       <Link
@@ -744,7 +744,7 @@ const Navbar = () => {
                         onClick={closeMenu}
                       >
                         <CreditCard size={18} className="text-muted-foreground" />
-                        <span className="font-medium text-sm">My Subscriptions</span>
+                        <span className="font-medium text-sm">My Payments</span>
                       </Link>
                       
                       <button

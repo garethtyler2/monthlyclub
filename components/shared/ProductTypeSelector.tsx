@@ -46,7 +46,7 @@ export default function ProductTypeSelector({
     standard: "e.g., 'Membership to a club, or for a regular service'",
     balance_builder: "e.g., 'Personal training credit - choose own monthly amount'",
     pay_it_off: "e.g., 'Wedding Photography - £1200 total, pay over 2-18 months'",
-    one_time: "e.g., 'One-off purchase or single service'"
+    one_time: "e.g., 'A product or one-off session'"
   };
 
   const recurringTypes = Object.entries(PRODUCT_TYPE_CONFIG).filter(([type]) => type !== 'one_time');
@@ -96,7 +96,7 @@ export default function ProductTypeSelector({
           {/* Recurring Products Section */}
           <div>
             <h5 className="text-xs font-semibold text-gray-300 mb-3 uppercase tracking-wide">Recurring Products</h5>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {recurringTypes.map(([type, config]) => {
                 const Icon = typeIcons[config.icon as keyof typeof typeIcons];
                 const isSelected = selectedType === type;
@@ -113,31 +113,25 @@ export default function ProductTypeSelector({
                       setIsOpen(false);
                     }}
                   >
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3">
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
                           <div className={cn(
                             "p-2 rounded-lg",
                             config.color === 'blue' && "bg-blue-500/20 text-blue-400",
                             config.color === 'green' && "bg-green-500/20 text-green-400",
                             config.color === 'purple' && "bg-purple-500/20 text-purple-400"
                           )}>
-                            <Icon className="w-5 h-5" />
+                            <Icon className="w-4 h-4" />
                           </div>
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center gap-2">
                               <h5 className="font-semibold text-sm text-white">{config.label}</h5>
                               {isSelected && <Check className="w-4 h-4 text-blue-400" />}
                             </div>
-                            <p className="text-xs text-gray-300 mb-2 font-medium">
+                            <p className="text-xs text-gray-400">
                               {config.shortDescription}
                             </p>
-                            <p className="text-xs text-gray-400 mb-2">
-                              {config.description}
-                            </p>
-                            <div className="text-xs text-gray-500 italic">
-                              {examples[type as keyof typeof examples]}
-                            </div>
                           </div>
                         </div>
                       </div>
@@ -151,7 +145,7 @@ export default function ProductTypeSelector({
           {/* One-Time Products Section */}
           <div>
             <h5 className="text-xs font-semibold text-gray-300 mb-3 uppercase tracking-wide">One-Time Products</h5>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {oneTimeTypes.map(([type, config]) => {
                 const Icon = typeIcons[config.icon as keyof typeof typeIcons];
                 const isSelected = selectedType === type;
@@ -168,29 +162,23 @@ export default function ProductTypeSelector({
                       setIsOpen(false);
                     }}
                   >
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3">
+                    <CardContent className="p-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
                           <div className={cn(
                             "p-2 rounded-lg",
                             config.color === 'orange' && "bg-orange-500/20 text-orange-400"
                           )}>
-                            <Icon className="w-5 h-5" />
+                            <Icon className="w-4 h-4" />
                           </div>
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
+                            <div className="flex items-center gap-2">
                               <h5 className="font-semibold text-sm text-white">{config.label}</h5>
                               {isSelected && <Check className="w-4 h-4 text-orange-400" />}
                             </div>
-                            <p className="text-xs text-gray-300 mb-2 font-medium">
+                            <p className="text-xs text-gray-400">
                               {config.shortDescription}
                             </p>
-                            <p className="text-xs text-gray-400 mb-2">
-                              {config.description}
-                            </p>
-                            <div className="text-xs text-gray-500 italic">
-                              {examples[type as keyof typeof examples]}
-                            </div>
                           </div>
                         </div>
                       </div>
