@@ -40,6 +40,8 @@ export default function CreateBusinessPage() {
   const [showHelp, setShowHelp] = useState(false);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [showTermsField, setShowTermsField] = useState(false);
+  const [termsAndConditions, setTermsAndConditions] = useState('');
   const router = useRouter();
 
   useEffect(() => {
@@ -66,6 +68,8 @@ export default function CreateBusinessPage() {
         setAccountType(existingBusiness.business_type || '');
         setBusinessType(existingBusiness.service_type || '');
         setExistingImageUrl(existingBusiness.image_url);
+        setTermsAndConditions(existingBusiness.terms_and_conditions || '');
+        setShowTermsField(!!existingBusiness.terms_and_conditions);
 
         // Load products
         const { data: productData } = await supabase
@@ -309,6 +313,7 @@ export default function CreateBusinessPage() {
           image_url: imageUrl,
           service_type: businessType,
           business_type: accountType,
+          terms_and_conditions: termsAndConditions || null,
           status: "pre-stripe"
         })
         .eq("id", businessId);
@@ -406,6 +411,7 @@ export default function CreateBusinessPage() {
             image_url: imageUrl,
             service_type: finalBusinessType,
             business_type: accountType,
+            terms_and_conditions: termsAndConditions || null,
             slug,
             status: "pre-stripe"
           }
@@ -755,6 +761,40 @@ export default function CreateBusinessPage() {
                   Add New Product
                 </Button>
               </div>
+            </div>
+
+            {/* Terms and Conditions Section */}
+            <div>
+              <label className="block text-base font-semibold mb-1 text-gray-100">
+                Do you want to add your own terms and conditions?
+              </label>
+              <div className="flex gap-4 mb-4">
+                <label className="flex items-center gap-2 text-white">
+                  <input
+                    type="radio"
+                    name="add_terms"
+                    value="yes"
+                    checked={showTermsField}
+                    onChange={() => setShowTermsField(true)}
+                  />
+                  Yes, add custom terms
+                </label>
+              </div>
+              
+              {showTermsField && (
+                <div>
+                  <Textarea
+                    value={termsAndConditions}
+                    onChange={(e) => setTermsAndConditions(e.target.value)}
+                    rows={6}
+                    className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-800 text-white"
+                    placeholder="Enter your custom terms and conditions here..."
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    This will be displayed to customers before they subscribe to your services.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Preview Section */}

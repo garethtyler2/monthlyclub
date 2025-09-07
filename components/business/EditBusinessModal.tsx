@@ -33,6 +33,8 @@ export function EditBusinessModal({ business }: { business: any }) {
   const [editSlug, setEditSlug] = useState(business.slug || "");
   const [newImageFile, setNewImageFile] = useState<File | null>(null);
   const [slugError, setSlugError] = useState("");
+  const [editTermsAndConditions, setEditTermsAndConditions] = useState(business.terms_and_conditions || "");
+  const [showTermsField, setShowTermsField] = useState(!!business.terms_and_conditions);
   
   // Product management state
   const [products, setProducts] = useState<Product[]>([]);
@@ -259,6 +261,7 @@ export function EditBusinessModal({ business }: { business: any }) {
         description: editDescription,
         image_url: imageUrl,
         slug: editSlug,
+        terms_and_conditions: showTermsField ? editTermsAndConditions : null,
       })
       .eq("id", business.id);
 
@@ -355,6 +358,51 @@ export function EditBusinessModal({ business }: { business: any }) {
                 rows={5}
                 style={{ minHeight: "120px" }}
               />
+            </div>
+
+            {/* Terms and Conditions Section */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Terms and Conditions</label>
+              <div className="flex gap-4 mb-4">
+                <label className="flex items-center gap-2 text-white">
+                  <input
+                    type="radio"
+                    name="edit_add_terms"
+                    value="no"
+                    checked={!showTermsField}
+                    onChange={() => {
+                      setShowTermsField(false);
+                      setEditTermsAndConditions('');
+                    }}
+                  />
+                  No custom terms
+                </label>
+                <label className="flex items-center gap-2 text-white">
+                  <input
+                    type="radio"
+                    name="edit_add_terms"
+                    value="yes"
+                    checked={showTermsField}
+                    onChange={() => setShowTermsField(true)}
+                  />
+                  Add custom terms
+                </label>
+              </div>
+              
+              {showTermsField && (
+                <div>
+                  <Textarea
+                    value={editTermsAndConditions}
+                    onChange={(e) => setEditTermsAndConditions(e.target.value)}
+                    rows={6}
+                    className="w-full"
+                    placeholder="Enter your custom terms and conditions here..."
+                  />
+                  <p className="text-xs text-gray-400 mt-1">
+                    This will be displayed to customers before they subscribe to your services.
+                  </p>
+                </div>
+              )}
             </div>
             
             <div className="flex justify-end gap-2">

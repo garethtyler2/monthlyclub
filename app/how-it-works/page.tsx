@@ -30,18 +30,14 @@ const HowItWorks = () => {
   const [formData, setFormData] = useState({
     businessName: '',
     imageUploaded: false,
-    description: ''
+    description: '',
+    products: [] as Array<{name: string, price: string, description: string, type: string}>
   });
 
   const demoData = {
     businessName: 'Monthly Club\'s Hair Salon',
     description: 'Join our exclusive hair salon community. Get access to premium styling services, expert hair care tips, and networking opportunities that will help you look and feel your best.',
-    imageUploaded: true
-  };
-
-  const step2Data = {
-    businessName: 'Monthly Club\'s Hair Salon',
-    description: 'Join our exclusive hair salon community. Get access to premium styling services, expert hair care tips, and networking opportunities that will help you look and feel your best.',
+    imageUploaded: true,
     products: [
       {
         name: 'Premium Hair Cut Subscription',
@@ -60,7 +56,7 @@ const HowItWorks = () => {
 
   const startDemo = () => {
     setIsPlaying(true);
-    setFormData({ businessName: '', imageUploaded: false, description: '' });
+    setFormData({ businessName: '', imageUploaded: false, description: '', products: [] });
     
     // Fill business name after 0.5 seconds
     setTimeout(() => {
@@ -75,6 +71,11 @@ const HowItWorks = () => {
     // Upload image after 2.5 seconds
     setTimeout(() => {
       setFormData(prev => ({ ...prev, imageUploaded: demoData.imageUploaded }));
+    }, 2500);
+    
+    // Add products after 3.5 seconds
+    setTimeout(() => {
+      setFormData(prev => ({ ...prev, products: demoData.products }));
       setIsPlaying(false);
       
       // Show loading screen for 2 seconds
@@ -83,51 +84,42 @@ const HowItWorks = () => {
         setIsLoading(false);
         setCurrentStep(1);
       }, 2000);
-    }, 2500);
+    }, 3500);
   };
 
   const resetDemo = () => {
     setIsPlaying(false);
     setCurrentStep(0);
-    setFormData({ businessName: '', imageUploaded: false, description: '' });
+    setFormData({ businessName: '', imageUploaded: false, description: '', products: [] });
   };
 
   const steps = [
     {
       number: "01",
-      title: "Create",
-      subtitle: "Add your information and product details",
-      description: "Tell us about yourself and what you're selling. Upload an image, write your description including your products and pricing. Our intuitive interface makes it easy to showcase your products in the best light.",
+      title: "Create & Design",
+      subtitle: "Build your business page with products in one step",
+      description: "Tell us about your business, upload your image, and create your products all in one place. Choose from different product types like subscriptions, balance builders, or one-time purchases. Use our AI polish feature to enhance your descriptions instantly.",
       icon: Lightbulb,
       color: "from-purple-primary to-blue-secondary",
-      features: ["Business Profile Image", "Rich descriptions", "Custom pricing", "Brand showcase"]
+      features: ["Business Profile Setup", "Product Creation", "AI Description Polish", "Multiple Product Types"]
     },
     {
-      number: "02", 
-      title: "Generate",
-      subtitle: "AI turns your info into wonderful descriptions",
-      description: "Watch the magic happen! Our AI analyzes your input and creates compelling product descriptions, optimizes your listings, and suggests improvements to maximize your sales potential.",
-      icon: Sparkles,
-      color: "from-pink-accent to-orange-accent",
-      features: ["AI Optimisation", "Smart suggestions", "Auto-formatting"]
+      number: "02",
+      title: "Connect Stripe", 
+      subtitle: "Set up payments in minutes",
+      description: "Connect your Stripe account seamlessly. We handle all the payment processing, security, and compliance so you can focus on what you do best - creating amazing products and services.",
+      icon: CreditCard,
+      color: "from-blue-secondary to-purple-light",
+      features: ["Secure payments", "Automatic payouts", "Fraud protection", "Easy setup"]
     },
     {
       number: "03",
-      title: "Sign up to Stripe", 
-      subtitle: "Add your payment details so you can get paid",
-      description: "Connect your Stripe account in seconds. We handle all the payment processing, security, and compliance so you can focus on what you do best - creating amazing products.",
-      icon: CreditCard,
-      color: "from-blue-secondary to-purple-light",
-      features: ["Secure payments", "Regular Payouts", "Fraud protection"]
-    },
-    {
-      number: "04",
-      title: "Share your link!",
-      subtitle: "Start selling and earning money",
-      description: "Your beautiful storefront is ready! Share your custom link across social media, embed it in your bio, or send it directly to customers. Start earning money immediately.",
+      title: "Share & Earn",
+      subtitle: "Start selling immediately",
+      description: "Your beautiful business page is ready! Share your custom link across social media, embed it in your bio, or send it directly to customers. Start earning recurring revenue from day one.",
       icon: Share2,
       color: "from-orange-accent to-pink-accent", 
-      features: ["Custom storefront", "Social sharing", "Analytics dashboard", "Mobile optimized"]
+      features: ["Custom storefront", "Social sharing", "Mobile optimized", "Instant earnings"]
     }
   ];
 
@@ -137,10 +129,10 @@ const HowItWorks = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Step 1: Create Your Business
+              Step 1: Create Your Business & Products
             </h2>
             <p className="text-lg text-muted-foreground mb-6">
-              Watch how easy it is! Click play to see the form fill out automatically with demo data.
+              Watch how easy it is! Click play to see the form fill out automatically with demo data including product creation.
             </p>
             
             <div className="flex gap-4 justify-center">
@@ -239,18 +231,46 @@ const HowItWorks = () => {
                         </div>
                       )}
                     </div>
+                    
+                    {/* Products Section */}
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Your Products
+                      </label>
+                      <div className="space-y-3">
+                        {formData.products.map((product, index) => (
+                          <div key={index} className="bg-gray-100 dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center justify-between mb-2">
+                              <h6 className="font-semibold text-foreground">{product.name}</h6>
+                              <Badge variant="secondary" className="text-xs">
+                                {product.type === 'balance-builder' ? 'Balance Builder' : 'Subscription'}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-2">{product.description}</p>
+                            <p className="text-sm font-medium text-primary">
+                              {product.type === 'balance-builder' ? 'Flexible amount' : `£${product.price}/month`}
+                            </p>
+                          </div>
+                        ))}
+                        {formData.products.length === 0 && (
+                          <div className="text-center py-4 text-muted-foreground">
+                            <p>Products will appear here...</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                   
                   {/* Progress Indicator */}
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm text-muted-foreground">
                       <span>Form Progress</span>
-                      <span>{Math.round((Object.values(formData).filter(Boolean).length / 3) * 100)}%</span>
+                      <span>{Math.round((Object.values(formData).filter(Boolean).length / 4) * 100)}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
                       <div 
                         className="bg-green-600 h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${(Object.values(formData).filter(Boolean).length / 3) * 100}%` }}
+                        style={{ width: `${(Object.values(formData).filter(Boolean).length / 4) * 100}%` }}
                       ></div>
                     </div>
                   </div>
@@ -268,80 +288,42 @@ const HowItWorks = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Step 2: AI Enhancement
+              Step 2: Connect Stripe
             </h2>
             <p className="text-lg text-muted-foreground">
-              Watch our AI transform your basic information into a professional business page with products!
+              Your business page is ready! Now connect your Stripe account to start accepting payments.
             </p>
           </div>
           
-                {/* Enhanced Business Preview */}
+                {/* Stripe Connection */}
                 <div className="space-y-4 md:space-y-6">
-                  <Card className="border border-border/50 bg-gray-800/50">
-                    <CardContent className="p-3 md:p-6">
-                      <div className="space-y-4 md:space-y-6">
-                        {/* Business Header */}
-                        <div className="text-center">
-                          <div className="w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-purple-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-2xl md:text-3xl mx-auto mb-3 md:mb-4">
-                            HS
-                          </div>
-                          <h4 className="text-xl md:text-2xl font-bold text-foreground mb-2 md:mb-3 px-2">
-                            {step2Data.businessName}
-                          </h4>
-                          <p className="text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2 text-sm md:text-base">
-                            {step2Data.description}
-                          </p>
-                        </div>
-                        
-                        {/* Available Products Section */}
-                        <div className="space-y-3 md:space-y-4">
+                  <Card className="border-0 shadow-glow overflow-hidden">
+                    <CardContent className="p-4 md:p-8">
+                      <div className="grid gap-8">
+                        <div className="space-y-6">
                           <div className="text-center">
-                            <h5 className="text-lg md:text-xl font-bold text-foreground mb-2">Available Products</h5>
-                            <p className="text-muted-foreground text-sm">Choose the perfect subscription for your needs</p>
+                            <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white mx-auto mb-6">
+                              <CreditCard className="w-12 h-12" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-foreground mb-4">Connect Stripe</h3>
+                            <p className="text-muted-foreground max-w-2xl mx-auto">
+                              Connect your Stripe account to start accepting payments. We handle all the security and compliance so you can focus on your business.
+                            </p>
                           </div>
                           
-                          <div className="grid gap-3 md:gap-4">
-                            {step2Data.products.map((product, index) => (
-                              <div key={index} className="bg-gray-700/50 rounded-lg p-3 md:p-4 border border-gray-600/30">
-                                <div className="flex items-start gap-3 md:gap-4">
-                                  {/* Product Icon */}
-                                  <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    {product.type === 'balance-builder' ? (
-                                      <CreditCard className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                                    ) : (
-                                      <Building2 className="w-4 h-4 md:w-5 md:h-5 text-white" />
-                                    )}
-                                  </div>
-                                  
-                                  {/* Product Content */}
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex flex-col gap-1 md:gap-2 mb-2">
-                                      <h6 className="font-semibold text-foreground text-base md:text-lg">{product.name}</h6>
-                                      <span className="text-lg md:text-xl font-bold text-primary">
-                                        {product.type === 'balance-builder' ? 'Flexible amount' : `£${product.price}/month`}
-                                      </span>
-                                    </div>
-                                    <p className="text-muted-foreground mb-2 md:mb-3 leading-relaxed text-sm md:text-base">
-                                      {product.description}
-                                    </p>
-                                    {product.type === 'balance-builder' && (
-                                      <div className="mb-2 md:mb-3">
-                                        <Badge variant="secondary" className="bg-blue-600/20 text-blue-300 border-blue-500/30 text-xs">
-                                          <Sparkles className="w-3 h-3 mr-1" />
-                                          Balance Builder
-                                        </Badge>
-                                      </div>
-                                    )}
-                                    
-                                    {/* Action Button */}
-                                    <Button className="hero-button-primary w-full text-sm md:text-base py-2 md:py-2">
-                                      Subscribe Now
-                                      <ArrowRight className="w-3 h-3 md:w-4 md:h-4 ml-1 md:ml-2" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
+                          <div className="grid gap-4 max-w-md mx-auto">
+                            <div className="flex items-center gap-3">
+                              <CheckCircle className="w-5 h-5 text-green-500" />
+                              <span className="text-sm text-muted-foreground">Secure payment processing</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <CheckCircle className="w-5 h-5 text-green-500" />
+                              <span className="text-sm text-muted-foreground">Automatic payouts</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <CheckCircle className="w-5 h-5 text-green-500" />
+                              <span className="text-sm text-muted-foreground">Fraud protection</span>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -373,73 +355,13 @@ const HowItWorks = () => {
       );
     }
 
-    // Step 3: Stripe Onboarding
+    // Step 3: Share & Earn
     if (currentStep === 2) {
       return (
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Step 3: Connect Stripe
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Set up your payment processing in just a few minutes with Stripe.
-            </p>
-          </div>
-          
-          <Card className="border-0 shadow-glow overflow-hidden">
-            <CardContent className="p-4 md:p-8">
-              <div className="grid gap-8">
-                <div className="space-y-6">
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white mx-auto mb-6">
-                      <CreditCard className="w-12 h-12" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-foreground mb-4">Stripe Onboarding</h3>
-                    <p className="text-muted-foreground max-w-2xl mx-auto">
-                      Connect your Stripe account to start accepting payments. We handle all the security and compliance so you can focus on your business.
-                    </p>
-                  </div>
-                  
-                  <div className="grid gap-4 max-w-md mx-auto">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                      <span className="text-sm text-muted-foreground">Secure payment processing</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                      <span className="text-sm text-muted-foreground">Automatic payouts</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                      <span className="text-sm text-muted-foreground">Fraud protection</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Continue to Step 4 Button */}
-          <div className="text-center mt-8">
-            <Button 
-              onClick={() => setCurrentStep(3)}
-              className="hero-button-primary"
-            >
-              Continue to Step 4
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </div>
-        </div>
-      );
-    }
-
-    // Step 4: Share Your Link
-    if (currentStep === 3) {
-      return (
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Step 4: Share & Start Earning
+              Step 3: Share & Start Earning
             </h2>
             <p className="text-lg text-muted-foreground">
               Your business is ready! Share your link and start earning money.
@@ -499,6 +421,7 @@ const HowItWorks = () => {
         </div>
       );
     }
+
   };
 
   return (
@@ -515,10 +438,10 @@ const HowItWorks = () => {
             How It Works
           </Badge>
           <h1 className="text-4xl md:text-7xl font-bold bg-clip-text gradient-text mb-6 animate-scale-in leading-tight">
-            Launch Your Subscription Business <br className="md:hidden" /> in 4 Easy Steps
+            Launch Your Subscription Business <br className="md:hidden" /> in 3 Easy Steps
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-slide-in-up">
-            Transform your creativity into recurring revenue. Follow four simple steps to build and grow your subscription business.          </p>
+            Transform your creativity into recurring revenue. Create your business page with products, connect payments, and start earning - all in minutes.          </p>
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="hero-button-primary">

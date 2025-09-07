@@ -10,6 +10,7 @@ import Image from "next/image";
 import ProductsListWrapper from "@/components/business/ProductsListWrapper";
 import { EditBusinessModal } from "@/components/business/EditBusinessModal";
 import { ShareButton } from "@/components/shared/ShareButton";
+import { TermsAndConditionsDisplay } from "@/components/business/TermsAndConditionsDisplay";
 
 const gradientStyles = [
   "from-brand-blue/10 to-transparent border-brand-blue/20",
@@ -113,6 +114,13 @@ export default async function BusinessPage(
             className="border-white/20 text-white hover:bg-white/10"
           />
         </div>
+
+        {/* Terms and Conditions */}
+        {business?.terms_and_conditions && (
+          <div className="mb-10">
+            <TermsAndConditionsDisplay terms={business.terms_and_conditions} />
+          </div>
+        )}
 
         {/* Products */}
         {products && products.length > 0 && (
