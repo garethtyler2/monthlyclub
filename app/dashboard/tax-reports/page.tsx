@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -61,37 +61,7 @@ export default function TaxReportsPage() {
   const [reportData, setReportData] = useState<TaxReportData | null>(null);
   const [availableTaxYears, setAvailableTaxYears] = useState<TaxYear[]>([]);
 
-  useEffect(() => {
-    const fetchBusinessId = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      console.log("Current user:", user);
-      if (!user) return;
-
-      const { data: business, error } = await supabase
-        .from("businesses")
-        .select("id")
-        .eq("user_id", user.id)
-        .single();
-
-      console.log("Business data:", business);
-      console.log("Business error:", error);
-
-      if (business) {
-        setBusinessId(business.id);
-      }
-    };
-
-    fetchBusinessId();
-  }, []);
-
-  useEffect(() => {
-    if (businessId) {
-      fetchAvailableTaxYears();
-      fetchTaxReportData();
-    }
-  }, [businessId, selectedTaxYear]);
-
-  const fetchAvailableTaxYears = async () => {
+  const fetchAvailableTaxYears = useCallback(async () => {
     if (!businessId) return;
 
     try {
@@ -139,9 +109,9 @@ export default function TaxReportsPage() {
     } catch (error) {
       console.error("Error fetching available tax years:", error);
     }
-  };
+  }, [businessId]);
 
-  const fetchTaxReportData = async () => {
+  const fetchTaxReportData = useCallback(async () => {
     if (!businessId) return;
 
     setLoading(true);
@@ -292,7 +262,7 @@ export default function TaxReportsPage() {
 
       // Calculate product breakdown
       const productMap = new Map<string, { revenue: number; count: number; name: string }>();
-      enrichedPayments?.forEach(payment => {
+      enrichedPayments?.forEach((payment: any) => {
         const productId = payment.product_id;
         const productName = payment.products?.name || 'Unknown Product';
         
@@ -329,7 +299,37 @@ export default function TaxReportsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [businessId, selectedTaxYear]);
+
+  useEffect(() => {
+    const fetchBusinessId = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log("Current user:", user);
+      if (!user) return;
+
+      const { data: business, error } = await supabase
+        .from("businesses")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+      console.log("Business data:", business);
+      console.log("Business error:", error);
+
+      if (business) {
+        setBusinessId(business.id);
+      }
+    };
+
+    fetchBusinessId();
+  }, []);
+
+  useEffect(() => {
+    if (businessId) {
+      fetchAvailableTaxYears();
+      fetchTaxReportData();
+    }
+  }, [businessId, selectedTaxYear, fetchAvailableTaxYears, fetchTaxReportData]);
 
   const exportToCSV = () => {
     if (!reportData) return;
