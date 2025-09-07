@@ -59,14 +59,6 @@ export async function GET() {
           .eq('sender_id', otherParticipantId)
           .is('read_at', null);
         
-        console.log('Unread count calculation:', {
-          conversationId: conv.id,
-          currentUserId: user.id,
-          otherParticipantId,
-          unreadCount,
-          participant1: conv.participant1_id,
-          participant2: conv.participant2_id
-        });
         
         // Also log the actual messages to see their read_at status
         const { data: messageDetails } = await supabase
@@ -74,7 +66,6 @@ export async function GET() {
           .select('id, sender_id, read_at, content')
           .eq('conversation_id', conv.id);
         
-        console.log('Message details for conversation:', conv.id, messageDetails);
         
         return {
           ...conv,

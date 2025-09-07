@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
-import { AlertTriangle, ArrowLeft, RefreshCw, TrendingUp, TrendingDown, Users, CreditCard, Building2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, RefreshCw, TrendingUp, TrendingDown, Users, CreditCard, Building2, FileText } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BusinessOwnerView } from "@/components/dashboard/BusinessOwnerView";
 import BusinessProductManager from "@/components/dashboard/BusinessProductManager";
 import { ShareButton } from "@/components/shared/ShareButton";
+import Link from "next/link";
 
 export default function BusinessDashboardPage() {
   const [user, setUser] = useState<any>(null);
@@ -168,6 +169,56 @@ export default function BusinessDashboardPage() {
             </CardContent>
           </Card>
         )}
+
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-white mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Link href="/dashboard/tax-reports">
+              <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-500/20 rounded-lg">
+                      <FileText className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white">Tax Reports</h3>
+                      <p className="text-sm text-gray-400">Generate income reports for tax purposes</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+            
+            <Card className="border-white/10 bg-white/5 opacity-60 cursor-not-allowed">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-500/20 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-green-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Analytics</h3>
+                    <p className="text-sm text-gray-400">Coming Soon - View detailed business analytics</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-white/10 bg-white/5 opacity-60 cursor-not-allowed">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-500/20 rounded-lg">
+                    <Users className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">Customers</h3>
+                    <p className="text-sm text-gray-400">Coming Soon - Manage your customer base</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
         {/* Business Overview */}
         <div className="mb-8">

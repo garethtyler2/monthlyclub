@@ -19,7 +19,8 @@ import {
   TrendingUp,
   Building2,
   User,
-  Clock
+  Clock,
+  ShoppingCart
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product, isCustomerAmountType } from "@/types/products";
@@ -191,6 +192,12 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                         <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs mt-1">
                           <CreditCard className="w-3 h-3 mr-1" />
                           Standard
+                        </Badge>
+                      )}
+                      {product.product_type === 'one_time' && (
+                        <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30 text-xs mt-1">
+                          <ShoppingCart className="w-3 h-3 mr-1" />
+                          One Time
                         </Badge>
                       )}
                     </div>

@@ -68,7 +68,7 @@ export const PRODUCT_TYPE_CONFIG = {
     previewText: (price: number) => `£${price} total (choose payment plan)`
   },
   one_time: {
-    label: 'General Products',
+    label: 'One Time',
     description: 'Single payment for immediate purchase - no recurring billing',
     shortDescription: 'One-off payment',
     icon: 'ShoppingCart',

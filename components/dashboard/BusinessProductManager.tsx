@@ -26,7 +26,8 @@ import {
   CheckCircle,
   ArrowRight,
   PoundSterling,
-  Calendar
+  Calendar,
+  ShoppingCart
 } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { ProductWithSubscribers, ProductType, getProductTypeConfig, requiresPrice } from '@/types/products';
@@ -348,6 +349,8 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                           <TrendingUp className="w-5 h-5 text-green-400" />
                         ) : product.product_type === 'pay_it_off' ? (
                           <Calendar className="w-5 h-5 text-purple-400" />
+                        ) : product.product_type === 'one_time' ? (
+                          <ShoppingCart className="w-5 h-5 text-orange-400" />
                         ) : (
                           <CreditCard className="w-5 h-5 text-blue-400" />
                         )}
@@ -359,7 +362,8 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                             "text-xs",
                             product.product_type === 'balance_builder' && "bg-green-500/20 text-green-400 border-green-500/30",
                             product.product_type === 'pay_it_off' && "bg-purple-500/20 text-purple-400 border-purple-500/30",
-                            product.product_type === 'standard' && "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                            product.product_type === 'standard' && "bg-blue-500/20 text-blue-400 border-blue-500/30",
+                            product.product_type === 'one_time' && "bg-orange-500/20 text-orange-400 border-orange-500/30"
                           )}>
                             {getProductTypeConfig(product.product_type).label}
                           </Badge>
@@ -394,6 +398,11 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                           <span className="text-lg font-bold text-purple-300">£{product.price?.toFixed(2)} total</span>
                           <p className="text-sm text-purple-200">Customer chooses payment plan</p>
                         </div>
+                      </div>
+                    ) : product.product_type === 'one_time' ? (
+                      <div className="flex items-center space-x-2">
+                        <PoundSterling className="w-4 h-4 text-orange-400" />
+                        <span className="text-lg font-bold text-orange-300">£{product.price?.toFixed(2)} one-time</span>
                       </div>
                     ) : (
                       <div className="flex items-center space-x-2">
