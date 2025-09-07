@@ -443,6 +443,12 @@ export default function CreateBusinessPage() {
 
     // Continue to Stripe setup
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("No active session");
+      }
+
+      // Get the current session for the access token
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error("No active session");

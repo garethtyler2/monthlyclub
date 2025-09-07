@@ -45,9 +45,9 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
   const pathname = usePathname();
 
   const handleSelect = async (productId: string) => {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!session?.user) {
+    if (!user) {
       router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
