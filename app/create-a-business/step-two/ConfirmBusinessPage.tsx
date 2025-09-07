@@ -317,6 +317,20 @@ export default function ConfirmBusinessPage() {
                   </Button>
                 </div>
               </div>
+              <div className="text-center mb-4">
+                <p className="text-sm text-gray-400 mb-2">
+                  By continuing, you agree to our{' '}
+                  <a 
+                    href="/terms-business" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-brand-blue hover:text-brand-purple underline"
+                  >
+                    Business Terms and Conditions
+                  </a>
+                </p>
+              </div>
+
               <div className="mt-4 w-full flex flex-col md:flex-row md:justify-between gap-3">
                 <Button
                   variant="ghost"

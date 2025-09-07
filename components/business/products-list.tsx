@@ -364,6 +364,21 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                       </div>
                     )}
 
+                    {/* Terms Link */}
+                    <div className="text-center mb-4">
+                      <p className="text-xs text-muted-foreground">
+                        By {product.product_type === 'one_time' ? 'purchasing' : 'subscribing'}, you agree to our{' '}
+                        <a 
+                          href="/terms-customer" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-brand-blue hover:text-brand-purple underline"
+                        >
+                          Customer Terms and Conditions
+                        </a>
+                      </p>
+                    </div>
+
                     {/* Continue Button */}
                     <Button
                       className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"

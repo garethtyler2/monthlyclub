@@ -834,6 +834,20 @@ export default function CreateBusinessPage() {
               </div>
             )}
 
+            <div className="text-center mb-4">
+              <p className="text-sm text-gray-400 mb-2">
+                By continuing, you agree to our{' '}
+                <a 
+                  href="/terms-business" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-brand-blue hover:text-brand-purple underline"
+                >
+                  Business Terms and Conditions
+                </a>
+              </p>
+            </div>
+
             <Button type="submit" className="w-full hero-button-primary">
               {isEditing ? "Update & Continue to Stripe" : "Create & Continue to Stripe"}
             </Button>
