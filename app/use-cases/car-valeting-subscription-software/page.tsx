@@ -99,7 +99,6 @@ const features = [
 const realWorldExamples = [
   {
     business: "Example Car Valeting A",
-    location: "Major City",
     setup: "Car Valet Premium + Seasonal",
     revenue: "£3,200/month recurring",
     customers: "50 car owners",
@@ -107,7 +106,6 @@ const realWorldExamples = [
   },
   {
     business: "Example Car Valeting B",
-    location: "Major City",
     setup: "Car Care Complete focus",
     revenue: "£4,800/month recurring",
     customers: "40 car owners",
@@ -115,7 +113,6 @@ const realWorldExamples = [
   },
   {
     business: "Example Car Valeting C",
-    location: "Major City",
     setup: "Car Valet Basic + Premium mix",
     revenue: "£2,100/month recurring",
     customers: "60 car owners",
@@ -417,7 +414,6 @@ export default function CarValetingSubscriptionSoftware() {
                       ))}
                     </div>
                   </div>
-                  <CardDescription className="text-brand-purple font-medium">{example.location}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">

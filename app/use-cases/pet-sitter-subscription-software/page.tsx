@@ -100,7 +100,6 @@ const features = [
 const realWorldExamples = [
   {
     business: "Example Pet Services A",
-    location: "Major City",
     setup: "Dog Walking + Pet Sitting + Grooming",
     revenue: "£3,200/month recurring",
     customers: "40 pet families",
@@ -108,7 +107,6 @@ const realWorldExamples = [
   },
   {
     business: "Example Pet Services B",
-    location: "Major City",
     setup: "Full Pet Services Complete",
     revenue: "£4,800/month recurring",
     customers: "32 pet families",
@@ -116,7 +114,6 @@ const realWorldExamples = [
   },
   {
     business: "Example Pet Services C",
-    location: "Major City",
     setup: "Dog Walking + Pet Sitting mix",
     revenue: "£2,100/month recurring",
     customers: "50 pet families",
@@ -418,7 +415,6 @@ export default function PetSitterSubscriptionSoftware() {
                       ))}
                     </div>
                   </div>
-                  <CardDescription className="text-brand-purple font-medium">{example.location}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">

@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Pricing | Simple Pay-As-You-Go Model",
     description: "No monthly fees—just a small % per transaction. Built for growing businesses.",
     url: "https://www.monthlyclubhq.com/pricing",
-    siteName: "MonthlyClubHQ",
+    siteName: "Monthly Club",
     images: [
       {
         url: "https://www.monthlyclubhq.com/images/MonthlyClubLogo.png",
@@ -48,7 +48,10 @@ const PricingPage = () => {
             Simple, Transparent Pricing
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-            No monthly fee. Just pay when you get paid.
+            No monthly fee. Just pay when you get paid.*
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            *Payment processed immediately, funds typically reach your bank account within 7 days
           </p>
         </div>
       </section>
@@ -233,6 +236,11 @@ const PricingPage = () => {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-2">Example Payouts</h2>
           <p className="text-center text-muted-foreground mb-8">How a single payment breaks down with our fees</p>
+          <div className="bg-blue-50/10 border border-blue-200/20 rounded-lg p-4 mb-8 max-w-2xl mx-auto">
+            <p className="text-sm text-muted-foreground text-center">
+              <strong>Payment Timing:</strong> When a customer's payment is processed, Stripe typically holds the funds for about 7 days before transferring them to your bank account. This is standard practice for payment processors to ensure transaction security.
+            </p>
+          </div>
 
           {/* Desktop/table */}
           <div className="overflow-x-auto hidden md:block">

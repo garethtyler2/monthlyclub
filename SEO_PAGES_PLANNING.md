@@ -84,7 +84,7 @@
     - [ ] `/features/pay-it-off` - BOFU, 700 words
     - [ ] `/features/one-time-purchases` - BOFU, 600 words
     - [ ] `/features/messaging-community` - MOFU, 700 words
-    - [ ] `/features/custom-branding` - BOFU, 500 words
+    - [ ] `/features/business-branding` - BOFU, 500 words
     - [ ] `/features/ai-descriptions` - MOFU, 700 words
     - [ ] `/features/tax-analytics` - MOFU, 700 words
     - [ ] `/features/stripe-billing` - BOFU, 900 words

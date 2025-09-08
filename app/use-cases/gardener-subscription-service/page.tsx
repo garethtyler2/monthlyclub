@@ -99,7 +99,6 @@ const features = [
 const realWorldExamples = [
   {
     business: "Example Gardening Business A",
-    location: "Major City",
     setup: "Garden Maintenance Premium + Seasonal",
     revenue: "£2,800/month recurring",
     customers: "35 garden clients",
@@ -107,7 +106,6 @@ const realWorldExamples = [
   },
   {
     business: "Example Gardening Business B",
-    location: "Major City",
     setup: "Garden Care Complete focus",
     revenue: "£4,200/month recurring",
     customers: "28 garden clients",
@@ -115,7 +113,6 @@ const realWorldExamples = [
   },
   {
     business: "Example Gardening Business C",
-    location: "Major City",
     setup: "Garden Maintenance Basic + Premium mix",
     revenue: "£1,900/month recurring",
     customers: "45 garden clients",
@@ -417,7 +414,6 @@ export default function GardenerSubscriptionService() {
                       ))}
                     </div>
                   </div>
-                  <CardDescription className="text-brand-purple font-medium">{example.location}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">

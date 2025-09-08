@@ -101,8 +101,13 @@ export default function AutomatePaymentsStripePage() {
 
               <h2>Getting Paid</h2>
               <p>
-                Once you're set up with Monthly Club, you'll connect your payout details and Stripe handles the rest. You’ll get paid out automatically based on their schedule — typically daily or weekly.
+                Once you're set up with Monthly Club, you'll connect your payout details and Stripe handles the rest. You'll get paid out automatically based on their schedule — typically daily or weekly.
               </p>
+              <div className="bg-blue-50/10 border border-blue-200/20 rounded-lg p-4 my-6">
+                <p className="text-sm text-muted-foreground">
+                  <strong>Payment Timing:</strong> When a customer's payment is processed, Stripe typically holds the funds for about 7 days before transferring them to your bank account. This is standard practice for payment processors to ensure transaction security and handle any potential disputes.
+                </p>
+              </div>
 
               <h2>Fully Integrated – No Tech Skills Needed</h2>
               <p>

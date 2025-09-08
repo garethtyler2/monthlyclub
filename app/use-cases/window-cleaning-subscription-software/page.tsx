@@ -99,7 +99,6 @@ const features = [
 const realWorldExamples = [
   {
     business: "Example Window Cleaning A",
-    location: "Major City",
     setup: "Residential Premium + Commercial",
     revenue: "£3,200/month recurring",
     customers: "45 residential + 8 commercial",
@@ -107,7 +106,6 @@ const realWorldExamples = [
   },
   {
     business: "Example Window Cleaning B",
-    location: "Major City",
     setup: "Commercial focus",
     revenue: "£8,500/month recurring",
     customers: "25 commercial clients",
@@ -115,7 +113,6 @@ const realWorldExamples = [
   },
   {
     business: "Example Window Cleaning C",
-    location: "Major City",
     setup: "Residential Basic + Premium",
     revenue: "£1,800/month recurring",
     customers: "60 residential clients",
@@ -322,7 +319,6 @@ export default function WindowCleaningSubscriptionSoftware() {
                       ))}
                     </div>
                   </div>
-                  <CardDescription className="text-brand-purple font-medium">{example.location}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">

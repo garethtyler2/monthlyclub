@@ -7,22 +7,22 @@ import { Zap } from "lucide-react";
 import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "About | The Story Behind MonthlyClubHQ",
+  title: "About | The Story Behind Monthly Club",
   description: "Learn about the mission, founder, and thinking behind MonthlyClub. We're building modern tools to help creators and service businesses earn recurring revenue with ease.",
   alternates: {
     canonical: "https://www.monthlyclubhq.com/about"
   },
   openGraph: {
-    title: "About | The Story Behind MonthlyClubHQ",
+    title: "About | The Story Behind Monthly Club",
     description: "We're on a mission to make launching a subscription business dead simple. Built for creators, solo founders, and service providers.",
     url: "https://www.monthlyclubhq.com/about",
-    siteName: "MonthlyClubHQ",
+    siteName: "Monthly Club",
     images: [
       {
         url: "https://www.monthlyclubhq.com/images/MonthlyClubLogo.png",
         width: 1200,
         height: 630,
-        alt: "MonthlyClubHQ Logo"
+        alt: "Monthly Club Logo"
       }
     ],
     type: "website"
@@ -92,7 +92,7 @@ const AboutPage = () => {
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebPage",
-          "name": "About MonthlyClubHQ",
+          "name": "About Monthly Club",
           "url": "https://www.monthlyclubhq.com/about",
           "description": "Learn about the mission, founder, and thinking behind MonthlyClub. Built to help you launch your subscription business with ease."
         })}

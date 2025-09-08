@@ -199,6 +199,12 @@ export default function BusinessTermsAndConditions() {
                 <strong className="text-white">6.2 Payouts.</strong> Stripe issues payouts to your nominated bank account according to Stripe's schedules and policies. We do not control payout timing and are not responsible for Stripe's holds, reserves, or delays.
               </p>
               
+              <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4 mb-6">
+                <p className="text-yellow-200 text-sm leading-relaxed">
+                  <strong className="text-yellow-100">Important Payment Timing:</strong> When a customer's payment is successfully processed, Stripe typically holds the funds for approximately 7 days before transferring them to your bank account. This settlement period is standard practice for payment processors to ensure transaction security, handle potential disputes, and comply with financial regulations. The exact timing may vary based on your account status, business type, and Stripe's risk assessment.
+                </p>
+              </div>
+              
               <p className="text-gray-300 mb-4 leading-relaxed">
                 <strong className="text-white">6.3 Refunds.</strong> You must publish a refund policy that complies with consumer law. If you do not publish a policy, the default is no voluntary refunds except where required by law. All refunds must be processed through Stripe.
               </p>

@@ -96,15 +96,13 @@ const features = [
 const realWorldExamples = [
   {
     business: "Example Tattoo Studio A",
-    location: "Major City",
     setup: "Pay It Off + Balance Builder focus",
     revenue: "£1,500/month recurring",
     customers: "45 active clients",
-    testimonial: "Monthly Club transformed our tattoo business. Clients love the payment flexibility and we get paid upfront."
+    testimonial: "Monthly Club transformed our tattoo business. Clients love the payment flexibility and we get paid upfront*."
   },
   {
     business: "Example Tattoo Studio B",
-    location: "Major City",
     setup: "Full payment plan options",
     revenue: "£2,200/month recurring",
     customers: "20 active clients",
@@ -112,7 +110,6 @@ const realWorldExamples = [
   },
   {
     business: "Example Tattoo Studio C",
-    location: "Major City",
     setup: "Balance Builder + One-time",
     revenue: "£3,800/month recurring",
     customers: "35 active clients",
@@ -414,7 +411,6 @@ export default function TattooArtistBuyNowPayLater() {
                       ))}
                     </div>
                   </div>
-                  <CardDescription className="text-brand-purple font-medium">{example.location}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -437,6 +433,11 @@ export default function TattooArtistBuyNowPayLater() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+          <div className="mt-6 text-center">
+            <p className="text-xs text-muted-foreground">
+              *Payment processed immediately, funds typically reach your bank account within 7 days
+            </p>
           </div>
         </div>
       </section>

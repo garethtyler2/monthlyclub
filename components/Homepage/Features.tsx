@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, Shield, Clipboard, Brain, Target, BarChart, Newspaper, MessageCircle } from "lucide-react";
+import { Activity, Shield, Clipboard, Brain, Target, BarChart, Newspaper, MessageCircle, CreditCard, ShoppingCart } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -48,11 +48,11 @@ const featureItems = [
   },
   {
     icon: Target,
-    title: "Custom Branding",
-    description: "Each business gets a clean, branded page to showcase and sell their services.",
+    title: "Business Branding",
+    description: "Create your professional business page with logo, description, and products.",
     className: "border-brand-pink/20 bg-gradient-to-b from-brand-pink/10 to-transparent",
     delay: 300,
-    link: "/features/custom-branding"
+    link: "/features/business-branding"
   },
   {
     icon: Activity,
@@ -63,20 +63,36 @@ const featureItems = [
     link: "/features/balance-builder"
   },
   {
+    icon: CreditCard,
+    title: "Pay It Off Plans",
+    description: "Break down expensive services into manageable monthly payments for customers.",
+    className: "border-brand-green/20 bg-gradient-to-b from-brand-green/10 to-transparent",
+    delay: 450,
+    link: "/features/pay-it-off"
+  },
+  {
+    icon: ShoppingCart,
+    title: "One-Time Purchases",
+    description: "Perfect for add-ons, one-off services, or standalone products.",
+    className: "border-brand-orange/20 bg-gradient-to-b from-brand-orange/10 to-transparent",
+    delay: 500,
+    link: "/features/one-time-purchases"
+  },
+  {
+    icon: Shield,
+    title: "Stripe Billing",
+    description: "Handle all payments, subscriptions, and billing automatically with Stripe.",
+    className: "border-brand-slate/20 bg-gradient-to-b from-brand-slate/10 to-transparent",
+    delay: 550,
+    link: "/features/stripe-billing"
+  },
+  {
     icon: Brain,
     title: "Built for Service Businesses",
     description: "Perfect for cleaners, groomers, beauty pros, and anyone who works on repeat bookings.",
     className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
-    delay: 500,
-    link: "/use-cases/"
-  },
-  {
-    icon: MessageCircle,
-    title: "AI-Powered Descriptions",
-    description: "Generate compelling service descriptions and marketing copy with built-in AI assistance.",
-    className: "border-brand-green/20 bg-gradient-to-b from-brand-green/10 to-transparent",
     delay: 600,
-    link: "/features/ai-descriptions"
+    link: "/use-cases/"
   }
 ];
 

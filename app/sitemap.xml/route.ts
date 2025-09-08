@@ -37,6 +37,13 @@ export async function GET() {
     "use-cases/gym-membership-software",
     "use-cases/beauty-salon-subscription-software",
     "use-cases/tattoo-artist-buy-now-pay-later",
+    "features/balance-builder",
+    "features/pay-it-off",
+    "features/one-time-purchases",
+    "features/messaging-community",
+    "features/business-branding",
+    "features/tax-analytics",
+    "features/stripe-billing",
   ]
 
   const urls = [
