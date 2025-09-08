@@ -177,7 +177,7 @@ Founding offer this month only → [plan link]`}
               </ul>
 
               <div className="mt-8">
-                <Link href="/create-a-business/step-one" className="hero-button-primary">Create your plans</Link>
+                <Link href="/create-a-business" className="hero-button-primary">Create your plans</Link>
               </div>
               </article>
   

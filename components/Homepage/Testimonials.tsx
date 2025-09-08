@@ -66,7 +66,7 @@ const Testimonials = () => {
           </p>
           <div className="mt-4 animate-fade-in" style={{ animationDelay: "200ms" }}>
             <a
-              href="/guides/hairdresser-subscriptions"
+              href="/use-cases/hairdressers-subscription-software"
               className="text-sm text-brand-purple underline underline-offset-2 hover:text-brand-purple/80"
             >
               See how hairdressers, cleaners, and pros use subscriptions →

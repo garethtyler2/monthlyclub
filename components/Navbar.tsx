@@ -220,6 +220,13 @@ const Navbar = () => {
                 Guides
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-brand-purple to-brand-blue transition-all duration-200 group-hover:w-full"></span>
               </Link>
+              <Link 
+                href="/use-cases" 
+                className="text-sm font-medium text-muted-foreground hover:text-white transition-colors duration-200 relative group"
+              >
+                Use Cases
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-brand-purple to-brand-blue transition-all duration-200 group-hover:w-full"></span>
+              </Link>
               {hasSubscriptions && (
                 <Link 
                   href="/feed" 
@@ -618,6 +625,13 @@ const Navbar = () => {
                         onClick={closeMenu}
                       >
                         <span className="font-medium text-sm">Guides</span>
+                      </Link>
+                      <Link
+                        href="/use-cases"
+                        className="flex items-center space-x-3 p-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                        onClick={closeMenu}
+                      >
+                        <span className="font-medium text-sm">Use Cases</span>
                       </Link>
                     </div>
                     

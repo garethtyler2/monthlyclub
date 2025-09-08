@@ -4,6 +4,7 @@ import React from "react";
 import Head from "next/head";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import TopicGrid from "@/components/TopicGrid";
 import { CheckCircle } from "lucide-react";
 
@@ -120,6 +121,84 @@ export default function GuidesHomePage() {
           </div>
 
           <TopicGrid />
+
+          {/* See Examples Section */}
+          <section className="py-12 md:py-16">
+            <div className="container mx-auto px-6 max-w-6xl">
+              <h2 className="text-3xl font-bold mb-8 text-center">See Real Examples</h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto text-center mb-12">
+                Explore how different industries use Monthly Club to build recurring revenue and grow their businesses.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle>Sports Clubs</CardTitle>
+                    <CardDescription>See how amateur sports clubs use subscriptions for membership management</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button asChild variant="outline" className="w-full">
+                      <Link href="/use-cases/sports-club-membership-software">View Example</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle>Hairdressers</CardTitle>
+                    <CardDescription>See how salons and barbers use subscription plans for regular clients</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button asChild variant="outline" className="w-full">
+                      <Link href="/use-cases/hairdressers-subscription-software">View Example</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle>Cleaning Services</CardTitle>
+                    <CardDescription>See how cleaners use recurring revenue for steady income</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button asChild variant="outline" className="w-full">
+                      <Link href="/use-cases/cleaning-subscription-software">View Example</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle>Personal Trainers</CardTitle>
+                    <CardDescription>See how fitness professionals use subscriptions for training sessions</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button asChild variant="outline" className="w-full">
+                      <Link href="/use-cases/personal-trainers-gym-memberships">View Example</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle>Gym Memberships</CardTitle>
+                    <CardDescription>See how local gyms use subscription management for members</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button asChild variant="outline" className="w-full">
+                      <Link href="/use-cases/gym-membership-software">View Example</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <CardTitle>Beauty Salons</CardTitle>
+                    <CardDescription>See how aestheticians and beauty therapists use subscriptions</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button asChild variant="outline" className="w-full">
+                      <Link href="/use-cases/beauty-salon-subscription-software">View Example</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </section>
         </section>
       </main>
     </div>

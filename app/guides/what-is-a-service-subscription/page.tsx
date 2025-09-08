@@ -84,12 +84,59 @@ export default function WhatIsAServiceSubscriptionPage() {
                 A service subscription is a recurring arrangement where customers pay at regular intervals—weekly, monthly, or otherwise—for a service they use often. Think of it like Netflix, but for services like cleaning, dog walking, haircuts, or gardening.
               </p>
 
+              <h2>Four Ways to Monetize Your Service Business</h2>
+              <p>
+                Monthly Club offers four flexible product types to help you generate revenue and improve customer experience:
+              </p>
+
+              <h3>1. Traditional Subscriptions</h3>
+              <p>
+                Regular recurring payments for ongoing services. Customers pay monthly for a set number of services or access.
+              </p>
+              <ul>
+                <li>£35/month for monthly haircut</li>
+                <li>£80/month for weekly cleaning</li>
+                <li>£25/month for gym membership</li>
+              </ul>
+
+              <h3>2. Balance Builder Subscriptions</h3>
+              <p>
+                Customers build credit over time with a single flexible subscription. They can adjust their monthly payment amount anytime and use the accumulated balance for any future services.
+              </p>
+              <ul>
+                <li>£20/month (adjustable) - use for annual membership in 6 months</li>
+                <li>£30/month (adjustable) - use for treatments when ready</li>
+                <li>£15/month (adjustable) - use for products throughout the year</li>
+              </ul>
+
+              <h3>3. Pay It Off Products</h3>
+              <p>
+                Higher-value packages paid in monthly installments. Perfect for annual memberships, training packages, or treatment programs.
+              </p>
+              <ul>
+                <li>Annual membership (£500) paid over 12 months</li>
+                <li>Personal training package (£800) paid over 8 months</li>
+                <li>Wedding styling package (£300) paid over 6 months</li>
+              </ul>
+
+              <h3>4. One-Time Products</h3>
+              <p>
+                Individual services and products sold alongside subscriptions. Great for add-ons, walk-ins, and additional revenue.
+              </p>
+              <ul>
+                <li>Single training sessions (£50-80 each)</li>
+                <li>Day passes (£10-15 each)</li>
+                <li>Hair products (£15-60 items)</li>
+              </ul>
+
               <h2>Why Subscriptions Work for Local Businesses</h2>
               <ul>
                 <li>📅 Predictable, recurring revenue</li>
                 <li>🧾 Less time spent chasing payments</li>
                 <li>📈 Easier to plan your schedule and grow</li>
                 <li>🤝 Stronger, longer-term client relationships</li>
+                <li>💳 Automated payments powered by Stripe</li>
+                <li>🔄 Flexible product types for different customer needs</li>
               </ul>
 
               <h2>How Monthly Club Makes It Simple</h2>
@@ -111,7 +158,7 @@ export default function WhatIsAServiceSubscriptionPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/create-a-business/step-one">Start Your Free Early Access</Link>
+                <Link href="/create-a-business">Start Your Free Early Access</Link>
               </Button>
             </div>
           </div>

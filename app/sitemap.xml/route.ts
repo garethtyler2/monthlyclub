@@ -6,19 +6,19 @@ export async function GET() {
   const formatDate = (date: string | Date) =>
     new Date(date).toISOString().split("T")[0]
 
-  // Only include the homepage and all guides for sitemap
+  // Include homepage, guides, and use-cases for sitemap
   const staticPaths = [
     "",
     "how-it-works",
     "pricing",
     "features",
+    "guides",
+    "use-cases",
     "guides/automate-payments-stripe",
-    "guides/cleaning-subscription-model",
     "guides/create-subscription-plan",
     "guides/pricing-subscription-plans-service-business",
     "guides/subscription-launch-checklist",
     "guides/balance-builder-subscriptions-guide",
-    "guides/hairdresser-subscriptions",
     "guides/how-monthly-club-helps",
     "guides/marketing-subscription-services",
     "guides/recurring-revenue-benefits",
@@ -26,6 +26,17 @@ export async function GET() {
     "guides/subscription-billing-tools",
     "guides/subscription-ideas-for-service-businesses",
     "guides/what-is-a-service-subscription",
+    "use-cases/sports-club-membership-software",
+    "use-cases/hairdressers-subscription-software",
+    "use-cases/cleaning-subscription-software",
+    "use-cases/window-cleaning-subscription-software",
+    "use-cases/gardener-subscription-service",
+    "use-cases/car-valeting-subscription-software",
+    "use-cases/pet-sitter-subscription-software",
+    "use-cases/personal-trainers-gym-memberships",
+    "use-cases/gym-membership-software",
+    "use-cases/beauty-salon-subscription-software",
+    "use-cases/tattoo-artist-buy-now-pay-later",
   ]
 
   const urls = [

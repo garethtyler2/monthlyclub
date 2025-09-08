@@ -211,7 +211,7 @@ export default function BalanceBuilderGuide() {
               </ul>
 
               <div className="mt-8">
-                <Link href="/create-a-business/step-one" className="hero-button-primary">Set up Balance Builder</Link>
+                <Link href="/create-a-business" className="hero-button-primary">Set up Balance Builder</Link>
               </div>
               </article>
      

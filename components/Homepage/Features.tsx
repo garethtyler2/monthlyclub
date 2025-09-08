@@ -12,7 +12,7 @@ const featureItems = [
     description: "With recurring payments, you know exactly what you'll earn and when—no more chasing payments.",
     className: "border-brand-indigo/20 bg-gradient-to-b from-brand-indigo/10 to-transparent",
     delay: 600,
-    link: "/"
+    link: "/guides/recurring-revenue-benefits"
   },
   {
     icon: Clipboard,
@@ -24,8 +24,8 @@ const featureItems = [
   },
   {
     icon: Shield,
-    title: "Automated Payments",
-    description: "Connect Stripe and let customers subscribe with automated recurring payments.",
+    title: "Stripe Payment Integration",
+    description: "Accept card payments and recurring billing with automated dunning management through Stripe.",
     className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
     delay: 100,
     link: "/guides/automate-payments-stripe"
@@ -36,31 +36,31 @@ const featureItems = [
     description: "Publish updates, photos and links to your paying subscribers with a built-in feed.",
     className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
     delay: 150,
-    link: "/feed"
+    link: "/features/messaging-community"
   },
   {
     icon: BarChart,
-    title: "Customer Insights",
-    description: "Track your active subscribers, earnings, and plan performance in your dashboard.",
+    title: "Tax Analytics & Reporting",
+    description: "Track your active subscribers, earnings, and plan performance with detailed analytics.",
     className: "border-brand-indigo/20 bg-gradient-to-b from-brand-indigo/10 to-transparent",
     delay: 200,
-    link: "/"
+    link: "/features/tax-analytics"
   },
   {
     icon: Target,
-    title: "Public Service Page",
+    title: "Custom Branding",
     description: "Each business gets a clean, branded page to showcase and sell their services.",
     className: "border-brand-pink/20 bg-gradient-to-b from-brand-pink/10 to-transparent",
     delay: 300,
-    link: "/"
+    link: "/features/custom-branding"
   },
   {
     icon: Activity,
-    title: "No Tech Skills Needed",
-    description: "We’ve built everything so you don’t have to. Just sign up and go live in minutes.",
+    title: "Balance Builder Subscriptions",
+    description: "Let customers build up credit for future services with our unique pay-it-off system.",
     className: "border-brand-purple/20 bg-gradient-to-b from-brand-purple/10 to-transparent",
     delay: 400,
-    link: "/"
+    link: "/features/balance-builder"
   },
   {
     icon: Brain,
@@ -68,15 +68,15 @@ const featureItems = [
     description: "Perfect for cleaners, groomers, beauty pros, and anyone who works on repeat bookings.",
     className: "border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent",
     delay: 500,
-    link: "/guides/service-subscription-examples"
+    link: "/use-cases/"
   },
   {
     icon: MessageCircle,
-    title: "Messaging & Content Sharing",
-    description: "DM customers and collaborators, or share updates and content directly with your audience.",
+    title: "AI-Powered Descriptions",
+    description: "Generate compelling service descriptions and marketing copy with built-in AI assistance.",
     className: "border-brand-green/20 bg-gradient-to-b from-brand-green/10 to-transparent",
     delay: 600,
-    link: "/private-messaging"
+    link: "/features/ai-descriptions"
   }
 ];
 

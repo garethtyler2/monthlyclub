@@ -34,6 +34,22 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
+  async redirects() {
+    return [
+      // Guide pages moved to use-cases
+      {
+        source: '/guides/cleaning-subscription-model',
+        destination: '/use-cases/cleaning-subscription-software',
+        permanent: true, // 301 redirect for SEO
+      },
+      {
+        source: '/guides/hairdresser-subscriptions',
+        destination: '/use-cases/hairdressers-subscription-software',
+        permanent: true, // 301 redirect for SEO
+      },
+    ];
+  },
+
   async rewrites() {
     return [
       {

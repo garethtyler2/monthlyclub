@@ -146,7 +146,7 @@ export default function SubscriptionIdeasPage() {
 
               <div className="text-center pt-4">
                 <Button className="hero-button-primary mt-6">
-                  <Link href="/create-a-business/step-one">Try These Ideas with Monthly Club</Link>
+                  <Link href="/create-a-business">Try These Ideas with Monthly Club</Link>
                 </Button>
               </div>
             </div>

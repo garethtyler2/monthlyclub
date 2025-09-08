@@ -16,8 +16,8 @@ interface SearchItem {
 const searchItems: SearchItem[] = [
   { id: "seo-1", title: "What is a Service Subscription?", category: "Subscriptions", url: "/guides/what-is-a-service-subscription" },
   { id: "seo-2", title: "Benefits of Recurring Revenue for Local Businesses", category: "Subscriptions", url: "/guides/recurring-revenue-benefits" },
-  { id: "seo-3", title: "How to Sell Subscriptions as a Hairdresser", category: "Use Cases", url: "/guides/hairdresser-subscriptions" },
-  { id: "seo-4", title: "Cleaning Business Subscription Models", category: "Use Cases", url: "/guides/cleaning-subscription-model" },
+  { id: "seo-3", title: "How to Sell Subscriptions as a Hairdresser", category: "Use Cases", url: "/use-cases/hairdressers-subscription-software" },
+  { id: "seo-4", title: "Cleaning Business Subscription Models", category: "Use Cases", url: "/use-cases/cleaning-subscription-software" },
   { id: "seo-5", title: "Subscription Billing Tools for Small Businesses", category: "Tools", url: "/guides/subscription-billing-tools" },
   { id: "seo-6", title: "Marketing Your Subscription Services Online", category: "Marketing", url: "/guides/marketing-subscription-services" },
   { id: "seo-7", title: "How to Create a Subscription Plan with Monthly Club", category: "Product Help", url: "/guides/create-subscription-plan" },

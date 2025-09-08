@@ -17,7 +17,7 @@ export default function SubscriptionBillingToolsPage() {
     <div className="min-h-screen flex flex-col bg-white dark:bg-background">
       <Head>
         <title>Top Subscription Billing Tools for Local Businesses | Monthly Club</title>
-        <meta name="description" content="Simplify recurring payments with the best subscription billing tools. See how Stripe, GoCardless, and Monthly Club make billing stress-free for service pros." />
+        <meta name="description" content="Simplify recurring payments with the best subscription billing tools. See how Stripe and Monthly Club make billing stress-free for service pros." />
         <link rel="canonical" href="https://www.monthlyclubhq.com/guides/subscription-billing-tools" />
         <script
           type="application/ld+json"
@@ -30,7 +30,7 @@ export default function SubscriptionBillingToolsPage() {
                 "@id": "https://www.monthlyclubhq.com/guides/subscription-billing-tools"
               },
               "headline": "Top Subscription Billing Tools for Local Businesses",
-              "description": "Simplify recurring payments with the best subscription billing tools. See how Stripe, GoCardless, and Monthly Club make billing stress-free for service pros.",
+              "description": "Simplify recurring payments with the best subscription billing tools. See how Stripe and Monthly Club make billing stress-free for service pros.",
               "author": {
                 "@type": "Organization",
                 "name": "Monthly Club",
@@ -87,9 +87,9 @@ export default function SubscriptionBillingToolsPage() {
 
               <h2>Top Subscription Billing Tools</h2>
               <ul>
-                <li><strong>Stripe:</strong> The most popular choice for small businesses. Handles recurring billing, invoices, failed payment recovery, and more.</li>
-                <li><strong>GoCardless:</strong> Great for direct debit in the UK and Europe. Ideal for lower-fee, high-volume billing.</li>
+                <li><strong>Stripe:</strong> The most popular choice for small businesses. Handles recurring billing, invoices, failed payment recovery, and more. Powers Monthly Club's payment processing.</li>
                 <li><strong>Square:</strong> Easy for in-person service businesses already using Square POS.</li>
+                <li><strong>PayPal:</strong> Familiar to customers, good for smaller businesses starting out.</li>
                 <li><strong>Chargebee / Paddle:</strong> More advanced platforms for software or multi-currency use — not always ideal for local service pros.</li>
               </ul>
 
@@ -107,7 +107,7 @@ export default function SubscriptionBillingToolsPage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/create-a-business/step-one">Start Simplifying Your Billing Today</Link>
+                <Link href="/create-a-business">Start Simplifying Your Billing Today</Link>
               </Button>
             </div>
           </div>

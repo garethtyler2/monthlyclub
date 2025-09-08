@@ -224,7 +224,7 @@ export default function PricingSubscriptionPlansGuide() {
               </ul>
 
               <div className="mt-8">
-                <Link href="/create-a-business/step-one" className="hero-button-primary">Create your plan</Link>
+                <Link href="/create-a-business" className="hero-button-primary">Create your plan</Link>
               </div>
               </article>
 

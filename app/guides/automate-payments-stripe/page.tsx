@@ -80,7 +80,7 @@ export default function AutomatePaymentsStripePage() {
             <div className="prose prose-lg max-w-none dark:prose-invert space-y-8">
               <h2>What Is Stripe?</h2>
               <p>
-                Stripe is a trusted payment platform used by millions of businesses worldwide. Monthly Club uses Stripe to securely handle card payments, direct debits, and recurring billing — all without you needing a separate Stripe account.
+                Stripe is a trusted payment platform used by millions of businesses worldwide. Monthly Club uses Stripe to securely handle card payments, recurring billing, and one-time payments — all without you needing a separate Stripe account.
               </p>
 
               <h2>How Monthly Club Uses Stripe</h2>
@@ -113,7 +113,7 @@ export default function AutomatePaymentsStripePage() {
               </p>
 
               <Button className="hero-button-primary mt-4">
-                <Link href="/create-a-business/step-one">Get Started with Stripe & Monthly Club</Link>
+                <Link href="/create-a-business">Get Started with Stripe & Monthly Club</Link>
               </Button>
             </div>
           </div>

@@ -25,15 +25,19 @@ const CTAFeatures = [
 const CTAButtons = [
   {
     text: "Create a Plan",
-    link: "/get-started"
+    link: "/create-a-business"
   },
   {
-    text: "See How It Works",
-    link: "/how-it-works"
+    text: "See Pricing",
+    link: "/pricing"
   },
   {
     text: "View Examples",
-    link: "/examples"
+    link: "/use-cases/"
+  },
+  {
+    text: "Stripe Integration",
+    link: "/guides/automate-payments-stripe"
   }
 ];
 
