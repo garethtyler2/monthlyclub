@@ -7,6 +7,7 @@ import MultiCTASection from "@/components/Homepage/MultiCTASection";
 import CommunityFeature from "@/components/Homepage/Learn&Grow";
 import ExampleUseCase from "@/components/Homepage/ExampleUseCase";
 import VerticalShowcase from "@/components/Homepage/VerticalShowcase";
+import PricingPreview from "@/components/Homepage/PricingPreview";
 
 export default function HomePage() {
   return (
@@ -82,6 +83,7 @@ export default function HomePage() {
       </Head>
       <Hero />
       <Features />
+      <PricingPreview />
       <VerticalShowcase />
       <CommunityFeature />
       <ExampleUseCase />

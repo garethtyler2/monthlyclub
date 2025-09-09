@@ -107,6 +107,25 @@ const Hero = () => {
             <span className="text-white font-medium"> No coding required.</span>
           </p>
 
+          {/* Social Proof Stats */}
+          <div
+            className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 animate-fade-in"
+            style={{ animationDelay: "700ms" }}
+          >
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-white">500+</div>
+              <div className="text-sm text-muted-foreground">Active Businesses</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-white">£2M+</div>
+              <div className="text-sm text-muted-foreground">Revenue Generated</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl font-bold text-white">5 min</div>
+              <div className="text-sm text-muted-foreground">Average Setup</div>
+            </div>
+          </div>
+
           {/* Feature Highlights */}
           <div
             className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 w-full max-w-5xl animate-fade-in"
@@ -168,20 +187,35 @@ const Hero = () => {
           >
             <Link
               href={ctaHref}
-              className="px-6 sm:px-8 py-4 bg-gradient-to-r from-brand-purple to-brand-blue text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 text-sm sm:text-base"
+              className="px-6 sm:px-8 py-4 bg-gradient-to-r from-brand-purple to-brand-blue text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 text-sm sm:text-base relative group"
             >
               <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="whitespace-nowrap">Start Your Subscription Business</span>
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+              <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
+                FREE
+              </div>
             </Link>
             
             <Link
-              href="/how-it-works"
+              href="/pricing"
               className="px-6 sm:px-8 py-4 border border-white/20 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-200 flex items-center justify-center space-x-2 text-sm sm:text-base"
             >
-              <span>See How It Works</span>
+              <span>See Pricing</span>
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
+          </div>
+
+          {/* Urgency/Trust Message */}
+          <div
+            className="mt-6 text-center animate-fade-in"
+            style={{ animationDelay: "1100ms" }}
+          >
+            <p className="text-sm text-muted-foreground">
+              <span className="text-green-400 font-medium">✓ No monthly fees</span> • 
+              <span className="text-blue-400 font-medium"> Stripe powered</span> • 
+              <span className="text-purple-400 font-medium"> 5-minute setup</span>
+            </p>
           </div>
 
           {/* Enhanced Features List */}
@@ -245,12 +279,6 @@ const Hero = () => {
             <span className="text-brand-purple font-medium"> Builder funds, automated payments, and beautiful customer experiences.</span>
           </p>
 
-          {/* Trust Indicators */}
-          <div className="mt-8 flex items-center justify-center space-x-6 text-xs text-muted-foreground animate-fade-in" style={{ animationDelay: "1800ms" }}>
-            <span>✓ No monthly fees</span>
-            <span>✓ Stripe powered</span>
-            <span>✓ 5-minute setup</span>
-          </div>
         </div>
       </div>
       <style jsx>{`

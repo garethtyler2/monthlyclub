@@ -88,9 +88,37 @@ const CTA = () => {
               </div>
             </div>
           </div>
-          <Button asChild className="mt-4 hero-button-primary">
-            <Link href="/guides">Explore the Guides</Link>
-          </Button>
+
+          {/* Enhanced CTA Buttons */}
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild className="hero-button-primary">
+              <Link href="/create-a-business">Start Building Your Business</Link>
+            </Button>
+            <Button asChild variant="outline" className="border-white/20 text-white hover:bg-white/10">
+              <Link href="/use-cases/">See Real Examples</Link>
+            </Button>
+          </div>
+
+          {/* Additional Trust Signals */}
+          <div className="mt-8 text-center">
+            <p className="text-sm text-muted-foreground mb-4">
+              Join 500+ service businesses already growing with Monthly Club
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-6 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <ShieldCheck className="w-4 h-4 text-green-400" />
+                Secure Payments
+              </span>
+              <span className="flex items-center gap-1">
+                <Activity className="w-4 h-4 text-blue-400" />
+                Real-time Analytics
+              </span>
+              <span className="flex items-center gap-1">
+                <TrendingUp className="w-4 h-4 text-purple-400" />
+                Growing Revenue
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
