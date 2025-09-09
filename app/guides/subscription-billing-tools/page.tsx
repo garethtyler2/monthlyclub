@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, CheckCircle, Star, Users, TrendingUp, CreditCard, Wallet, ShoppingCart, Zap, MessageCircle, BarChart3, DollarSign, Calendar, Target, Shield, Clock, Smartphone, Globe, Settings, Share2, Eye, BookOpen, Lightbulb, Rocket, Award, ArrowUpRight, Wrench, Cog, Database, FileText, AlertTriangle, CheckCircle2, XCircle, ExternalLink, ArrowUpRight as ArrowUpRightIcon } from "lucide-react";
+import { ArrowRight, CheckCircle, Star, Users, TrendingUp, CreditCard, Wallet, ShoppingCart, Zap, MessageCircle, BarChart3, DollarSign, Calendar, Target, Shield, Clock, Smartphone, Globe, Settings, Share2, Eye, BookOpen, Lightbulb, Rocket, Award, ArrowUpRight, Wrench, Cog, Database, FileText, AlertTriangle, CheckCircle2, XCircle, ExternalLink, ArrowUpRight as ArrowUpRightIcon, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import Script from "next/script";
 
