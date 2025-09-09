@@ -225,7 +225,7 @@ export default function CarValetingSubscriptionSoftware() {
               and maintenance services with Monthly Club.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="hero-button-primary">
+              <Button asChild size="lg" className="hero-button-primary w-full sm:w-auto">
                 <Link href="/create-a-business">Start Your Car Valeting Business</Link>
               </Button>
               <Button asChild variant="outline" size="lg">

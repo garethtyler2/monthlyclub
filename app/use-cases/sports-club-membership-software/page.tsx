@@ -507,13 +507,13 @@ export default function SportsClubMembershipSoftwarePage() {
               Join the growing number of amateur sports clubs using Monthly Club to streamline their operations and grow their membership.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="hero-button-primary">
+              <Button asChild size="lg" className="hero-button-primary w-full sm:w-auto">
                 <Link href="/create-a-business">
-                  Create Your Club Account
+                  Create Your Account
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+              <Button asChild variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20 w-full sm:w-auto">
                 <Link href="/pricing">
                   View Pricing
                 </Link>

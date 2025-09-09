@@ -308,13 +308,13 @@ const FeaturesPage = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/create-a-business">
-                  <Button className="hero-button-primary">
+                  <Button className="hero-button-primary w-full sm:w-auto">
                     Start Your Free Account
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
                 <Link href="/how-it-works">
-                  <Button variant="outline" className="border-primary text-primary hover:bg-primary/10">
+                  <Button variant="outline" className="border-primary text-primary hover:bg-primary/10 w-full sm:w-auto">
                     See How It Works
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
@@ -639,13 +639,13 @@ const FeaturesPage = () => {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
                   <Link href="/how-it-works">
-                    <Button className="bg-background text-primary border border-primary hover:bg-background/80">
+                    <Button className="bg-background text-primary border border-primary hover:bg-background/80 w-full sm:w-auto">
                       See How It Works
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
                   </Link>
                   <Link href="/create-a-business">
-                    <Button className="hero-button-primary">
+                    <Button className="hero-button-primary w-full sm:w-auto">
                       Start Your Club
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>

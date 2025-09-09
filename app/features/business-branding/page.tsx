@@ -58,13 +58,13 @@ export default function CustomBrandingPage() {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Link href="/create-a-business">
-                <Button className="hero-button-primary text-lg px-8 py-4">
+                <Button className="hero-button-primary text-base sm:text-lg px-6 sm:px-8 py-4 w-full sm:w-auto">
                   Start Customizing
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
               <Link href="/features">
-                <Button variant="outline" className="text-lg px-8 py-4">
+                <Button variant="outline" className="text-base sm:text-lg px-6 sm:px-8 py-4 w-full sm:w-auto">
                   View All Features
                 </Button>
               </Link>
@@ -569,13 +569,13 @@ export default function CustomBrandingPage() {
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
                   <Link href="/create-a-business">
-                    <Button className="hero-button-primary text-lg px-8 py-4">
+                    <Button className="hero-button-primary text-base sm:text-lg px-6 sm:px-8 py-4 w-full sm:w-auto">
                       Start Customizing
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
                   </Link>
                   <Link href="/features">
-                    <Button variant="outline" className="text-lg px-8 py-4">
+                    <Button variant="outline" className="text-base sm:text-lg px-6 sm:px-8 py-4 w-full sm:w-auto">
                       Explore All Features
                     </Button>
                   </Link>
