@@ -189,7 +189,6 @@ export default function CleaningSubscriptionSoftwarePage() {
         <title>Cleaning Subscription Software | Monthly Club</title>
         <meta name="description" content="Build recurring revenue with cleaning services, housekeeping, and maintenance subscriptions. Perfect for cleaners, housekeepers, and cleaning companies." />
         <meta name="robots" content="index,follow" />
-        <link rel="canonical" href="https://www.monthlyclubhq.com/use-cases/cleaning-subscription-software" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

@@ -174,7 +174,6 @@ export default function HairdressersSubscriptionSoftwarePage() {
         <title>Hairdresser Subscription Software | Monthly Club</title>
         <meta name="description" content="Transform your salon with subscription plans for haircuts, styling, and treatments. Automated payments, client management, and recurring revenue for hairdressers and barbers." />
         <meta name="robots" content="index,follow" />
-        <link rel="canonical" href="https://www.monthlyclubhq.com/use-cases/hairdressers-subscription-software" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

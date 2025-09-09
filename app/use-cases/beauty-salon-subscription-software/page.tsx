@@ -189,7 +189,6 @@ export default function BeautySalonSubscriptionSoftwarePage() {
         <title>Beauty Salon & Aesthetician Subscription Software | Monthly Club</title>
         <meta name="description" content="Build recurring revenue with beauty treatments, aesthetic procedures, and salon services. Perfect for solo aestheticians, beauty therapists, and salon owners." />
         <meta name="robots" content="index,follow" />
-        <link rel="canonical" href="https://www.monthlyclubhq.com/use-cases/beauty-salon-subscription-software" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

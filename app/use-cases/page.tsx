@@ -116,7 +116,6 @@ export default function UseCasesPage() {
         <title>Subscription Software by Industry | Monthly Club</title>
         <meta name="description" content="Discover how Monthly Club helps different service businesses build recurring revenue. From sports clubs to beauty salons, see industry-specific solutions for subscription management." />
         <meta name="robots" content="index,follow" />
-        <link rel="canonical" href="https://www.monthlyclubhq.com/use-cases" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

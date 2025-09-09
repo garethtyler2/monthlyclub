@@ -18,7 +18,6 @@ export default function HomePage() {
           content="Transform your service business with automated recurring payments and subscription management powered by Stripe. Perfect for hairdressers, cleaners, sports clubs, and local service providers. No coding required."
         />
         <meta name="keywords" content="subscription billing software, recurring payments, Stripe integration, membership management, local business subscriptions, service business automation" />
-        <link rel="canonical" href="https://www.monthlyclubhq.com/" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

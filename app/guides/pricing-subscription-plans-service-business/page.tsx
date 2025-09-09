@@ -1,252 +1,663 @@
 import { Metadata } from "next";
-import Head from "next/head";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight, CheckCircle, Star, Users, TrendingUp, CreditCard, Wallet, ShoppingCart, Zap, MessageCircle, BarChart3, DollarSign, Calendar, Target, Shield, Clock, Smartphone, Globe, Settings, Share2, Eye, BookOpen, Lightbulb, Rocket, Award, ArrowUpRight, Calculator, Percent, Clock3, TrendingDown, Award as AwardIcon } from "lucide-react";
 import Link from "next/link";
+import Script from "next/script";
 
 export const metadata: Metadata = {
-  title: "Pricing Your Subscription Plans for Service Businesses | Monthly Club",
-  description:
-    "A complete guide to subscription pricing for service businesses: models, value metrics, trials vs discounts, payment day strategy, and example pricing tables.",
+  title: "Pricing Subscription Plans for Service Businesses | Complete Guide | Monthly Club",
+  description: "Master subscription pricing with our complete guide. Learn pricing models, anchoring strategies, payment day optimization, and see real pricing examples for service businesses.",
   alternates: {
-    canonical: "https://www.monthlyclubhq.com/guides/pricing-subscription-plans-service-business",
+    canonical: "https://www.monthlyclubhq.com/guides/pricing-subscription-plans-service-business"
   },
   openGraph: {
-    title: "Pricing Your Subscription Plans for Service Businesses",
-    description:
-      "Learn subscription pricing models, anchoring, value metrics, payment day strategy, and see example pricing tables by niche.",
+    title: "Pricing Subscription Plans for Service Businesses | Complete Guide | Monthly Club",
+    description: "Master subscription pricing with our complete guide. Learn pricing models, anchoring strategies, and see real pricing examples.",
     url: "https://www.monthlyclubhq.com/guides/pricing-subscription-plans-service-business",
-    type: "article",
     siteName: "Monthly Club",
-    images: [
-      {
-        url: "https://www.monthlyclubhq.com/images/MonthlyClubHomepageImage.png",
-        width: 1200,
-        height: 630,
-        alt: "Monthly Club",
-      },
-    ],
+    type: "article",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pricing Subscription Plans for Service Businesses | Complete Guide | Monthly Club",
+    description: "Master subscription pricing with our complete guide. Learn pricing models, anchoring strategies, and see real pricing examples.",
+  },
+  keywords: [
+    "subscription pricing",
+    "service business pricing",
+    "recurring revenue pricing",
+    "subscription pricing models",
+    "pricing strategy",
+    "subscription pricing guide",
+    "service pricing examples",
+    "monthly subscription pricing"
+  ]
 };
 
-export default function PricingSubscriptionPlansGuide() {
-  const primaryKeyword = "subscription pricing for service businesses";
+export default function PricingSubscriptionPlansPage() {
+  const pricingModels = [
+    {
+      name: "Flat Pricing",
+      description: "One monthly price for a defined bundle of services",
+      example: "2 cleans per month for £89",
+      pros: ["Simple to understand", "Predictable revenue", "Easy to manage"],
+      cons: ["Less flexibility", "May not suit all customers"],
+      bestFor: "New businesses, simple service offerings"
+    },
+    {
+      name: "Tiered Pricing",
+      description: "Good/better/best packages with clear added benefits",
+      example: "Basic £49, Standard £89, Premium £129",
+      pros: ["Clear value progression", "Higher revenue potential", "Customer choice"],
+      cons: ["More complex to manage", "Can confuse customers"],
+      bestFor: "Established businesses, varied service levels"
+    },
+    {
+      name: "Usage-Based Pricing",
+      description: "Price scales by number of visits or time spent",
+      example: "£25 per visit, max 4 visits per month",
+      pros: ["Fair for customers", "Scales with demand", "Flexible"],
+      cons: ["Unpredictable revenue", "Complex billing", "Hard to budget"],
+      bestFor: "Variable service needs, high-value services"
+    }
+  ];
 
-  const toc = [
-    { id: "pricing-models", label: "Pricing models" },
-    { id: "anchoring", label: "Anchoring & value metrics" },
-    { id: "trials", label: "Trials vs. discounts" },
-    { id: "payment-day", label: "Payment day strategy" },
-    { id: "examples", label: "Example pricing tables" },
+  const pricingExamples = [
+    {
+      business: "Home Cleaning",
+      basic: { price: "£49/mo", description: "1 clean per month" },
+      standard: { price: "£89/mo", description: "2 cleans per month" },
+      premium: { price: "£129/mo", description: "3 cleans + deep clean quarterly" }
+    },
+    {
+      business: "Hair & Beauty",
+      basic: { price: "£35/mo", description: "1 blow dry per month" },
+      standard: { price: "£65/mo", description: "2 blow dries per month" },
+      premium: { price: "£99/mo", description: "3 blow dries + treatment" }
+    },
+    {
+      business: "Dog Grooming",
+      basic: { price: "£29/mo", description: "Bath only" },
+      standard: { price: "£55/mo", description: "Bath + tidy" },
+      premium: { price: "£85/mo", description: "Full groom + nail trim" }
+    },
+    {
+      business: "Personal Training",
+      basic: { price: "£79/mo", description: "1 session per month" },
+      standard: { price: "£149/mo", description: "2 sessions per month" },
+      premium: { price: "£219/mo", description: "3 sessions + meal plan" }
+    },
+    {
+      business: "Window Cleaning",
+      basic: { price: "£39/mo", description: "Monthly clean" },
+      standard: { price: "£69/mo", description: "Bi-weekly clean" },
+      premium: { price: "£99/mo", description: "Weekly clean + frames" }
+    },
+    {
+      business: "Garden Maintenance",
+      basic: { price: "£59/mo", description: "Monthly maintenance" },
+      standard: { price: "£99/mo", description: "Bi-weekly maintenance" },
+      premium: { price: "£149/mo", description: "Weekly maintenance + seasonal work" }
+    }
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Head>
-        <title>Pricing Your Subscription Plans for Service Businesses | Monthly Club</title>
-        <meta
-          name="description"
-          content="A complete guide to subscription pricing for service businesses: models, value metrics, trials vs. discounts, payment day strategy, and example pricing tables."
-        />
-        <meta name="robots" content="index,follow" />
-        <link
-          rel="canonical"
-          href="https://www.monthlyclubhq.com/guides/pricing-subscription-plans-service-business"
-        />
-        <meta name="keywords" content={`${primaryKeyword}, subscription pricing models, tiered pricing, usage pricing, pricing tables by niche`} />
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Pricing Your Subscription Plans for Service Businesses" />
-        <meta name="twitter:description" content="Learn pricing models, anchoring, payment day strategy and see example tables by niche." />
-        <meta name="twitter:image" content="https://www.monthlyclubhq.com/images/MonthlyClubHomepageImage.png" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Article",
-              mainEntityOfPage: {
-                "@type": "WebPage",
-                "@id": "https://www.monthlyclubhq.com/guides/pricing-subscription-plans-service-business",
-              },
-              headline: "Pricing Your Subscription Plans for Service Businesses",
-              description:
-                "A complete guide to subscription pricing for service businesses: models, value metrics, trials vs. discounts, payment day strategy, and example pricing tables.",
-              author: {
-                "@type": "Organization",
-                name: "Monthly Club",
-                url: "https://www.monthlyclubhq.com",
-              },
-              publisher: {
-                "@type": "Organization",
-                name: "Monthly Club",
-                logo: {
-                  "@type": "ImageObject",
-                  url: "https://www.monthlyclubhq.com/images/MonthlyClubLogo.png",
-                },
-              },
-              datePublished: new Date().toISOString().slice(0, 10),
-              dateModified: new Date().toISOString().slice(0, 10),
-              articleSection: [
-                "Common pricing models",
-                "Anchoring and value metrics",
-                "Trial vs. discount vs. first-month promos",
-                "Payment day strategy",
-                "Example pricing tables by niche",
-              ],
-              keywords: primaryKeyword,
-            }),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "BreadcrumbList",
-              itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: "https://www.monthlyclubhq.com/" },
-                { "@type": "ListItem", position: 2, name: "Guides", item: "https://www.monthlyclubhq.com/guides" },
-                { "@type": "ListItem", position: 3, name: "Pricing Your Subscription Plans" },
-              ],
-            }),
-          }}
-        />
-      </Head>
-
-      <main className="flex-1">
-        {/* Hero */}
-        <section className="py-16 md:py-24 bg-gradient-to-b from-brand-purple/10 to-transparent">
-          <div className="container mx-auto px-6 max-w-5xl">
-            <nav className="mb-5 text-sm">
-              <Link href="/guides" className="text-brand-purple hover:underline">← Back to Guides</Link>
-            </nav>
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-3">
-              Pricing Your Subscription Plans for Service Businesses
+    <>
+      <div className="min-h-screen bg-background">
+        {/* Hero Section */}
+        <section className="py-20 px-4 bg-gradient-to-br from-slate-50/20 via-background to-green-50/20">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 bg-slate-500/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <Calculator className="w-4 h-4" />
+              Pricing Guide
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
+              Pricing Subscription Plans for Service Businesses
             </h1>
-            <p className="text-base md:text-lg text-muted-foreground max-w-3xl">
-              A practical handbook for {primaryKeyword}: models, anchoring, promos and payment‑day strategy — plus ready‑to‑use pricing tables by niche.
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+              Master subscription pricing with our complete guide. Learn pricing models, anchoring strategies, 
+              payment day optimization, and see real pricing examples for service businesses.
             </p>
-            {/* Mobile TOC */}
-            <details className="md:hidden mt-5 rounded-lg border border-white/10 p-3 bg-white/5">
-              <summary className="cursor-pointer text-sm font-medium">Table of contents</summary>
-              <ul className="mt-3 space-y-2 text-sm">
-                {toc.map((item) => (
-                  <li key={item.id}>
-                    <a href={`#${item.id}`} className="text-brand-purple hover:underline">{item.label}</a>
-                  </li>
-                ))}
-              </ul>
-            </details>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+              <Link href="/create-a-business">
+                <Button className="hero-button-primary text-base sm:text-lg px-6 sm:px-8 py-4 w-full sm:w-auto">
+                  Create Your Pricing Plan
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/guides">
+                <Button variant="outline" className="text-base sm:text-lg px-6 sm:px-8 py-4 w-full sm:w-auto">
+                  Browse All Guides
+                </Button>
+              </Link>
+            </div>
+
+            {/* Key Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary mb-2">3</div>
+                <div className="text-sm text-muted-foreground">Pricing Models</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary mb-2">6</div>
+                <div className="text-sm text-muted-foreground">Industry Examples</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary mb-2">10-20%</div>
+                <div className="text-sm text-muted-foreground">Typical Discount</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-primary mb-2">4</div>
+                <div className="text-sm text-muted-foreground">Min Read</div>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* Content */}
-        <section className="py-12 md:py-16">
-          <div className="container mx-auto px-6 max-w-6xl grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-12">
-
-              <article className="prose prose-base md:prose-lg max-w-none dark:prose-invert space-y-8 md:space-y-10">
-              <h2 id="pricing-models">Common pricing models</h2>
-              <p>
-                The most common models for service subscriptions are flat, tiered, and usage-linked. For local services, we recommend starting with a
-                <strong> flat monthly</strong> plan, then layering <strong>tiers</strong> (e.g., basic/standard/premium) when you have clear value differences, or
-                <strong> usage</strong> when session counts vary widely.
+        {/* Pricing Models */}
+        <section className="py-16 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Choose Your Pricing Model
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Start with the right pricing model for your service business. Each has its own advantages 
+                and works best for different types of services and customer needs.
               </p>
-              <ul>
-                <li><strong>Flat</strong>: One monthly price for a defined bundle (e.g., 2 cleans/month).</li>
-                <li><strong>Tiered</strong>: Good/better/best packages with clear added benefits.</li>
-                <li><strong>Usage</strong>: Price scales by number of visits or time; cap usage to keep margins predictable.</li>
-              </ul>
+            </div>
 
-              <h2 id="anchoring">Anchoring and value metrics</h2>
-              <p>
-                Price perception improves when you anchor against <em>retail value</em>, <em>time saved</em>, or <em>outcomes</em>. Use a value metric that matches customer goals (e.g., visits/month, hours saved, areas cleaned) and present a
-                "retail vs. member" comparison. On your plan card, include: <strong>normal price</strong>, <strong>member price</strong>, and <strong>you save X%</strong>.
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {pricingModels.map((model, index) => (
+                <Card key={index} className={`border border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent`}>
+                  <CardHeader>
+                    <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                      <DollarSign className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="text-xl text-primary">{model.name}</CardTitle>
+                    <CardDescription>{model.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="bg-background/50 rounded-lg p-3">
+                        <h4 className="font-semibold text-sm mb-2">Example:</h4>
+                        <p className="text-sm text-muted-foreground">{model.example}</p>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-semibold text-sm mb-2 text-green-600">Pros:</h4>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          {model.pros.map((pro, i) => (
+                            <li key={i} className="flex items-center gap-2">
+                              <CheckCircle className="w-3 h-3 text-green-500" />
+                              {pro}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-semibold text-sm mb-2 text-orange-600">Considerations:</h4>
+                        <ul className="text-sm text-muted-foreground space-y-1">
+                          {model.cons.map((con, i) => (
+                            <li key={i} className="flex items-center gap-2">
+                              <Clock3 className="w-3 h-3 text-orange-500" />
+                              {con}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div className="bg-background/50 rounded-lg p-3">
+                        <h4 className="font-semibold text-sm mb-2">Best For:</h4>
+                        <p className="text-sm text-muted-foreground">{model.bestFor}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Anchoring Strategies */}
+        <section className="py-16 px-4 bg-slate-50/5">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Anchoring & Value Metrics
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Price perception improves when you anchor against retail value, time saved, or outcomes. 
+                Use value metrics that match customer goals and present clear comparisons.
               </p>
+            </div>
 
-              <h2 id="trials">Trial vs. discount vs. first-month promos</h2>
-              <p>
-                Trials reduce friction but can attract tire‑kickers; discounts convert faster but risk anchoring low. For most service businesses we suggest a
-                <strong> modest first‑month discount (10–20%)</strong> with clear renewal to the standard price. If you use free trials, require a card and limit benefits.
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="border border-brand-green/20 bg-gradient-to-b from-brand-green/10 to-transparent">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                    <Target className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl text-primary">Value Anchoring</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Always show customers what they're getting compared to retail prices. 
+                      This makes your subscription pricing feel like a great deal.
+                    </p>
+                    <div className="bg-background/50 rounded-lg p-4">
+                      <h4 className="font-semibold text-sm mb-3">Example Display:</h4>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Normal Price:</span>
+                          <span className="line-through text-muted-foreground">£120</span>
+                        </div>
+                        <div className="flex justify-between text-sm font-semibold">
+                          <span>Member Price:</span>
+                          <span className="text-green-600">£89</span>
+                        </div>
+                        <div className="flex justify-between text-sm text-green-600">
+                          <span>You Save:</span>
+                          <span>26%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-brand-purple/20 bg-gradient-to-b from-brand-purple/10 to-transparent">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                    <BarChart3 className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl text-primary">Value Metrics</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Choose metrics that match customer goals and make the value clear and tangible.
+                    </p>
+                    <div className="space-y-3">
+                      <div className="bg-background/50 rounded-lg p-3">
+                        <h4 className="font-semibold text-sm mb-2">Time Saved</h4>
+                        <p className="text-sm text-muted-foreground">"Save 3 hours per week"</p>
+                      </div>
+                      <div className="bg-background/50 rounded-lg p-3">
+                        <h4 className="font-semibold text-sm mb-2">Visits Included</h4>
+                        <p className="text-sm text-muted-foreground">"2 professional cleans per month"</p>
+                      </div>
+                      <div className="bg-background/50 rounded-lg p-3">
+                        <h4 className="font-semibold text-sm mb-2">Outcomes</h4>
+                        <p className="text-sm text-muted-foreground">"Always-ready home"</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Promotions & Trials */}
+        <section className="py-16 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Promotions & Trials
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Choose the right promotion strategy to convert customers without devaluing your service 
+                or attracting the wrong type of customers.
               </p>
+            </div>
 
-              <h2 id="payment-day">Setting payment day strategy</h2>
-              <p>
-                Align the billing day with cash‑flow needs and customer expectations. Popular options are <strong>anniversary billing</strong> (same day each month) or a chosen
-                <strong> preferred payment day</strong> (e.g., the 1st or 15th). If your business is busiest at month‑end, collect earlier to avoid payment collisions. Monthly Club supports preferred payment day configuration.
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <Card className="border border-brand-orange/20 bg-gradient-to-b from-brand-orange/10 to-transparent">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                    <Percent className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl text-primary">First-Month Discount</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Offer 10-20% off the first month with clear renewal pricing. 
+                      This reduces friction while maintaining value perception.
+                    </p>
+                    <div className="bg-background/50 rounded-lg p-3">
+                      <h4 className="font-semibold text-sm mb-2">Recommended:</h4>
+                      <p className="text-sm text-muted-foreground">10-20% first month discount</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm">Converts well</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm">Maintains value</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                    <Clock className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl text-primary">Free Trials</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      If using free trials, require a card and limit benefits to avoid attracting 
+                      tire-kickers who won't convert.
+                    </p>
+                    <div className="bg-background/50 rounded-lg p-3">
+                      <h4 className="font-semibold text-sm mb-2">Best Practice:</h4>
+                      <p className="text-sm text-muted-foreground">Require card, limit trial benefits</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock3 className="w-4 h-4 text-orange-500" />
+                      <span className="text-sm">Can attract tire-kickers</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm">Reduces friction</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-brand-green/20 bg-gradient-to-b from-brand-green/10 to-transparent">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                    <AwardIcon className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl text-primary">No Promotions</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Sometimes the best strategy is no promotion at all. Focus on value 
+                      and quality instead of competing on price.
+                    </p>
+                    <div className="bg-background/50 rounded-lg p-3">
+                      <h4 className="font-semibold text-sm mb-2">When to Use:</h4>
+                      <p className="text-sm text-muted-foreground">High-demand services, premium positioning</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm">Maintains premium feel</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm">Higher margins</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Payment Day Strategy */}
+        <section className="py-16 px-4 bg-slate-50/5">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Payment Day Strategy
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Align your billing day with cash flow needs and customer expectations. 
+                Monthly Club supports flexible payment day configuration.
               </p>
+            </div>
 
-              <h2 id="examples">Example pricing tables by niche</h2>
-              <p>Use these as starting points and adjust for local rates and demand.</p>
-              <div className="not-prose overflow-x-auto rounded-lg border border-white/10 bg-white/5">
-                <table className="min-w-[640px] w-full text-sm">
-                  <thead className="bg-white/5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="border border-brand-indigo/20 bg-gradient-to-b from-brand-indigo/10 to-transparent">
+                <CardHeader>
+                  <CardTitle className="text-xl text-primary">Anniversary Billing</CardTitle>
+                  <CardDescription>Same day each month based on signup date</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm">Spreads cash flow evenly</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm">Easy to remember</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm">Consistent revenue</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-brand-pink/20 bg-gradient-to-b from-brand-pink/10 to-transparent">
+                <CardHeader>
+                  <CardTitle className="text-xl text-primary">Preferred Payment Day</CardTitle>
+                  <CardDescription>All customers billed on the same day (1st, 15th, etc.)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm">Predictable cash flow</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-sm">Easier accounting</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock3 className="w-4 h-4 text-orange-500" />
+                      <span className="text-sm">May cause payment collisions</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Examples */}
+        <section className="py-16 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Real Pricing Examples by Industry
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Use these pricing tables as starting points and adjust for your local market rates and demand. 
+                All prices are in GBP and based on UK market research.
+              </p>
+            </div>
+
+            <div className="overflow-x-auto">
+              <div className="min-w-[800px] bg-background rounded-lg border border-slate-200/20 overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-slate-50/50">
                     <tr>
-                      <th className="px-3 py-2 text-left">Business Type</th>
-                      <th className="px-3 py-2 text-left">Basic</th>
-                      <th className="px-3 py-2 text-left">Standard</th>
-                      <th className="px-3 py-2 text-left">Premium</th>
+                      <th className="px-6 py-4 text-left font-semibold text-foreground">Business Type</th>
+                      <th className="px-6 py-4 text-left font-semibold text-foreground">Basic</th>
+                      <th className="px-6 py-4 text-left font-semibold text-foreground">Standard</th>
+                      <th className="px-6 py-4 text-left font-semibold text-foreground">Premium</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr className="border-t border-white/10">
-                      <td className="px-3 py-2">Home Cleaning</td>
-                      <td className="px-3 py-2">£49/mo (1 clean)</td>
-                      <td className="px-3 py-2">£89/mo (2 cleans)</td>
-                      <td className="px-3 py-2">£129/mo (3 cleans + deep clean 1x/qtr)</td>
-                    </tr>
-                    <tr className="border-t border-white/10">
-                      <td className="px-3 py-2">Hair &amp; Beauty</td>
-                      <td className="px-3 py-2">£35/mo (1 blow dry)</td>
-                      <td className="px-3 py-2">£65/mo (2 blow dries)</td>
-                      <td className="px-3 py-2">£99/mo (3 blow dries + treatment)</td>
-                    </tr>
-                    <tr className="border-t border-white/10">
-                      <td className="px-3 py-2">Dog Grooming</td>
-                      <td className="px-3 py-2">£29/mo (bath)</td>
-                      <td className="px-3 py-2">£55/mo (bath + tidy)</td>
-                      <td className="px-3 py-2">£85/mo (full groom + nail trim)</td>
-                    </tr>
-                    <tr className="border-t border-white/10">
-                      <td className="px-3 py-2">Personal Training</td>
-                      <td className="px-3 py-2">£79/mo (1 session)</td>
-                      <td className="px-3 py-2">£149/mo (2 sessions)</td>
-                      <td className="px-3 py-2">£219/mo (3 sessions + plan)</td>
-                    </tr>
+                  <tbody className="divide-y divide-slate-200/20">
+                    {pricingExamples.map((example, index) => (
+                      <tr key={index} className="hover:bg-slate-50/30 transition-colors">
+                        <td className="px-6 py-4 font-medium text-foreground">{example.business}</td>
+                        <td className="px-6 py-4">
+                          <div className="font-semibold text-primary">{example.basic.price}</div>
+                          <div className="text-sm text-muted-foreground">{example.basic.description}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="font-semibold text-primary">{example.standard.price}</div>
+                          <div className="text-sm text-muted-foreground">{example.standard.description}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="font-semibold text-primary">{example.premium.price}</div>
+                          <div className="text-sm text-muted-foreground">{example.premium.description}</div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
-
-              <h2>Next steps</h2>
-              <ul>
-                <li>Start with a simple flat plan; add a tier if demand outstrips capacity.</li>
-                <li>Anchor prices with retail comparison and hours saved.</li>
-                <li>Test a first‑month discount; keep renewal price clear.</li>
-                <li>Pick a payment day that smooths cash flow.</li>
-              </ul>
-
-              <div className="mt-8">
-                <Link href="/create-a-business" className="hero-button-primary">Create your plan</Link>
-              </div>
-              </article>
-
-
-            {/* Desktop sticky TOC */}
-            <aside className="hidden lg:block">
-              <div className="sticky top-28 rounded-lg border border-white/10 p-4 bg-white/5">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">On this page</p>
-                <ul className="space-y-2 text-sm">
-                  {toc.map((item) => (
-                    <li key={item.id}>
-                      <a href={`#${item.id}`} className="text-brand-purple hover:underline">{item.label}</a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </aside>
+            </div>
           </div>
         </section>
-      </main>
-    </div>
+
+        {/* Best Practices */}
+        <section className="py-16 px-4 bg-slate-50/5">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Pricing Best Practices
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Follow these proven strategies to create pricing that converts customers 
+                and maximizes your recurring revenue.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <Card className="border border-brand-green/20 bg-gradient-to-b from-brand-green/10 to-transparent">
+                <CardHeader>
+                  <CardTitle className="text-2xl text-primary mb-4">Start Simple</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold">Begin with Flat Pricing</h4>
+                        <p className="text-sm text-muted-foreground">Start with one simple plan, add tiers as you grow</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold">Test and Adjust</h4>
+                        <p className="text-sm text-muted-foreground">Monitor conversion rates and adjust pricing based on demand</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold">Local Market Research</h4>
+                        <p className="text-sm text-muted-foreground">Check competitor pricing in your area and adjust accordingly</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border border-brand-purple/20 bg-gradient-to-b from-brand-purple/10 to-transparent">
+                <CardHeader>
+                  <CardTitle className="text-2xl text-primary mb-4">Value Communication</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold">Show Savings</h4>
+                        <p className="text-sm text-muted-foreground">Always display retail vs. member pricing with savings percentage</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold">Clear Benefits</h4>
+                        <p className="text-sm text-muted-foreground">List exactly what's included in each plan tier</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="w-5 h-5 text-primary mt-1 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold">Time-Based Value</h4>
+                        <p className="text-sm text-muted-foreground">Emphasize time saved, convenience, and peace of mind</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-20 px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <Card className="border-0 shadow-glow overflow-hidden relative">
+              <CardContent className="p-8 relative z-10">
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-500/10 to-green-500/10"></div>
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 relative z-10">
+                  Ready to Set Your Pricing?
+                </h2>
+                <p className="text-xl mb-8 opacity-90 relative z-10 max-w-2xl mx-auto">
+                  Use these strategies to create pricing that converts customers and maximizes 
+                  your recurring revenue. Start with simple plans and grow from there.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+                  <Link href="/create-a-business">
+                    <Button className="hero-button-primary text-base sm:text-lg px-6 sm:px-8 py-4 w-full sm:w-auto">
+                      Create Your Pricing Plan
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </Link>
+                  <Link href="/guides">
+                    <Button variant="outline" className="text-base sm:text-lg px-6 sm:px-8 py-4 w-full sm:w-auto">
+                      Explore More Guides
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-slate-500/5 rounded-full -translate-y-16 translate-x-16"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-green-500/5 rounded-full translate-y-12 -translate-x-12"></div>
+            </Card>
+          </div>
+        </section>
+      </div>
+
+      <Script id="pricing-subscription-plans-schema" type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "name": "Pricing Subscription Plans for Service Businesses | Complete Guide | Monthly Club",
+          "url": "https://www.monthlyclubhq.com/guides/pricing-subscription-plans-service-business",
+          "description": "Master subscription pricing with our complete guide. Learn pricing models, anchoring strategies, payment day optimization, and see real pricing examples.",
+          "author": {
+            "@type": "Organization",
+            "name": "Monthly Club",
+            "url": "https://www.monthlyclubhq.com"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Monthly Club",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://www.monthlyclubhq.com/images/MonthlyClubLogo.png"
+            }
+          },
+          "datePublished": "2024-06-01",
+          "dateModified": "2025-01-15"
+        })}
+      </Script>
+    </>
   );
 }
-
-

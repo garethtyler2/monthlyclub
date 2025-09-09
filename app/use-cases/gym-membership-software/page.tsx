@@ -174,7 +174,6 @@ export default function GymMembershipSoftwarePage() {
         <title>Gym Membership Software | Monthly Club</title>
         <meta name="description" content="Complete gym membership management with automated payments, member access control, and facility management. Perfect for local gyms and fitness centers." />
         <meta name="robots" content="index,follow" />
-        <link rel="canonical" href="https://www.monthlyclubhq.com/use-cases/gym-membership-software" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

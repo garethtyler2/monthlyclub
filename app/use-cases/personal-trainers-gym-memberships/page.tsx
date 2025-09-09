@@ -174,7 +174,6 @@ export default function PersonalTrainersGymMembershipsPage() {
         <title>Personal Trainer Subscription Software | Monthly Club</title>
         <meta name="description" content="Build recurring revenue with gym memberships and personal training subscriptions. Automated payments, client management, and workout scheduling for fitness professionals." />
         <meta name="robots" content="index,follow" />
-        <link rel="canonical" href="https://www.monthlyclubhq.com/use-cases/personal-trainers-gym-memberships" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

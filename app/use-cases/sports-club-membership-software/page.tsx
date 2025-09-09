@@ -154,7 +154,6 @@ export default function SportsClubMembershipSoftwarePage() {
         <title>Sports Club Membership Software | Monthly Club</title>
         <meta name="description" content="Complete membership management for amateur rugby, cricket, and football clubs. Automated payments, member communication, and subscription management in one platform." />
         <meta name="robots" content="index,follow" />
-        <link rel="canonical" href="https://www.monthlyclubhq.com/use-cases/sports-club-membership-software" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
