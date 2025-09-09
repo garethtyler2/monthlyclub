@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { CheckCircle, X, Zap, ArrowRight, MessageCircle, Star, TrendingUp, CreditCard, Users, FileText, Wallet, ShoppingCart, Palette, Brain, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import Script from "next/script";
-import HomepageFeatures from "@/components/Homepage/Features";
 
 export const metadata: Metadata = {
   title: "Features | Tools Built to Power Your Subscription Club",
@@ -325,10 +324,273 @@ const FeaturesPage = () => {
           </div>
         </section>
 
+        {/* Detailed Features */}
+        <section className="py-16 px-4 bg-slate-50/5">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Detailed Features
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Everything you need to run and grow your subscription business, all in one platform.
+              </p>
+            </div>
 
-        {/* Tiles: same feature items as homepage */}
-        <HomepageFeatures />
-        
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Balance Builder */}
+              <Card className="border border-brand-blue/20 bg-gradient-to-b from-brand-blue/10 to-transparent">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                    <Wallet className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl text-primary">Balance Builder</CardTitle>
+                  <CardDescription>
+                    Flexible prepaid subscriptions where customers build credit for any future service.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Adjustable monthly amounts</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Use credit for any service</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Real-time balance tracking</span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <Link href="/features/balance-builder">
+                      <Button variant="outline" size="sm" className="w-full">
+                        Learn More
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Pay It Off Plans */}
+              <Card className="border border-brand-green/20 bg-gradient-to-b from-brand-green/10 to-transparent">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                    <CreditCard className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl text-primary">Pay It Off Plans</CardTitle>
+                  <CardDescription>
+                    Installment plans for higher-value packages and services.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Flexible payment schedules</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Upfront payment collection</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Automated installment billing</span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <Link href="/features/pay-it-off">
+                      <Button variant="outline" size="sm" className="w-full">
+                        Learn More
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* One-Time Purchases */}
+              <Card className="border border-brand-purple/20 bg-gradient-to-b from-brand-purple/10 to-transparent">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                    <ShoppingCart className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl text-primary">One-Time Purchases</CardTitle>
+                  <CardDescription>
+                    Individual services, add-ons, and single purchases alongside subscriptions.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Instant payment processing</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Add-on services</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Standalone products</span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <Link href="/features/one-time-purchases">
+                      <Button variant="outline" size="sm" className="w-full">
+                        Learn More
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Messaging & Community */}
+              <Card className="border border-brand-orange/20 bg-gradient-to-b from-brand-orange/10 to-transparent">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                    <MessageCircle className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl text-primary">Messaging & Community</CardTitle>
+                  <CardDescription>
+                    Private messaging and content sharing with your subscribers.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Private conversations</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Content posts for subscribers</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Community building tools</span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <Link href="/features/messaging-community">
+                      <Button variant="outline" size="sm" className="w-full">
+                        Learn More
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Business Branding */}
+              <Card className="border border-brand-indigo/20 bg-gradient-to-b from-brand-indigo/10 to-transparent">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                    <Palette className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl text-primary">Business Branding</CardTitle>
+                  <CardDescription>
+                    Create your professional business page with logo, description, and products.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Custom business page</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Logo and description</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Dedicated business URL</span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <Link href="/features/business-branding">
+                      <Button variant="outline" size="sm" className="w-full">
+                        Learn More
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Tax Analytics */}
+              <Card className="border border-brand-pink/20 bg-gradient-to-b from-brand-pink/10 to-transparent">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                    <BarChart3 className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl text-primary">Tax Analytics</CardTitle>
+                  <CardDescription>
+                    Simple tax reports and basic analytics for your subscription business.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">View all transactions</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Basic tax calculations</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">CSV export</span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <Link href="/features/tax-analytics">
+                      <Button variant="outline" size="sm" className="w-full">
+                        Learn More
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Stripe Billing */}
+              <Card className="border border-brand-indigo/20 bg-gradient-to-b from-brand-indigo/10 to-transparent">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-background rounded-lg flex items-center justify-center mb-4">
+                    <CreditCard className="w-6 h-6 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl text-primary">Stripe Billing</CardTitle>
+                  <CardDescription>
+                    Secure payment processing and automated billing through Stripe integration.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Automated payment processing</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Multiple payment methods</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-primary" />
+                      <span className="text-sm">Stripe's security & compliance</span>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <Link href="/features/stripe-billing">
+                      <Button variant="outline" size="sm" className="w-full">
+                        Learn More
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
 
         {/* Why It Works */}
         <section className="py-16 px-4">

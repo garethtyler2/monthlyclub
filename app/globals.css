@@ -12,6 +12,8 @@
   --color-brand-blue: #2563EB;
   --color-brand-indigo: #4F46E5;
   --color-brand-pink: #EC4899;
+  --color-brand-green: #10B981;
+  --color-brand-orange: #F59E0B;
 
   /* App Color System (Shadcn-style HSL vars) */
   --color-background: hsl(var(--background));
