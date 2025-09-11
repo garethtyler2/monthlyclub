@@ -204,19 +204,21 @@ export default function BusinessDashboardPage() {
               </CardContent>
             </Card>
             
-            <Card className="border-white/10 bg-white/5 opacity-60 cursor-not-allowed">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-500/20 rounded-lg">
-                    <Users className="w-5 h-5 text-purple-400" />
+            <Link href="/dashboard/customers">
+              <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200 cursor-pointer">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-500/20 rounded-lg">
+                      <Users className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white">Customers</h3>
+                      <p className="text-sm text-gray-400">Manage your customer base and subscriptions</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-white">Customers</h3>
-                    <p className="text-sm text-gray-400">Coming Soon - Manage your customer base</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           </div>
         </div>
 
