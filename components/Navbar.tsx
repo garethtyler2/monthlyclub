@@ -461,39 +461,41 @@ const Navbar = () => {
 
           {/* Mobile Header */}
           <div className="md:hidden flex items-center justify-between w-full">
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
-              aria-label="Toggle Menu"
-            >
-              <div className="relative">
-                {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                {unreadMessageCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
-                )}
-              </div>
-            </button>
-
             {/* Mobile Logo */}
             <Link href="/" className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-brand-purple to-brand-blue">
               Monthly Club
             </Link>
 
-            {/* Mobile Avatar/Login Button */}
-            {user ? (
-              <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue w-8 h-8">
-                {businessImageUrl ? (
-                  <Image src={businessImageUrl} alt={businessName ?? "Business"} width={32} height={32} className="rounded-full object-cover w-full h-full" />
-                ) : (
-                  <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
-                )}
-              </Avatar>
-            ) : (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-brand-purple to-brand-blue flex items-center justify-center">
-                <User size={16} className="text-white" />
-              </div>
-            )}
+            {/* Mobile Avatar/Login Button - right side (acts as menu toggle) */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-1 rounded-lg hover:bg-white/5 transition-colors"
+              aria-label="Toggle Menu"
+            >
+              {user ? (
+                <div className="relative">
+                  <Avatar className="bg-gradient-to-r from-brand-purple to-brand-blue w-8 h-8">
+                    {businessImageUrl ? (
+                      <Image src={businessImageUrl} alt={businessName ?? "Business"} width={32} height={32} className="rounded-full object-cover w-full h-full" />
+                    ) : (
+                      <AvatarFallback title={user?.email ?? "Logged in"}>👤</AvatarFallback>
+                    )}
+                  </Avatar>
+                  {unreadMessageCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                  )}
+                </div>
+              ) : (
+                <div className="relative">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-brand-purple to-brand-blue flex items-center justify-center">
+                    <User size={16} className="text-white" />
+                  </div>
+                  {unreadMessageCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                  )}
+                </div>
+              )}
+            </button>
           </div>
         </div>
 
