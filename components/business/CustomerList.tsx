@@ -25,6 +25,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from 'sonner';
 
 interface Customer {
   id: string;
@@ -82,6 +83,15 @@ interface Payment {
   product_name: string;
 }
 
+interface CreditTransaction {
+  id: string;
+  amount: number;
+  type: 'earned' | 'spent' | 'refund';
+  description: string;
+  created_at: string;
+  related_subscription_id?: string;
+}
+
 const getProductIcon = (productType: string) => {
   switch (productType) {
     case 'balance_builder':
@@ -126,23 +136,28 @@ export function CustomerList() {
   const [page, setPage] = useState(1);
   const [businessId, setBusinessId] = useState<string | null>(null);
   const [businessName, setBusinessName] = useState<string>('');
+  const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [showCustomerDetail, setShowCustomerDetail] = useState(false);
   const [customerTransactions, setCustomerTransactions] = useState<{
     payments: Payment[];
     serviceEvents: ServiceEvent[];
-  }>({ payments: [], serviceEvents: [] });
+    creditTransactions: CreditTransaction[];
+  }>({ payments: [], serviceEvents: [], creditTransactions: [] });
   const [sortBy, setSortBy] = useState<'name' | 'date' | 'balance' | 'spent'>('name');
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'cancelled' | 'with_balance'>('all');
+  const [filterProduct, setFilterProduct] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [showChargeModal, setShowChargeModal] = useState(false);
   const [showLogModal, setShowLogModal] = useState(false);
   const [chargeAmount, setChargeAmount] = useState('');
   const [chargeDescription, setChargeDescription] = useState('');
   const [logNotes, setLogNotes] = useState('');
+  const [selectedProductId, setSelectedProductId] = useState<string>('');
   const [isCharging, setIsCharging] = useState(false);
   const [isLogging, setIsLogging] = useState(false);
   const [expandedCustomer, setExpandedCustomer] = useState<string | null>(null);
+  
   
   const isMobile = useIsMobile();
   const [pageSize, setPageSize] = useState(12);
@@ -173,6 +188,23 @@ export function CustomerList() {
 
     fetchBusinessInfo();
   }, []);
+
+  // Fetch available products when businessId changes
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (!businessId) return;
+
+      const { data: productsData } = await supabase
+        .from('products')
+        .select('id, name, product_type, price, currency')
+        .eq('business_id', businessId)
+        .order('name');
+
+      setAvailableProducts(productsData || []);
+    };
+
+    fetchProducts();
+  }, [businessId]);
 
   const fetchCustomers = useCallback(async () => {
     if (!businessId) return;
@@ -325,7 +357,7 @@ export function CustomerList() {
 
     try {
       // Fetch payments
-      const { data: paymentData } = await supabase
+      const { data: paymentData, error: paymentError } = await supabase
         .from('payments')
         .select(`
           id,
@@ -333,12 +365,44 @@ export function CustomerList() {
           status,
           paid_at,
           created_at,
-          products(name)
+          product_id
         `)
         .eq('user_id', customerId)
         .eq('business_id', businessId)
         .order('created_at', { ascending: false })
         .limit(20);
+
+      if (paymentError) {
+        console.error('Error fetching payments:', paymentError);
+      } else {
+        console.log('Fetched payments for customer:', customerId, paymentData);
+      }
+
+      // Get product names for payments
+      let paymentDataWithProducts: Payment[] = paymentData?.map(p => ({
+        ...p,
+        product_name: 'Unknown Product'
+      })) || [];
+      
+      if (paymentData && paymentData.length > 0) {
+        const productIds = [...new Set(paymentData.map(p => p.product_id).filter(Boolean))];
+        if (productIds.length > 0) {
+          const { data: productsData } = await supabase
+            .from('products')
+            .select('id, name')
+            .in('id', productIds);
+          
+          const productMap = (productsData || []).reduce((acc, product) => {
+            acc[product.id] = product.name;
+            return acc;
+          }, {} as Record<string, string>);
+
+          paymentDataWithProducts = paymentData.map(payment => ({
+            ...payment,
+            product_name: productMap[payment.product_id] || 'Unknown Product'
+          }));
+        }
+      }
 
       // Fetch service events
       const { data: serviceData } = await supabase
@@ -356,15 +420,29 @@ export function CustomerList() {
         .order('served_at', { ascending: false })
         .limit(20);
 
+      // Fetch credit transactions
+      const { data: creditData } = await supabase
+        .from('credit_transactions')
+        .select(`
+          id,
+          amount,
+          type,
+          description,
+          created_at,
+          related_subscription_id
+        `)
+        .eq('user_id', customerId)
+        .eq('business_id', businessId)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
         setCustomerTransactions({
-          payments: paymentData?.map(p => ({
-            ...p,
-            product_name: (p.products as any)?.name || 'Unknown Product'
-          })) || [],
+          payments: paymentDataWithProducts,
           serviceEvents: serviceData?.map(s => ({
             ...s,
             product_name: (s.products as any)?.name || 'Unknown Product'
-          })) || []
+          })) || [],
+          creditTransactions: creditData || []
         });
     } catch (error) {
       console.error('Error fetching customer transactions:', error);
@@ -384,7 +462,10 @@ export function CustomerList() {
     try {
       const currentCredit = selectedCustomer.user_credits;
       if (!currentCredit || currentCredit.balance < amount) {
-        alert('Insufficient credit');
+        toast.error("Insufficient Credit", {
+          description: `Customer only has £${((currentCredit?.balance || 0) / 100).toFixed(2)} available, but you're trying to charge £${(amount / 100).toFixed(2)}.`,
+        });
+        setIsCharging(false);
         return;
       }
 
@@ -424,6 +505,10 @@ export function CustomerList() {
       setChargeAmount('');
       setChargeDescription('');
       fetchCustomers();
+      
+      toast.success("Credit Charged Successfully", {
+        description: `£${(amount / 100).toFixed(2)} charged from customer's balance.`,
+      });
     } catch (error) {
       console.error('Error charging credit:', error);
     } finally {
@@ -432,16 +517,29 @@ export function CustomerList() {
   };
 
   const handleLogVisit = async () => {
-    if (!selectedCustomer || !businessId) return;
+    if (!selectedCustomer || !businessId || !selectedProductId) return;
 
     setIsLogging(true);
 
     try {
       const { data: authData } = await supabase.auth.getUser();
       
+      // Find the selected subscription
+      const selectedSubscription = selectedCustomer.subscriptions.find(sub => sub.product_id === selectedProductId);
+      
+      if (!selectedSubscription) {
+        toast.error("Error", {
+          description: "Selected subscription not found. Please try again.",
+        });
+        setIsLogging(false);
+        return;
+      }
+      
       await supabase.from('service_events').insert({
         business_id: businessId,
         user_id: selectedCustomer.id,
+        product_id: selectedProductId,
+        subscription_id: selectedSubscription.id,
         notes: logNotes || null,
         source: 'manual',
         created_by: authData?.user?.id || null,
@@ -449,9 +547,17 @@ export function CustomerList() {
 
       setShowLogModal(false);
       setLogNotes('');
+      setSelectedProductId('');
       fetchCustomers();
+      
+      toast.success("Visit Logged Successfully", {
+        description: "Customer visit has been recorded.",
+      });
     } catch (error) {
       console.error('Error logging visit:', error);
+      toast.error("Error", {
+        description: "Failed to log visit. Please try again.",
+      });
     } finally {
       setIsLogging(false);
     }
@@ -464,7 +570,7 @@ export function CustomerList() {
   // Reset to first page when search or filter changes
   useEffect(() => {
     setPage(1);
-  }, [searchTerm, filterStatus, sortBy]);
+  }, [searchTerm, filterStatus, filterProduct, sortBy]);
 
   const filteredAndSortedCustomers = allCustomers
     .filter(customer => {
@@ -491,6 +597,12 @@ export function CustomerList() {
         default:
           return true;
       }
+    })
+    .filter(customer => {
+      if (filterProduct === 'all') return true;
+      
+      // Check if customer has a subscription for the selected product
+      return customer.subscriptions.some(sub => sub.product_id === filterProduct);
     })
     .sort((a, b) => {
       switch (sortBy) {
@@ -556,7 +668,7 @@ export function CustomerList() {
             />
           </div>
           
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
@@ -577,6 +689,19 @@ export function CustomerList() {
               <option value="active">Active Only</option>
               <option value="cancelled">Cancelled Only</option>
               <option value="with_balance">With Balance</option>
+            </select>
+
+            <select
+              value={filterProduct}
+              onChange={(e) => setFilterProduct(e.target.value)}
+              className="px-4 py-3 bg-white/5 border border-white/10 text-white rounded-lg text-sm font-medium"
+            >
+              <option value="all">All Products</option>
+              {availableProducts.map((product) => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -852,7 +977,7 @@ export function CustomerList() {
 
       {/* Customer Detail Modal */}
       <Dialog open={showCustomerDetail} onOpenChange={setShowCustomerDetail}>
-        <DialogContent className="bg-slate-800 border-white/10 max-w-md mx-4 max-h-[90vh] overflow-y-auto p-0">
+        <DialogContent className="bg-slate-800 border-white/10 w-full max-w-md mx-auto max-h-[90vh] overflow-y-auto p-0 sm:w-[90vw] sm:max-w-md">
           <DialogHeader className="p-6 pb-4">
             <DialogTitle className="text-white text-xl">
               {selectedCustomer?.display_name || selectedCustomer?.email}
@@ -961,49 +1086,112 @@ export function CustomerList() {
               <div>
                 <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {[...customerTransactions.payments, ...customerTransactions.serviceEvents]
+                  {(() => {
+                    const allTransactions = [...customerTransactions.payments, ...customerTransactions.serviceEvents, ...customerTransactions.creditTransactions];
+                    console.log('All transactions for recent activity:', allTransactions);
+                    return allTransactions;
+                  })()
                     .sort((a, b) => {
-                      const aDate = 'paid_at' in a ? a.paid_at : a.served_at;
-                      const bDate = 'paid_at' in b ? b.paid_at : b.served_at;
+                      const aDate = 'paid_at' in a ? (a.paid_at || a.created_at) : 'served_at' in a ? a.served_at : a.created_at;
+                      const bDate = 'paid_at' in b ? (b.paid_at || b.created_at) : 'served_at' in b ? b.served_at : b.created_at;
                       return new Date(bDate).getTime() - new Date(aDate).getTime();
                     })
                     .slice(0, 8)
-                    .map((item, index) => (
-                      <div
-                        key={index}
-                        className={`p-3 rounded-lg ${
-                          'amount' in item
-                            ? item.status === 'failed'
-                              ? 'bg-red-500/10 border border-red-500/20'
-                              : 'bg-blue-500/10 border border-blue-500/20'
-                            : 'bg-orange-500/10 border border-orange-500/20'
-                        }`}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-white">
-                              {new Date('paid_at' in item ? item.paid_at : item.served_at).toLocaleDateString()}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {'amount' in item
-                                ? (item.status === 'failed' ? 'Payment Failed' : 'Payment Received')
-                                : (item.notes || 'Service Delivered')
+                    .map((item, index) => {
+                      const isPayment = 'amount' in item && 'status' in item && ('paid_at' in item || 'created_at' in item);
+                      const isServiceEvent = 'served_at' in item;
+                      const isCreditTransaction = 'type' in item;
+                      
+                      // For service events, check if it's a charge (has amount_charged) or just a visit
+                      const isServiceCharge = isServiceEvent && item.amount_charged && item.amount_charged > 0;
+                      const isServiceVisit = isServiceEvent && (!item.amount_charged || item.amount_charged === 0);
+                      
+                      return (
+                        <div
+                          key={index}
+                          className={`p-3 rounded-lg ${
+                            isPayment
+                              ? item.status === 'failed'
+                                ? 'bg-red-500/10 border border-red-500/20'
+                                : item.status === 'pending'
+                                  ? 'bg-yellow-500/10 border border-yellow-500/20'
+                                  : 'bg-green-500/10 border border-green-500/20'
+                              : isServiceCharge
+                                ? 'bg-orange-500/10 border border-orange-500/20'
+                                : isCreditTransaction
+                                  ? 'bg-yellow-500/10 border border-yellow-500/20'
+                                  : 'bg-purple-500/10 border border-purple-500/20'
+                          }`}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <div className={`w-2 h-2 rounded-full ${
+                                  isPayment
+                                    ? item.status === 'failed'
+                                      ? 'bg-red-400'
+                                      : item.status === 'pending'
+                                        ? 'bg-yellow-400'
+                                        : 'bg-green-400'
+                                    : isServiceCharge
+                                      ? 'bg-orange-400'
+                                      : isCreditTransaction
+                                        ? 'bg-yellow-400'
+                                        : 'bg-purple-400'
+                                }`} />
+                                <p className="text-sm font-medium text-white">
+                                  {new Date(isPayment ? (item.paid_at || item.created_at) : isServiceEvent ? item.served_at : item.created_at).toLocaleDateString()}
+                                </p>
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {isPayment
+                                  ? (item.status === 'failed' ? `Payment Failed - ${item.product_name}` : 
+                                     item.status === 'pending' ? `Payment Pending - ${item.product_name}` : 
+                                     item.status === 'succeeded' ? `Payment Received - ${item.product_name}` : 
+                                     `Payment ${item.status} - ${item.product_name}`)
+                                  : isServiceCharge
+                                    ? `Service Charge - ${item.product_name}`
+                                    : isCreditTransaction
+                                      ? (item.type === 'spent' ? 'Credit Charged' : item.type === 'earned' ? 'Credit Earned' : 'Credit Refunded')
+                                      : `Service Visit Logged - ${item.product_name}`
+                                }
+                              </p>
+                              {(isServiceEvent && item.notes) || (isCreditTransaction && item.description) ? (
+                                <p className={`text-xs mt-1 italic ${
+                                  isServiceCharge ? 'text-orange-300' : 
+                                  isCreditTransaction ? 'text-yellow-300' : 
+                                  'text-purple-300'
+                                }`}>
+                                  "{isServiceEvent ? item.notes : item.description}"
+                                </p>
+                              ) : null}
+                            </div>
+                            <div className={`text-sm font-semibold ${
+                              isPayment
+                                ? (item.status === 'failed' ? 'text-red-400' : 
+                                   item.status === 'pending' ? 'text-yellow-400' : 
+                                   'text-green-400')
+                                : isServiceCharge
+                                  ? 'text-orange-400'
+                                  : isCreditTransaction
+                                    ? 'text-yellow-400'
+                                    : 'text-purple-400'
+                            }`}>
+                              {isPayment
+                                ? (item.status === 'failed' ? 'Failed' : 
+                                   item.status === 'pending' ? 'Pending' : 
+                                   `+£${(item.amount / 100).toFixed(2)}`)
+                                : isServiceCharge
+                                  ? `-£${((item.amount_charged || 0) / 100).toFixed(2)}`
+                                  : isCreditTransaction
+                                    ? `${item.type === 'spent' ? '-' : '+'}£${(item.amount / 100).toFixed(2)}`
+                                    : 'Visit'
                               }
-                            </p>
-                          </div>
-                          <div className={`text-sm font-semibold ${
-                            'amount' in item
-                              ? (item.status === 'failed' ? 'text-red-400' : 'text-blue-400')
-                              : 'text-orange-400'
-                          }`}>
-                            {'amount' in item
-                              ? (item.status === 'failed' ? 'Failed' : `+£${(item.amount / 100).toFixed(2)}`)
-                              : (item.amount_charged ? `-£${(item.amount_charged / 100).toFixed(2)}` : 'Service')
-                            }
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                 </div>
               </div>
 
@@ -1078,7 +1266,7 @@ export function CustomerList() {
 
       {/* Charge Credit Modal */}
       <Dialog open={showChargeModal} onOpenChange={setShowChargeModal}>
-        <DialogContent className="bg-slate-800 border-white/10">
+        <DialogContent className="bg-slate-800 border-white/10 w-full max-w-md mx-auto sm:w-[90vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-white">Charge Customer Credit</DialogTitle>
           </DialogHeader>
@@ -1113,14 +1301,19 @@ export function CustomerList() {
               </div>
             )}
           </div>
-          <DialogFooter className="mt-4">
-            <Button className="mt-2" variant="tertiary" onClick={() => setShowChargeModal(false)}>
+          <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+            <Button 
+              variant="tertiary" 
+              onClick={() => setShowChargeModal(false)}
+              className="mt-2 sm:mt-0"
+            >
               Cancel
             </Button>
             <Button 
               onClick={handleChargeCredit} 
               disabled={isCharging || !chargeAmount || !chargeDescription}
               variant="primary"
+              className="w-full sm:w-auto"
             >
               {isCharging ? 'Charging...' : 'Charge Balance'}
             </Button>
@@ -1130,11 +1323,40 @@ export function CustomerList() {
 
       {/* Log Visit Modal */}
       <Dialog open={showLogModal} onOpenChange={setShowLogModal}>
-        <DialogContent className="bg-slate-800 border-white/10">
+        <DialogContent className="bg-slate-800 border-white/10 w-full max-w-md mx-auto sm:w-[90vw] sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-white">Log Customer Visit</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
+            {selectedCustomer && (
+              <>
+                {selectedCustomer.subscriptions.filter(sub => sub.status === 'active').length > 0 ? (
+                  <div>
+                    <label className="text-sm font-medium text-white mb-2 block">Select Product</label>
+                    <select
+                      value={selectedProductId}
+                      onChange={(e) => setSelectedProductId(e.target.value)}
+                      className="w-full px-4 py-3 bg-white/5 border border-white/10 text-white rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Choose a product...</option>
+                      {selectedCustomer.subscriptions
+                        .filter(sub => sub.status === 'active')
+                        .map((sub) => (
+                        <option key={sub.id} value={sub.product_id}>
+                          {sub.product_name} ({sub.product_type})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div className="p-3 bg-red-500/10 border border-red-500/20 rounded">
+                    <p className="text-sm text-red-400">
+                      Customer must have an active subscription to log a visit.
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
             <div>
               <label className="text-sm font-medium text-white">Notes (optional)</label>
               <Input
@@ -1146,14 +1368,23 @@ export function CustomerList() {
               />
             </div>
           </div>
-          <DialogFooter className="mt-4">
-            <Button className="mt-2" variant="tertiary" onClick={() => setShowLogModal(false)}>
+          <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+            <Button 
+              variant="tertiary" 
+              onClick={() => {
+                setShowLogModal(false);
+                setSelectedProductId('');
+                setLogNotes('');
+              }}
+              className="mt-2 sm:mt-0"
+            >
               Cancel
             </Button>
             <Button 
               onClick={handleLogVisit} 
-              disabled={isLogging || !selectedCustomer}
+              disabled={isLogging || !selectedCustomer || !selectedProductId || selectedCustomer?.subscriptions.filter(sub => sub.status === 'active').length === 0}
               variant="primary"
+              className="w-full sm:w-auto"
             >
               {isLogging ? 'Logging...' : 'Log Visit'}
             </Button>

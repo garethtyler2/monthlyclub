@@ -16,7 +16,6 @@ import {
   Plus, 
   Info, 
   Trash2, 
-  Users, 
   Building2, 
   CreditCard, 
   Sparkles,
@@ -125,17 +124,24 @@ export default function BusinessProductManager({ businessId }: { businessId: str
   };
 
   const saveChanges = async () => {
-    if (!editingProduct || !editForm.name || !editForm.description || editForm.price === undefined) {
+    if (!editingProduct || !editForm.name || !editForm.description) {
       return;
+    }
+
+    // For balance builder products, don't update price
+    const updateData: any = {
+      name: editForm.name,
+      description: editForm.description,
+    };
+
+    // Only include price for non-balance-builder products
+    if (editingProduct.product_type !== 'balance_builder' && editForm.price !== undefined) {
+      updateData.price = editForm.price;
     }
 
     const { error } = await supabase
       .from("products")
-      .update({
-        name: editForm.name,
-        description: editForm.description,
-        price: editForm.price,
-      })
+      .update(updateData)
       .eq("id", editingProduct.id);
 
     if (error) {
@@ -415,7 +421,7 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                   {/* Stats */}
                   <div className="flex items-center justify-between mb-4 p-3 bg-white/5 rounded-lg">
                     <div className="flex items-center space-x-2">
-                      <Users className="w-4 h-4 text-muted-foreground" />
+                      <Building2 className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">
                         {product.product_type === 'balance_builder' ? 'Builders' : 'Subscribers'}
                       </span>
@@ -431,22 +437,11 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                       size="sm"
                       variant="outline"
                       className="flex-1 border-white/20 text-white hover:bg-white/10"
-                      onClick={() => window.location.href = `/dashboard/products/${product.id}/manage-users`}
+                      onClick={() => openEditModal(product)}
                     >
-                      <Users className="w-4 h-4 mr-2" />
-                      Manage Users
+                      <Pencil className="w-4 h-4 mr-2" />
+                      Edit
                     </Button>
-                    
-                    {product.product_type !== 'balance_builder' && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-white/20 text-white hover:bg-white/10"
-                        onClick={() => openEditModal(product)}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                    )}
                     
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
@@ -545,18 +540,27 @@ export default function BusinessProductManager({ businessId }: { businessId: str
                     className="min-h-[100px] bg-white/5 border-white/10 text-white"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="price" className="text-sm font-medium text-white">Price (£)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    value={editForm.price || ''}
-                    onChange={(e) => updateEditForm('price', parseFloat(e.target.value))}
-                    placeholder="0.00"
-                    className="bg-white/5 border-white/10 text-white"
-                  />
-                </div>
+                {editingProduct?.product_type !== 'balance_builder' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="price" className="text-sm font-medium text-white">
+                      {editingProduct?.product_type === 'pay_it_off' ? 'Total Amount (£)' : 'Price (£)'}
+                    </Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      step="0.01"
+                      value={editForm.price || ''}
+                      onChange={(e) => updateEditForm('price', parseFloat(e.target.value))}
+                      placeholder="0.00"
+                      className="bg-white/5 border-white/10 text-white"
+                    />
+                    {editingProduct?.product_type === 'pay_it_off' && (
+                      <p className="text-xs text-gray-400">
+                        Customers will choose how many months to pay this off over
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
               <DialogFooter>
 
