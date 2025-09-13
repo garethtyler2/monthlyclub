@@ -31,6 +31,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { ProductWithSubscribers, ProductType, getProductTypeConfig, requiresPrice } from '@/types/products';
 import ProductTypeSelector from '@/components/shared/ProductTypeSelector';
+import MultiStepProductCreator from '@/components/shared/MultiStepProductCreator';
 import { cn } from '@/lib/utils';
 
 // ProductWithSubscribers interface is now imported from types/products.ts
@@ -44,7 +45,6 @@ export default function BusinessProductManager({ businessId }: { businessId: str
   const [editForm, setEditForm] = useState<Partial<ProductWithSubscribers>>({});
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [addForm, setAddForm] = useState<Partial<ProductWithSubscribers>>({});
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<ProductWithSubscribers | null>(null);
@@ -66,18 +66,11 @@ export default function BusinessProductManager({ businessId }: { businessId: str
   };
 
   const openAddModal = () => {
-    setAddForm({
-      name: "",
-      description: "",
-      price: 0,
-      product_type: 'standard',
-    });
     setIsAddModalOpen(true);
   };
 
   const closeAddModal = () => {
     setIsAddModalOpen(false);
-    setAddForm({});
   };
 
   const openDeleteModal = (product: ProductWithSubscribers) => {
@@ -94,34 +87,6 @@ export default function BusinessProductManager({ businessId }: { businessId: str
     setEditForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const updateAddForm = (field: keyof ProductWithSubscribers, value: string | number | boolean) => {
-    setAddForm(prev => {
-      const updated = { ...prev, [field]: value };
-      
-      // If balance builder is enabled, set default values
-      if (field === 'product_type') {
-        const config = getProductTypeConfig(value as ProductType);
-        if (value === 'balance_builder') {
-          updated.name = "Balance Builder";
-          updated.description = "Build up a balance over time to use on any of our services. Choose how much you'd like to add each month.";
-        } else if (value === 'pay_it_off') {
-          updated.name = "Pay it off";
-          updated.description = "Pay off a larger amount over time with monthly installments.";
-          updated.price = 0;
-        } else if (value === 'one_time') {
-          updated.name = "One-time Purchase";
-          updated.description = "A single payment for immediate purchase - no recurring billing.";
-          updated.price = 0;
-        } else {
-          updated.name = "";
-          updated.description = "";
-          updated.price = 0;
-        }
-      }
-      
-      return updated;
-    });
-  };
 
   const saveChanges = async () => {
     if (!editingProduct || !editForm.name || !editForm.description) {
@@ -182,41 +147,36 @@ export default function BusinessProductManager({ businessId }: { businessId: str
     closeEditModal();
   };
 
-  const saveNewProduct = async () => {
-    if (!addForm.name || !addForm.description || addForm.price === undefined) {
-      return;
-    }
-
+  const handleCreateProduct = async (productData: any) => {
     const { error } = await supabase
       .from("products")
       .insert({
         business_id: businessId,
-        name: addForm.name,
-        description: addForm.description,
-        price: addForm.price,
-        product_type: addForm.product_type || 'standard',
+        name: productData.name,
+        description: productData.description,
+        price: productData.price || 0,
+        product_type: productData.product_type,
         status: 'active',
       });
 
     if (error) {
       console.error("Failed to create product:", error);
-      return;
+      throw error;
     }
 
     // Re-fetch products to show the new one
-    const { data: productData, error: productError } = await supabase
+    const { data: fetchedProducts, error: productError } = await supabase
       .from("products")
       .select("id, name, description, price, product_type, status")
       .eq("business_id", businessId);
 
     if (productError) {
       console.error("Failed to fetch products:", productError);
-      setLoading(false);
-      return;
+      throw productError;
     }
 
     const enrichedProducts = await Promise.all(
-      (productData || []).map(async (product) => {
+      (fetchedProducts || []).map(async (product: any) => {
         const { count, error: countError } = await supabase
           .from("subscriptions")
           .select("id", { count: "exact" })
@@ -231,7 +191,6 @@ export default function BusinessProductManager({ businessId }: { businessId: str
     );
 
     setProducts(enrichedProducts);
-    closeAddModal();
   };
 
   const deleteProduct = async () => {
@@ -575,71 +534,11 @@ export default function BusinessProductManager({ businessId }: { businessId: str
           </Dialog>
 
           {/* Add New Product Modal */}
-          <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-            <DialogContent className="bg-slate-800 border-white/10 sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle className="text-white">Add New Product</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <ProductTypeSelector
-                  selectedType={addForm.product_type || 'standard'}
-                  onTypeChange={(newType) => updateAddForm('product_type', newType)}
-                  className="mb-4"
-                />
-                <div className="space-y-2">
-                  <Label htmlFor="add-name" className="text-sm font-medium text-white">Name</Label>
-                  <Input
-                    id="add-name"
-                    value={addForm.name || ''}
-                    onChange={(e) => updateAddForm('name', e.target.value)}
-                    placeholder="Product name"
-                    className="bg-white/5 border-white/10 text-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="add-description" className="text-sm font-medium text-white">Description</Label>
-                  <Textarea
-                    id="add-description"
-                    value={addForm.description || ''}
-                    onChange={(e) => updateAddForm('description', e.target.value)}
-                    placeholder="Product description"
-                    className="min-h-[100px] bg-white/5 border-white/10 text-white"
-                  />
-                </div>
-                {requiresPrice(addForm.product_type || 'standard') && (
-                  <div className="space-y-2">
-                    <Label htmlFor="add-price" className="text-sm font-medium text-white">
-                      {addForm.product_type === 'pay_it_off' ? 'Total Amount (£)' : 'Price (£)'}
-                    </Label>
-                    <Input
-                      id="add-price"
-                      type="number"
-                      step="0.01"
-                      value={addForm.price || ''}
-                      onChange={(e) => updateAddForm('price', parseFloat(e.target.value))}
-                      placeholder="0.00"
-                      className="bg-white/5 border-white/10 text-white"
-                    />
-                    {addForm.product_type === 'pay_it_off' && (
-                      <p className="text-xs text-gray-400">
-                        Customers will choose how many months to pay this off over
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-              <DialogFooter>
-
-                <Button 
-                  onClick={saveNewProduct}
-                  className="bg-gradient-to-r from-brand-purple to-brand-blue hover:from-brand-purple/90 hover:to-brand-blue/90 text-white"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Product
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <MultiStepProductCreator
+            isOpen={isAddModalOpen}
+            onClose={closeAddModal}
+            onSubmit={handleCreateProduct}
+          />
 
           {/* Delete Confirmation Modal */}
           <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>

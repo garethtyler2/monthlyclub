@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import ProductTypeSelector from '@/components/shared/ProductTypeSelector';
+import MultiStepProductCreator from '@/components/shared/MultiStepProductCreator';
 import { Product, ProductType, getProductTypeConfig, isCustomerAmountType, requiresPrice } from '@/types/products';
 
 // Product interface is now imported from types/products.ts
@@ -38,6 +39,7 @@ export default function CreateBusinessPage() {
   const [hasBusiness, setHasBusiness] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [showHelp, setShowHelp] = useState(false);
+  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showTermsField, setShowTermsField] = useState(false);
@@ -209,16 +211,18 @@ export default function CreateBusinessPage() {
   };
 
   const addNewProduct = () => {
-    setProducts((prev) => [
-      ...prev,
-      { 
-        id: `temp-${Date.now()}`, 
-        name: "", 
-        description: "", 
-        price: 0,
-        product_type: 'standard'
-      }
-    ]);
+    setIsAddProductModalOpen(true);
+  };
+
+  const handleCreateProduct = async (productData: any) => {
+    const newProduct = {
+      id: `temp-${Date.now()}`,
+      name: productData.name,
+      description: productData.description,
+      price: productData.price || 0,
+      product_type: productData.product_type,
+    };
+    setProducts((prev) => [...prev, newProduct]);
   };
 
   const handleProductTypeChange = (index: number, newType: ProductType) => {
@@ -900,6 +904,14 @@ export default function CreateBusinessPage() {
           </form>
         </div>
       </div>
+
+      {/* Add Product Modal */}
+      <MultiStepProductCreator
+        isOpen={isAddProductModalOpen}
+        onClose={() => setIsAddProductModalOpen(false)}
+        onSubmit={handleCreateProduct}
+        title="Add Product to Your Business"
+      />
     </section>
   );
 }

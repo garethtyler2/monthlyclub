@@ -803,30 +803,7 @@ export function CustomerList() {
                         </div>
                       </div>
 
-                      {/* Subscription products */}
-                      <div className="mb-4">
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Subscriptions</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {customer.subscriptions.slice(0, 4).map((sub) => (
-                            <Badge
-                              key={sub.id}
-                              className={`text-xs px-3 py-1.5 ${getProductTypeColor(sub.product_type)}`}
-                            >
-                              <span className="font-medium">
-                                {sub.product_name.length > 15 
-                                  ? `${sub.product_name.substring(0, 15)}...` 
-                                  : sub.product_name
-                                }
-                              </span>
-                            </Badge>
-                          ))}
-                          {customer.subscriptions.length > 4 && (
-                            <Badge className="text-xs px-3 py-1.5 bg-gray-500/20 text-gray-400 border-gray-500/30">
-                              +{customer.subscriptions.length - 4} more
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
+
 
                       {/* Key metrics */}
                       <div className="grid grid-cols-2 gap-3 mb-4">
@@ -853,13 +830,6 @@ export function CustomerList() {
                         </div>
                       </div>
 
-                      {/* Last visit info */}
-                      {customer.last_visit && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground ">
-                          <Clock className="w-4 h-4" />
-                          <span>Last visit: {new Date(customer.last_visit).toLocaleDateString()}</span>
-                        </div>
-                      )}
 
                       {/* Expand button */}
                       <div className="flex justify-center pt-2">
