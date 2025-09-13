@@ -128,9 +128,10 @@ export default function MultiStepProductCreator({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="bg-slate-800 border-white/10 sm:max-w-[600px] max-h-[90vh] overflow-y-auto p-4">
-        <DialogHeader className="mb-6">
-          <DialogTitle className="text-white flex items-center gap-3">
+      <DialogContent className="bg-slate-800 border-white/10 w-[95vw] max-w-[600px] h-[90vh] max-h-[90vh] overflow-hidden p-4 flex flex-col">
+        <DialogHeader className="mb-4 flex-shrink-0">
+          <DialogTitle className="text-white flex items-center justify-between">
+            <span className="text-lg font-semibold">Choose Product Type</span>
             <div className="flex items-center gap-2 text-sm text-gray-400">
               <span>Step {currentStep} of 2</span>
               <div className="flex gap-1">
@@ -147,12 +148,11 @@ export default function MultiStepProductCreator({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-8">
+        <div className="flex-1 overflow-y-auto space-y-6">
           {/* Step 1: Product Type Selection */}
           {currentStep === 1 && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="space-y-2">
-                <h3 className="text-lg font-semibold text-white">Choose Product Type</h3>
                 <p className="text-gray-400">Select how customers will pay for this service</p>
               </div>
 
@@ -168,14 +168,14 @@ export default function MultiStepProductCreator({
                       <Card
                         key={type}
                         className={cn(
-                          "cursor-pointer transition-all hover:bg-white/10 border-white/10 hover:border-white/20",
+                          "cursor-pointer transition-all hover:bg-white/10 border-white/10 hover:border-white/20 w-full",
                           isSelected && `ring-4 ${config.color === 'blue' ? 'ring-blue-500 bg-blue-500/20 border-blue-500/30' : 
                                           config.color === 'green' ? 'ring-green-500 bg-green-500/20 border-green-500/30' : 
                                           'ring-purple-500 bg-purple-500/20 border-purple-500/30'}`
                         )}
                         onClick={() => handleProductTypeSelect(type as ProductType)}
                       >
-                        <CardContent className="p-2">
+                        <CardContent className="p-3 w-full">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                               <div className={cn(
@@ -219,12 +219,12 @@ export default function MultiStepProductCreator({
                       <Card
                         key={type}
                         className={cn(
-                          "cursor-pointer transition-all hover:bg-white/10 border-white/10 hover:border-white/20",
-                          isSelected && "ring-2 ring-orange-500 bg-orange-500/20 border-orange-500/30"
+                          "cursor-pointer transition-all hover:bg-white/10 border-white/10 hover:border-white/20 w-full",
+                          isSelected && "ring-4 ring-orange-500 bg-orange-500/20 border-orange-500/30"
                         )}
                         onClick={() => handleProductTypeSelect(type as ProductType)}
                       >
-                        <CardContent className="p-4">
+                        <CardContent className="p-3 w-full">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
                               <div className={cn(
@@ -259,7 +259,7 @@ export default function MultiStepProductCreator({
 
           {/* Step 2: Product Details */}
           {currentStep === 2 && (
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold text-white">Product Details</h3>
                 <p className="text-gray-400">Fill in the details for your product</p>
@@ -341,12 +341,15 @@ export default function MultiStepProductCreator({
             </div>
           )}
 
-          {/* Navigation buttons */}
-          <div className="flex justify-between pt-4 border-t border-white/10">
+        </div>
+
+        {/* Navigation buttons - Fixed at bottom */}
+        <div className="flex-shrink-0 pt-4 border-t border-white/10 mt-4">
+          <div className="flex justify-between">
             <Button
               variant="outline"
               onClick={currentStep === 1 ? handleClose : handleBack}
-              className="border-white/20 text-white hover:bg-white/10"
+              className="border-white/20 text-white hover:bg-white/10 flex-shrink-0"
             >
               {currentStep === 1 ? (
                 "Cancel"
@@ -365,7 +368,7 @@ export default function MultiStepProductCreator({
                   ? !formData.product_type 
                   : !formData.name || !formData.description || (needsPrice && !formData.price)
               }
-              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white flex-shrink-0"
             >
               {currentStep === 1 ? (
                 <>

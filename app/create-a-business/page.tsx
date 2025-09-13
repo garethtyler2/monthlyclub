@@ -502,7 +502,7 @@ export default function CreateBusinessPage() {
   }
 
   if (aiLoading) {
-    return <LoadingOverlay show message="Polishing your business description with AI..." />;
+    return <LoadingOverlay show message="Polishing with AI..." />;
   }
 
   return (
