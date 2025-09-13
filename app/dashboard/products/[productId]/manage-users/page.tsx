@@ -646,7 +646,7 @@ export default function ManageUsersPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => window.location.href = "/dashboard/business"}
+                onClick={() => window.location.href = "/dashboard/products"}
                 className="text-white hover:bg-white/10"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />

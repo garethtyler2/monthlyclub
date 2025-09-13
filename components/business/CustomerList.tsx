@@ -4,42 +4,27 @@ import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { 
   Search, 
   Users, 
   CreditCard, 
   Calendar, 
-  Mail, 
-  Hash, 
-  PoundSterling,
   TrendingUp,
   TrendingDown,
-  User,
-  AlertCircle,
   CheckCircle,
-  XCircle,
-  Plus,
-  Minus,
   ArrowLeft,
-  Filter,
-  Download,
-  RefreshCw,
   MessageCircle,
   Eye,
   Clock,
   DollarSign,
-  Activity,
   Package,
-  Settings,
-  MoreVertical,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useIsMobile } from '@/hooks/use-mobile';
-import Link from 'next/link';
 
 interface Customer {
   id: string;
@@ -134,7 +119,7 @@ const getProductShortName = (name: string, productType: string) => {
   return `${prefix}: ${name.substring(0, 8)}...`;
 };
 
-export default function CustomersPage() {
+export function CustomerList() {
   const [allCustomers, setAllCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -532,7 +517,7 @@ export default function CustomersPage() {
         <div className="fixed top-1/4 right-0 w-96 h-96 bg-brand-purple/30 rounded-full blur-[128px] -z-10" />
         <div className="fixed -bottom-24 left-0 w-96 h-96 bg-brand-blue/20 rounded-full blur-[128px] -z-10" />
         
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto ">
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
           </div>
@@ -548,26 +533,17 @@ export default function CustomersPage() {
       <div className="fixed -bottom-24 left-0 w-96 h-96 bg-brand-blue/20 rounded-full blur-[128px] -z-10" />
       
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-white/10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => window.location.href = "/dashboard/business"}
-              className="text-white hover:bg-white/10"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
+
             <div className="hidden sm:block w-px h-6 bg-white/20" />
-            <h1 className="text-lg font-semibold text-white">Customer Management</h1>
+            <h1 className="text-2xl font-semibold text-white">Customer Management</h1>
           </div>
         </div>
-      </div>
+
 
       {/* Search and Filters */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto">
         <div className="space-y-4 mb-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />

@@ -8,9 +8,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BusinessOwnerView } from "@/components/dashboard/BusinessOwnerView";
-import BusinessProductManager from "@/components/dashboard/BusinessProductManager";
 import { ShareButton } from "@/components/shared/ShareButton";
 import Link from "next/link";
+import { CustomerList } from "@/components/business/CustomerList";
 
 export default function BusinessDashboardPage() {
   const [user, setUser] = useState<any>(null);
@@ -119,14 +119,6 @@ export default function BusinessDashboardPage() {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-2 w-full sm:w-auto">
               {businessSlug && (
                 <>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => window.open(`/businesses/${businessSlug}`, '_blank')}
-                    className="w-full sm:w-auto"
-                  >
-                    View Business Page
-                  </Button>
                   <ShareButton
                     url={`${window.location.origin}/businesses/${businessSlug}`}
                     variant="outline"
@@ -174,6 +166,38 @@ export default function BusinessDashboardPage() {
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-white mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+          <Link href="/dashboard/products">
+              <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200 cursor-pointer">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-500/20 rounded-lg">
+                      <Users className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white">Manage Products</h3>
+                      <p className="text-sm text-gray-400">Edit or add new products</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+            <Link href={`/businesses/${businessSlug}`}>
+              <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200 cursor-pointer">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-purple-500/20 rounded-lg">
+                      <Users className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white">Business Page</h3>
+                      <p className="text-sm text-gray-400">View and edit your business page</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
             <Link href="/dashboard/tax-reports">
               <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
                 <CardContent className="p-4">
@@ -204,21 +228,6 @@ export default function BusinessDashboardPage() {
               </CardContent>
             </Card>
             
-            <Link href="/dashboard/customers">
-              <Card className="border-white/10 bg-white/5 hover:bg-white/10 transition-all duration-200 cursor-pointer">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-500/20 rounded-lg">
-                      <Users className="w-5 h-5 text-purple-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-white">Customers</h3>
-                      <p className="text-sm text-gray-400">Manage your customer base and subscriptions</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
           </div>
         </div>
 
@@ -233,11 +242,7 @@ export default function BusinessDashboardPage() {
           <BusinessOwnerView businessId={businessId!} />
         </div>
 
-        {/* Products Section */}
-        <div className="mb-8">
-          
-          <BusinessProductManager businessId={businessId!} />
-        </div>
+        <CustomerList />
 
       </div>
     </div>
