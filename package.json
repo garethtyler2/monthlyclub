@@ -15,7 +15,8 @@
     "test-handles": "npx tsx scripts/test-handle-generation.ts",
     "check-tables": "npx tsx scripts/check-database-tables.ts",
     "check-payments": "npx tsx scripts/check-payments.ts",
-    "fix-stuck-businesses": "npx tsx scripts/fix-stuck-businesses.ts"
+    "fix-stuck-businesses": "npx tsx scripts/fix-stuck-businesses.ts",
+    "fix-missing-profiles": "npx tsx scripts/fix-missing-profiles.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

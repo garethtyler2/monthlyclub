@@ -49,6 +49,30 @@ const Navbar = () => {
       setLoading(false);
 
       if (user) {
+        // Ensure user profile exists (for social logins that might not have one)
+        const { data: existingProfile } = await supabase
+          .from('user_profiles')
+          .select('id')
+          .eq('id', user.id)
+          .single();
+        
+        if (!existingProfile) {
+          console.log('Creating missing user profile for:', user.email);
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: user.id,
+              email: user.email,
+              created_at: user.created_at
+            });
+          
+          if (profileError) {
+            console.error('Failed to create user profile:', profileError);
+          } else {
+            console.log('Successfully created user profile for:', user.email);
+          }
+        }
+
         const { data: businessData, error } = await supabase
           .from("businesses")
           .select("id, slug, name, image_url, status")
@@ -92,6 +116,39 @@ const Navbar = () => {
     };
 
     getUser();
+
+    // Listen for auth state changes to handle social logins
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        // Ensure user profile exists for new sign-ins
+        const { data: existingProfile } = await supabase
+          .from('user_profiles')
+          .select('id')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (!existingProfile) {
+          console.log('Creating missing user profile for new sign-in:', session.user.email);
+          const { error: profileError } = await supabase
+            .from('user_profiles')
+            .insert({
+              id: session.user.id,
+              email: session.user.email,
+              created_at: session.user.created_at
+            });
+          
+          if (profileError) {
+            console.error('Failed to create user profile for new sign-in:', profileError);
+          } else {
+            console.log('Successfully created user profile for new sign-in:', session.user.email);
+          }
+        }
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleLogout = async () => {

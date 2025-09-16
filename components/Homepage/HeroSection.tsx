@@ -107,28 +107,12 @@ const Hero = () => {
             <span className="text-white font-medium"> No coding required.</span>
           </p>
 
-          {/* Social Proof Stats */}
-          <div
-            className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12 animate-fade-in"
-            style={{ animationDelay: "700ms" }}
-          >
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white">500+</div>
-              <div className="text-sm text-muted-foreground">Active Businesses</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white">£2M+</div>
-              <div className="text-sm text-muted-foreground">Revenue Generated</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white">5 min</div>
-              <div className="text-sm text-muted-foreground">Average Setup</div>
-            </div>
-          </div>
+
+
 
           {/* Feature Highlights */}
           <div
-            className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 w-full max-w-5xl animate-fade-in"
+            className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-5xl animate-fade-in"
             style={{ animationDelay: "800ms" }}
           >
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all duration-300">
