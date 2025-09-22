@@ -23,7 +23,6 @@ import {
   ImageIcon
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
 
 const HowItWorks = () => {
   const [isPlaying, setIsPlaying] = useState(false);
