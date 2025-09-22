@@ -51,6 +51,8 @@ const Hero = () => {
 
       if (user) {
         setCtaHref("/create-a-business");
+      } else {
+        setCtaHref("/login?redirect=/create-a-business");
       }
     };
 

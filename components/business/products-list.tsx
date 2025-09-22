@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Product, isCustomerAmountType } from "@/types/products";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Product interface is now imported from types/products.ts
 
@@ -43,10 +44,9 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
 
   const router = useRouter();
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const handleSelect = async (productId: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-
     if (!user) {
       router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
       return;
@@ -56,6 +56,11 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
   };
 
   const handleContinue = async (productId: string) => {
+    if (!user) {
+      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      return;
+    }
+
     setIsLoading(true);
     try {
       const selectedProduct = products.find(p => p.id === productId);
@@ -203,12 +208,7 @@ export default function ProductsList({ products, userSubscriptions, isOwner = fa
                     </div>
                   </div>
                   
-                  {alreadySubscribed && (
-                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      Subscribed
-                    </Badge>
-                  )}
+                  
                 </div>
 
                 {/* Product Description */}

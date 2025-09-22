@@ -56,13 +56,6 @@ export default async function BusinessPage(
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Fetch active subscriptions for logged-in user
-  const { data: subscriptions } = await supabase
-    .from("subscriptions")
-    .select("product_id")
-    .eq("user_id", user?.id)
-    .eq("status", "active");
-
   // Extract current user ID and check if the user is the owner
   const currentUserId = user?.id;
   const isOwner = business?.user_id === currentUserId;
@@ -126,7 +119,7 @@ export default async function BusinessPage(
         {products && products.length > 0 && (
           <>
             {console.log("Fetched products:", products)}
-            <ProductsListWrapper products={products} userSubscriptions={subscriptions ?? []} isOwner={isOwner} />
+            <ProductsListWrapper products={products} isOwner={isOwner} />
           </>
         )}
 

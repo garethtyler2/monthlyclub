@@ -36,7 +36,9 @@ export default function LoginPageContent() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('🔍 Login Page Auth State Change:', event, session?.user?.email || 'No user');
       if (event === 'SIGNED_IN' && session) {
+        console.log('🔍 Login Page redirecting to:', redirectTo);
         router.push(redirectTo);
       }
     });
@@ -124,13 +126,17 @@ export default function LoginPageContent() {
   };
 
   const handleOAuthSignIn = async (provider: "google" | "facebook") => {
+    console.log('🔍 OAuth Sign In started:', provider, 'redirectTo:', redirectUrl);
     setStatusMessage(null);
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: { redirectTo: redirectUrl },
     });
     if (error) {
+      console.log('🔍 OAuth Sign In error:', error);
       setStatusMessage(error.message);
+    } else {
+      console.log('🔍 OAuth Sign In initiated successfully');
     }
   };
 

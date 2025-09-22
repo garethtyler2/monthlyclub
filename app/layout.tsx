@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { getServerAuth } from "@/lib/auth-server"
+import { AuthProvider } from "@/contexts/AuthContext"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,11 +50,14 @@ export const metadata: Metadata = {
     },
   }
 };
-export default function RootLayout({
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const serverAuth = await getServerAuth();
+  
   return (
     <html lang="en">
       <head>
@@ -61,12 +66,14 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://qnecyousolguftvceaao.supabase.co" />
       </head> 
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased pt-20 bg-background text-foreground min-h-screen`}>
-        <Navbar />
-        <main className="">{children}</main>
-        <Analytics />
-        <SpeedInsights />
-        <Footer />
-        <Toaster />
+        <AuthProvider serverAuth={serverAuth}>
+          <Navbar />
+          <main className="">{children}</main>
+          <Analytics />
+          <SpeedInsights />
+          <Footer />
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );

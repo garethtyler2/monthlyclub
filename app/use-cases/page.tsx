@@ -242,7 +242,7 @@ export default function UseCasesPage() {
         
 
         {/* CTA Section */}
-        <section className="py-16 md:py-24 bg-gradient-to-r from-brand-purple to-brand-blue">
+        <section className="py-16 md:py-24 bg-gradient-to-r from-brand-green to-brand-blue">
           <div className="container mx-auto px-6 max-w-4xl text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Ready to Build Your Subscription Business?
@@ -253,7 +253,7 @@ export default function UseCasesPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="hero-button-primary">
                 <Link href="/create-a-business">
-                  Start Your Free Trial
+                  Start Your Business Now!
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>

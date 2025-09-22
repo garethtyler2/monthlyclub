@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import LottieLoadingGradient from "@/components/LottieLoadingGradient";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase/client";
 import { 
   Lightbulb, 
   Sparkles, 
@@ -26,6 +28,23 @@ import { useState } from "react";
 const HowItWorks = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [ctaHref, setCtaHref] = useState("/login");
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        setCtaHref("/create-a-business");
+      } else {
+        setCtaHref("/login?redirect=/create-a-business");
+      }
+    };
+
+    checkUser();
+  }, []);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     businessName: '',
@@ -445,7 +464,7 @@ const HowItWorks = () => {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="hero-button-primary">
-                <Link href="/create-a-business">
+                <Link href={ctaHref}>
                   Get Started Today
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>

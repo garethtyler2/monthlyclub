@@ -16,23 +16,28 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CreatePostModal from "@/components/business/CreatePostModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [hasBusiness, setHasBusiness] = useState(false);
-  const [hasSubscriptions, setHasSubscriptions] = useState(false);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
-  const [businessId, setBusinessId] = useState<string | null>(null);
-  const [businessSlug, setBusinessSlug] = useState<string | null>(null);
-  const [businessName, setBusinessName] = useState<string | null>(null);
-  const [businessImageUrl, setBusinessImageUrl] = useState<string | null>(null);
-  const [businessStatus, setBusinessStatus] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
-  const [isAdmin, setIsAdmin] = useState(false);
+  
+  // Get auth state from context
+  const {
+    user,
+    loading,
+    hasBusiness,
+    hasSubscriptions,
+    businessId,
+    businessSlug,
+    businessName,
+    businessImageUrl,
+    businessStatus,
+    isAdmin,
+    unreadMessageCount
+  } = useAuth();
   
   // Create Post Modal
   const [showCreatePost, setShowCreatePost] = useState(false);
@@ -40,120 +45,10 @@ const Navbar = () => {
   useEffect(() => {
     // Detect touch device
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
-    
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
-
-      if (user) {
-        // Ensure user profile exists (for social logins that might not have one)
-        const { data: existingProfile } = await supabase
-          .from('user_profiles')
-          .select('id')
-          .eq('id', user.id)
-          .single();
-        
-        if (!existingProfile) {
-          console.log('Creating missing user profile for:', user.email);
-          const { error: profileError } = await supabase
-            .from('user_profiles')
-            .insert({
-              id: user.id,
-              email: user.email,
-              created_at: user.created_at
-            });
-          
-          if (profileError) {
-            console.error('Failed to create user profile:', profileError);
-          } else {
-            console.log('Successfully created user profile for:', user.email);
-          }
-        }
-
-        const { data: businessData, error } = await supabase
-          .from("businesses")
-          .select("id, slug, name, image_url, status")
-          .eq("user_id", user.id)
-          .maybeSingle();
-
-        if (businessData) {
-          setHasBusiness(true);
-        }
-        setBusinessId(businessData?.id ?? null);
-        setBusinessSlug(businessData?.slug ?? null);
-        setBusinessName(businessData?.name ?? null);
-        setBusinessImageUrl(businessData?.image_url ?? null);
-        setBusinessStatus(businessData?.status ?? null);
-
-        // Check for subscriptions
-        const { data: subData } = await supabase
-          .from("subscriptions")
-          .select("id")
-          .eq("user_id", user.id);
-        if (subData && subData.length > 0) {
-          setHasSubscriptions(true);
-        }
-
-        // Check if user is admin
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        // Check if user has admin privileges
-        const adminEmails = ['gareth@monthlyclubhq.com']; // Add your admin emails
-        const adminHandles = ['admin', 'gareth']; // Add your admin handles
-        
-        const isAdminUser = adminEmails.includes(user.email || '') || 
-                           adminHandles.includes(profile?.handle || '');
-        
-        setIsAdmin(isAdminUser);
-      }
-    };
-
-    getUser();
-
-    // Listen for auth state changes to handle social logins
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        // Ensure user profile exists for new sign-ins
-        const { data: existingProfile } = await supabase
-          .from('user_profiles')
-          .select('id')
-          .eq('id', session.user.id)
-          .single();
-        
-        if (!existingProfile) {
-          console.log('Creating missing user profile for new sign-in:', session.user.email);
-          const { error: profileError } = await supabase
-            .from('user_profiles')
-            .insert({
-              id: session.user.id,
-              email: session.user.email,
-              created_at: session.user.created_at
-            });
-          
-          if (profileError) {
-            console.error('Failed to create user profile for new sign-in:', profileError);
-          } else {
-            console.log('Successfully created user profile for new sign-in:', session.user.email);
-          }
-        }
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
   }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setUser(null);
     setIsMenuOpen(false);
     window.location.href = "/";
   };
@@ -181,43 +76,6 @@ const Navbar = () => {
 
   const closeMenu = () => setIsMenuOpen(false);
 
-  // Fetch unread message count
-  const fetchUnreadMessageCount = useCallback(async () => {
-    if (!user) return;
-    
-    try {
-      const response = await fetch('/api/messaging/conversations');
-      if (response.ok) {
-        const data = await response.json();
-        const totalUnread = data.conversations.reduce((sum: number, conv: any) => sum + (conv.unread_count || 0), 0);
-        setUnreadMessageCount(totalUnread);
-      }
-    } catch (error) {
-      console.error('Error fetching unread message count:', error);
-    }
-  }, [user]);
-
-  // Fetch unread message count when user changes
-  useEffect(() => {
-    if (user) {
-      fetchUnreadMessageCount();
-      // Set up interval to refresh unread count every 30 seconds
-      const interval = setInterval(fetchUnreadMessageCount, 30000);
-      
-      // Listen for messages being read
-      const handleMessagesRead = () => {
-        fetchUnreadMessageCount();
-      };
-      window.addEventListener('messagesRead', handleMessagesRead);
-      
-      return () => {
-        clearInterval(interval);
-        window.removeEventListener('messagesRead', handleMessagesRead);
-      };
-    } else {
-      setUnreadMessageCount(0);
-    }
-  }, [user, fetchUnreadMessageCount]);
 
   // Prevent body scrolling when menu is open
   useEffect(() => {

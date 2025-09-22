@@ -3,6 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, ArrowRight, DollarSign, CreditCard, Zap } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase/client";
 
 const pricingFeatures = [
   "No monthly fees",
@@ -14,6 +16,24 @@ const pricingFeatures = [
 ];
 
 const PricingPreview = () => {
+  const [ctaHref, setCtaHref] = useState("/login");
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        setCtaHref("/create-a-business");
+      } else {
+        setCtaHref("/login?redirect=/create-a-business");
+      }
+    };
+
+    checkUser();
+  }, []);
+
   return (
     <section className="py-16 md:py-24 relative overflow-hidden">
       {/* Gradient background effects */}
@@ -54,7 +74,7 @@ const PricingPreview = () => {
                   ))}
                 </ul>
                 <Link
-                  href="/create-a-business"
+                  href={ctaHref}
                   className="w-full bg-gradient-to-r from-brand-purple to-brand-blue text-white font-semibold py-3 px-6 rounded-lg hover:opacity-90 transition-all duration-200 flex items-center justify-center space-x-2"
                 >
                   <span>Get Started Free</span>
