@@ -205,19 +205,7 @@ export default function LoginPageContent() {
               </button>
             </div>
           </div>
-        <p className="mt-4 text-xs text-gray-500">
-          Supabase ID: <strong className="text-gray-600">qnecyousolguftvceaao</strong>
-        </p>
-        <p className="text-xs text-gray-500">
-          <button className="underline text-xs" onClick={toggleAccordion}>
-            What's that?
-          </button>
-        </p>
-        {isAccordionOpen && (
-          <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded border border-gray-200">
-            To help build trust, we show our App ID here so you can confirm it matches the one shown in Google's login screen. This ensures you're signing in securely through our app.
-          </div>
-        )}
+
           {!showEmailForm ? (
             <button
               onClick={() => setShowEmailForm(true)}
