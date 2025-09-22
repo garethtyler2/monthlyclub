@@ -1,15 +1,20 @@
 "use client";
 
 import { supabase } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export default function LogoutButton() {
-  const router = useRouter();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
+    try {
+      await supabase.auth.signOut();
+      // Use window.location for reliable redirect after logout
+      window.location.href = "/";
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Force redirect even if logout fails
+      window.location.href = "/login";
+    }
   };
 
   return (
