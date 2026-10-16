@@ -176,7 +176,7 @@ const Hero = () => {
               className="px-6 sm:px-8 py-4 bg-gradient-to-r from-brand-purple to-brand-blue text-white font-semibold rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2 text-sm sm:text-base relative group"
             >
               <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="whitespace-nowrap">Start Your Subscription Business</span>
+              <span className="whitespace-nowrap">Google ME!!</span>
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               <div className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
                 FREE

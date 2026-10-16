@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
   try {
     const response = await openai.responses.create({
-      model: "gpt-4o-mini",
+      model: "gpt-6-luna",
       input: [
         {
           role: "system",
